@@ -380,6 +380,11 @@ class RegisterParcel extends Component {
                       )}
                     </View>
                   </TouchableOpacity>
+                  <View style={styles.col}>
+                     <Input
+                     placeholder='ParcelPrice'
+                      keyboardType="numeric"/>
+                  </View>
                 </KeyboardAwareScrollView>
               </View>
         );
