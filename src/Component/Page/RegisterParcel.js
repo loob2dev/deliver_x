@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Picker } from 'react-native';
-import { Header, CheckBox, Input } from 'react-native-elements';
+import { Header, CheckBox, Input, Divider  } from 'react-native-elements';
 import { Left, Right, Icon } from 'native-base';
 import colors from '../../config/colors';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -175,6 +175,7 @@ class RegisterParcel extends Component {
                         </TouchableOpacity>
                     </View>
                   </View>
+                  <Divider style={{ backgroundColor: '#000' }} />
                   <View style={styles.borderContainer}>                
                     <Text style={styles.subTitle}>
                         Parcel #1
@@ -302,7 +303,27 @@ class RegisterParcel extends Component {
                             <Text style={styles.lable_button}>Save address</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={{margin: 20}}>
+                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                      <Picker
+                          selectedValue={this.state.country}
+                          style={{height: 50, width: 100, margin: 10}}>
+                          <Picker.Item label="Czech" value="Czech" />
+                          <Picker.Item label="Slovak" value="Slovak" />
+                      </Picker>
+                      <Picker
+                          selectedValue={this.state.parcel_type}
+                          style={{height: 50, width: 100, margin: 10}}>
+                          <Picker.Item label="Large" value="Large" />
+                          <Picker.Item label="Normal" value="Normal" />
+                      </Picker>
+                      <Picker
+                          selectedValue={this.state.currency}
+                          style={{height: 50, width: 100, margin: 10}}>
+                          <Picker.Item label="CZK" value="CZK" />
+                          <Picker.Item label="EUR" value="EUR" />
+                      </Picker>
+                    </View>
+                    <View style={{marginLeft: 20, marginRight: 20, marginTop: 120}}>
                         <CheckBox
                           title='Insurance'
                           checked={this.state.insurance}
@@ -322,13 +343,6 @@ const styles = StyleSheet.create({
     },
     borderContainer: {
         paddingBottom: 30,
-        borderColor: '#000',
-        borderRadius: 5,
-        borderLeftWidth: 0,
-        borderRightWidth: 0,
-        borderTopWidth: 0,
-        borderBottomWidth: 1,
-        borderStyle: 'solid'
     },
     row: {
         flexDirection: 'row',
