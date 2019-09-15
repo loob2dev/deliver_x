@@ -370,7 +370,7 @@ class RegisterParcel extends Component {
                         />
                     </View>
                   </View>
-                  <TouchableOpacity onPress={this.selectPhotoTapped.bind(this)} style={{flex: 1, justifyContent: 'center'}>
+                  <TouchableOpacity onPress={this.selectPhotoTapped.bind(this)} style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                     <View
                       style={[styles.avatar, styles.avatarContainer, {marginBottom: 20}]}>
                       {this.state.avatarSource === null ? (
