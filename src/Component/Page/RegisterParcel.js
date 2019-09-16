@@ -36,6 +36,8 @@ class RegisterParcel extends Component {
             latitude: LATITUDE - SPACE,
             longitude: LONGITUDE - SPACE,
           },
+          isShowSenderMap: false,
+          isShowParcelMap: false
         }
         this.selectPhotoTapped = this.selectPhotoTapped.bind(this);
       }
@@ -80,8 +82,12 @@ class RegisterParcel extends Component {
     }
 
 
-    showMap = () => {
-        Alert.alert("Alert", "Button pressed ");
+    showSenderMap = () => {
+        this.setState({isShowSenderMap: !this.state.isShowSenderMap})
+      }
+
+    showParcelMap = () => {
+        this.setState({isShowParcelMap: !this.state.isShowParcelMap})
       }
 
     render () {
@@ -114,8 +120,15 @@ class RegisterParcel extends Component {
                     </Text>
                     <View style={styles.row}>
                       <View style={styles.col}>                  
-                        <TouchableOpacity style={[styles.buttonContainer, styles.mapButton]} onPress={() => this.showMap()}>
-                          <Text style={styles.lable_button}>Show map</Text>
+                        <TouchableOpacity style={[styles.buttonContainer, this.state.isShowSenderMap ? styles.mapButton_hide : styles.mapButton_show]} onPress={() => this.showSenderMap()}>
+                          {
+                            this.state.isShowSenderMap &&
+                            <Text style={styles.lable_button}>Hide map</Text>
+                          }
+                          {
+                            !this.state.isShowSenderMap &&
+                            <Text style={styles.lable_button}>Show map</Text>
+                          }
                         </TouchableOpacity>
                       </View>
                       <View style={styles.col}>
@@ -124,38 +137,31 @@ class RegisterParcel extends Component {
                         </TouchableOpacity>
                       </View>
                     </View>
-                    <Card containerStyle={{padding: 0}}>
-                      <MapView
-                        provider={this.props.provider}
-                        style={styles.map}
-                        initialRegion={{
-                          latitude: LATITUDE,
-                          longitude: LONGITUDE,
-                          latitudeDelta: LATITUDE_DELTA,
-                          longitudeDelta: LONGITUDE_DELTA,
-                        }}
-                      >
-                        <Marker
-                          coordinate={this.state.a}
-                          onSelect={e => log('onSelect', e)}
-                          onDrag={e => log('onDrag', e)}
-                          onDragStart={e => log('onDragStart', e)}
-                          onDragEnd={e => log('onDragEnd', e)}
-                          onPress={e => log('onPress', e)}
-                          draggable
+                    {
+                      this.state.isShowSenderMap &&
+                      <Card containerStyle={{padding: 0}}>
+                        <MapView
+                          provider={this.props.provider}
+                          style={styles.map}
+                          initialRegion={{
+                            latitude: LATITUDE,
+                            longitude: LONGITUDE,
+                            latitudeDelta: LATITUDE_DELTA,
+                            longitudeDelta: LONGITUDE_DELTA,
+                          }}
                         >
-                        </Marker>
-                        <Marker
-                          coordinate={this.state.b}
-                          onSelect={e => log('onSelect', e)}
-                          onDrag={e => log('onDrag', e)}
-                          onDragStart={e => log('onDragStart', e)}
-                          onDragEnd={e => log('onDragEnd', e)}
-                          onPress={e => log('onPress', e)}
-                          draggable
-                        />
-                      </MapView>
-                      </Card>
+                          <Marker
+                            coordinate={this.state.b}
+                            onSelect={e => log('onSelect', e)}
+                            onDrag={e => log('onDrag', e)}
+                            onDragStart={e => log('onDragStart', e)}
+                            onDragEnd={e => log('onDragEnd', e)}
+                            onPress={e => log('onPress', e)}
+                            draggable
+                          />
+                        </MapView>
+                        </Card>
+                      }
                     <View style={styles.row}>
                       <View style={styles.col}>                  
                         <Input
@@ -275,8 +281,15 @@ class RegisterParcel extends Component {
                     </Text>
                     <View style={styles.row}>
                       <View style={styles.col}>                  
-                        <TouchableOpacity style={[styles.buttonContainer, styles.mapButton]} onPress={() => this.showMap()}>
-                          <Text style={styles.lable_button}>Show map</Text>
+                        <TouchableOpacity style={[styles.buttonContainer, this.state.isShowParcelMap ? styles.mapButton_hide : styles.mapButton_show]} onPress={() => this.showParcelMap()}>
+                          {
+                            this.state.isShowParcelMap &&
+                            <Text style={styles.lable_button}>Hide map</Text>
+                          }
+                          {
+                            !this.state.isShowParcelMap &&
+                            <Text style={styles.lable_button}>Show map</Text>
+                          }
                         </TouchableOpacity>
                       </View>
                       <View style={styles.col}>
@@ -285,36 +298,31 @@ class RegisterParcel extends Component {
                         </TouchableOpacity>
                       </View>
                     </View>
-                    <MapView
-                      provider={this.props.provider}
-                      style={styles.map}
-                      initialRegion={{
-                        latitude: LATITUDE,
-                        longitude: LONGITUDE,
-                        latitudeDelta: LATITUDE_DELTA,
-                        longitudeDelta: LONGITUDE_DELTA,
-                      }}
-                    >
-                      <Marker
-                        coordinate={this.state.a}
-                        onSelect={e => log('onSelect', e)}
-                        onDrag={e => log('onDrag', e)}
-                        onDragStart={e => log('onDragStart', e)}
-                        onDragEnd={e => log('onDragEnd', e)}
-                        onPress={e => log('onPress', e)}
-                        draggable
-                      >
-                      </Marker>
-                      <Marker
-                        coordinate={this.state.b}
-                        onSelect={e => log('onSelect', e)}
-                        onDrag={e => log('onDrag', e)}
-                        onDragStart={e => log('onDragStart', e)}
-                        onDragEnd={e => log('onDragEnd', e)}
-                        onPress={e => log('onPress', e)}
-                        draggable
-                      />
-                    </MapView>
+                    {
+                      this.state.isShowParcelMap &&
+                      <Card containerStyle={{padding: 0}}>
+                        <MapView
+                          provider={this.props.provider}
+                          style={styles.map}
+                          initialRegion={{
+                            latitude: LATITUDE,
+                            longitude: LONGITUDE,
+                            latitudeDelta: LATITUDE_DELTA,
+                            longitudeDelta: LONGITUDE_DELTA,
+                          }}
+                        >
+                          <Marker
+                            coordinate={this.state.b}
+                            onSelect={e => log('onSelect', e)}
+                            onDrag={e => log('onDrag', e)}
+                            onDragStart={e => log('onDragStart', e)}
+                            onDragEnd={e => log('onDragEnd', e)}
+                            onPress={e => log('onPress', e)}
+                            draggable
+                          />
+                        </MapView>
+                        </Card>
+                      }
                     <View style={styles.row}>
                       <View style={styles.col}>                  
                         <Input
@@ -535,7 +543,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderRadius:5,
       },
-      mapButton: {
+      mapButton_show: {
+        backgroundColor: "#007bff",
+      },
+      mapButton_hide: {
         backgroundColor: "#6c757d",
       },
       addressButton: {
