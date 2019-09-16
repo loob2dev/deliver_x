@@ -1,11 +1,25 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Picker, Image, PixelRatio } from 'react-native';
-import { Header, CheckBox, Input, Divider  } from 'react-native-elements';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Picker, Image, PixelRatio, Dimensions  } from 'react-native';
+import { Header, CheckBox, Input, Divider, Card } from 'react-native-elements';
 import { Left, Right, Icon } from 'native-base';
 import colors from '../../config/colors';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker'
+import MapView, { Marker, ProviderPropType } from 'react-native-maps';
+
+const { width, height } = Dimensions.get('window');
+
+const ASPECT_RATIO = width / height;
+const LATITUDE = 37.78825;
+const LONGITUDE = -122.4324;
+const LATITUDE_DELTA = 0.0922;
+const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+const SPACE = 0.01;
+
+function log(eventName, e) {
+  console.log(eventName, e.nativeEvent);
+}
 
 
 class RegisterParcel extends Component {
@@ -13,7 +27,15 @@ class RegisterParcel extends Component {
         super(props)
         this.state = {
           date:"2016-05-15",
-          avatarSource: null
+          avatarSource: null,
+          a: {
+            latitude: LATITUDE + SPACE,
+            longitude: LONGITUDE + SPACE,
+          },
+          b: {
+            latitude: LATITUDE - SPACE,
+            longitude: LONGITUDE - SPACE,
+          },
         }
         this.selectPhotoTapped = this.selectPhotoTapped.bind(this);
       }
@@ -102,6 +124,38 @@ class RegisterParcel extends Component {
                         </TouchableOpacity>
                       </View>
                     </View>
+                    <Card containerStyle={{padding: 0}}>
+                      <MapView
+                        provider={this.props.provider}
+                        style={styles.map}
+                        initialRegion={{
+                          latitude: LATITUDE,
+                          longitude: LONGITUDE,
+                          latitudeDelta: LATITUDE_DELTA,
+                          longitudeDelta: LONGITUDE_DELTA,
+                        }}
+                      >
+                        <Marker
+                          coordinate={this.state.a}
+                          onSelect={e => log('onSelect', e)}
+                          onDrag={e => log('onDrag', e)}
+                          onDragStart={e => log('onDragStart', e)}
+                          onDragEnd={e => log('onDragEnd', e)}
+                          onPress={e => log('onPress', e)}
+                          draggable
+                        >
+                        </Marker>
+                        <Marker
+                          coordinate={this.state.b}
+                          onSelect={e => log('onSelect', e)}
+                          onDrag={e => log('onDrag', e)}
+                          onDragStart={e => log('onDragStart', e)}
+                          onDragEnd={e => log('onDragEnd', e)}
+                          onPress={e => log('onPress', e)}
+                          draggable
+                        />
+                      </MapView>
+                      </Card>
                     <View style={styles.row}>
                       <View style={styles.col}>                  
                         <Input
@@ -231,6 +285,36 @@ class RegisterParcel extends Component {
                         </TouchableOpacity>
                       </View>
                     </View>
+                    <MapView
+                      provider={this.props.provider}
+                      style={styles.map}
+                      initialRegion={{
+                        latitude: LATITUDE,
+                        longitude: LONGITUDE,
+                        latitudeDelta: LATITUDE_DELTA,
+                        longitudeDelta: LONGITUDE_DELTA,
+                      }}
+                    >
+                      <Marker
+                        coordinate={this.state.a}
+                        onSelect={e => log('onSelect', e)}
+                        onDrag={e => log('onDrag', e)}
+                        onDragStart={e => log('onDragStart', e)}
+                        onDragEnd={e => log('onDragEnd', e)}
+                        onPress={e => log('onPress', e)}
+                        draggable
+                      >
+                      </Marker>
+                      <Marker
+                        coordinate={this.state.b}
+                        onSelect={e => log('onSelect', e)}
+                        onDrag={e => log('onDrag', e)}
+                        onDragStart={e => log('onDragStart', e)}
+                        onDragEnd={e => log('onDragEnd', e)}
+                        onPress={e => log('onPress', e)}
+                        draggable
+                      />
+                    </MapView>
                     <View style={styles.row}>
                       <View style={styles.col}>                  
                         <Input
@@ -391,9 +475,16 @@ class RegisterParcel extends Component {
     }
 }
 
+RegisterParcel.propTypes = {
+  provider: ProviderPropType,
+};
+
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+    },
+    map: {
+      height: 300,
     },
     borderContainer: {
         paddingBottom: 30,
