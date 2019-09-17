@@ -2,11 +2,12 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Picker, Image, PixelRatio, Dimensions  } from 'react-native';
 import { Header, CheckBox, Input, Divider, Card } from 'react-native-elements';
 import { Left, Right, Icon } from 'native-base';
-import colors from '../../config/colors';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker'
 import MapView, { Marker, ProviderPropType } from 'react-native-maps';
+import colors from '../../config/colors';
+import key from '../../config/api_keys';
 
 const { width, height } = Dimensions.get('window');
 
@@ -28,13 +29,9 @@ class RegisterParcel extends Component {
         this.state = {
           date:"2016-05-15",
           avatarSource: null,
-          a: {
+          coords: {
             latitude: LATITUDE + SPACE,
             longitude: LONGITUDE + SPACE,
-          },
-          b: {
-            latitude: LATITUDE - SPACE,
-            longitude: LONGITUDE - SPACE,
           },
           isShowSenderMap: false,
           isShowParcelMap: false
@@ -42,14 +39,14 @@ class RegisterParcel extends Component {
         this.selectPhotoTapped = this.selectPhotoTapped.bind(this);
       }
 
-       selectPhotoTapped() {
-    const options = {
-      quality: 1.0,
-      maxWidth: 500,
-      maxHeight: 500,
-      storageOptions: {
-        skipBackup: true,
-      },
+    selectPhotoTapped() {
+      const options = {
+        quality: 1.0,
+        maxWidth: 500,
+        maxHeight: 500,
+        storageOptions: {
+          skipBackup: true,
+        },
     };
 
     ImagePicker.showImagePicker(options, response => {
@@ -151,7 +148,7 @@ class RegisterParcel extends Component {
                           }}
                         >
                           <Marker
-                            coordinate={this.state.b}
+                            coordinate={this.state.coords}
                             onSelect={e => log('onSelect', e)}
                             onDrag={e => log('onDrag', e)}
                             onDragStart={e => log('onDragStart', e)}
@@ -312,7 +309,7 @@ class RegisterParcel extends Component {
                           }}
                         >
                           <Marker
-                            coordinate={this.state.b}
+                            coordinate={this.state.coords}
                             onSelect={e => log('onSelect', e)}
                             onDrag={e => log('onDrag', e)}
                             onDragStart={e => log('onDragStart', e)}
