@@ -1,43 +1,342 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, Picker, Image, PixelRatio, Dimensions  } from 'react-native';
+import { 
+  View, 
+  Text,
+  StyleSheet, 
+  TouchableOpacity, 
+  Alert, 
+  Picker, 
+  Image, 
+  PixelRatio, 
+  Dimensions,
+  Button,
+  PermissionsAndroid,
+  Platform,
+  ToastAndroid
+} from 'react-native';
 import { Header, CheckBox, Input, Divider, Card } from 'react-native-elements';
 import { Left, Right, Icon } from 'native-base';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import DatePicker from 'react-native-datepicker'
 import ImagePicker from 'react-native-image-picker'
 import MapView, { Marker, ProviderPropType } from 'react-native-maps';
+import Geolocation from 'react-native-geolocation-service';
+import RNGeocoder from 'react-native-geocoder';
+import Geocoder from 'react-native-geocoding';
+import publicIP from 'react-native-public-ip';
 import colors from '../../config/colors';
 import key from '../../config/api_keys';
+import api from '../../config/api';
 
 const { width, height } = Dimensions.get('window');
 
 const ASPECT_RATIO = width / height;
-const LATITUDE = 37.78825;
-const LONGITUDE = -122.4324;
-const LATITUDE_DELTA = 0.0922;
+const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const SPACE = 0.01;
 
-function log(eventName, e) {
-  console.log(eventName, e.nativeEvent);
-}
-
 
 class RegisterParcel extends Component {
+    watchId = null;
+
     constructor(props){
         super(props)
         this.state = {
           date:"2016-05-15",
           avatarSource: null,
-          coords: {
-            latitude: LATITUDE + SPACE,
-            longitude: LONGITUDE + SPACE,
+          sender_coords: {
+            latitude: 37.78825 + SPACE,
+            longitude: -122.4324 + SPACE,
+            LATITUDE: 37.78825,
+            LONGITUDE: -122.4324
+          },
+          parcel_coords: {
+            latitude: 37.78825 + SPACE,
+            longitude: -122.4324 + SPACE,
+            LATITUDE: 37.78825,
+            LONGITUDE: -122.4324
           },
           isShowSenderMap: false,
-          isShowParcelMap: false
+          isShowParcelMap: false,
+          loading: false,
+          updatesEnabled: false,
+          location: {},
+          sender_address_name: null,
+          sender_email: null,
+          sender_phone: null,
+          sender_street: null,
+          sender_street_nr: null,
+          sender_city: null,
+          sender_postal_code: null,
+          sender_country: null,
+
+          parcel_address_name: null,
+          parcel_email: null,
+          parcel_phone: null,
+          parcel_street: null,
+          parcel_street_nr: null,
+          parcel_city: null,
+          parcel_postal_code: null,
+          parcel_country: null,
         }
         this.selectPhotoTapped = this.selectPhotoTapped.bind(this);
       }
+
+      componentDidMount() {
+        this.getLocation();
+      }
+
+      map_sender_log(eventName, e) {
+        console.log(eventName, e.nativeEvent);
+        if (eventName == "onSelect") {
+          this.setState({
+          sender_coords: {
+            longitude: e.nativeEvent.coordinate.longitude,
+            latitude: e.nativeEvent.coordinate.latitude
+          }
+          }, () => {
+            console.log(eventName, this.state.sender_coords);
+            this.getGeoCode_sender();
+            this.getGeoCode_parcel();
+          })
+        }
+      }
+
+      map_parcel_log(eventName, e) {
+        console.log(eventName, e.nativeEvent);
+        if (eventName == "onSelect") {
+          this.setState({
+          parcel_coords: {
+            longitude: e.nativeEvent.coordinate.longitude,
+            latitude: e.nativeEvent.coordinate.latitude
+          }
+          }, () => {
+            console.log(eventName, this.state.sender_coords);
+            this.getGeoCode_sender();
+            this.getGeoCode_parcel();
+          })
+        }
+      }
+
+      hasLocationPermission = async () => {
+        if (Platform.OS === 'ios' ||
+            (Platform.OS === 'android' && Platform.Version < 23)) {
+          return true;
+        }
+
+        const hasPermission = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+
+        if (hasPermission) return true;
+
+        const status = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+
+        if (status === PermissionsAndroid.RESULTS.GRANTED) return true;
+
+        if (status === PermissionsAndroid.RESULTS.DENIED) {
+          ToastAndroid.show('Location permission denied by user.', ToastAndroid.LONG);
+        } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+          ToastAndroid.show('Location permission revoked by user.', ToastAndroid.LONG);
+        }
+
+        return false;
+      }
+
+      getLocation = async () => {
+        const hasLocationPermission = await this.hasLocationPermission();
+
+        if (!hasLocationPermission) return;
+
+        this.setState({ loading: true }, () => {
+          Geolocation.getCurrentPosition(
+            (position) => {
+              this.setState({ location: position, loading: false });
+              this.setState({
+                sender_coords: {
+                  latitude : position.coords.latitude,
+                  longitude : position.coords.longitude,
+                  LATITUDE : position.coords.latitude,
+                  LONGITUDE : position.coords.longitude
+                },
+                parcel_coords: {
+                  latitude : position.coords.latitude,
+                  longitude : position.coords.longitude,
+                  LATITUDE : position.coords.latitude,
+                  LONGITUDE : position.coords.longitude
+                }
+              })
+              this.getGeoCode_sender();
+              this.getGeoCode_parcel();
+            },
+            (error) => {
+              this.setState({ location: error, loading: false });
+              console.log(error);
+              publicIP()
+              .then(ip => {
+                console.log(ip);
+                Platform.OS === 'ios' ? Geocoder.init(key.google_map_ios):
+                                      Geocoder.init(key.google_map_android);
+                fetch(api.ipStack + ip + "?access_key=" + key.ip_stack)
+                .then((response) => response.json())
+                .then((responseJson) => {                  
+                  this.setState({
+                    sender_coords: {
+                      latitude : responseJson.latitude,
+                      longitude : responseJson.longitude,
+                      LATITUDE : responseJson.latitude,
+                      LONGITUDE : responseJson.longitude
+                    },
+                    parcel_coords: {
+                      latitude : responseJson.latitude,
+                      longitude : responseJson.longitude,
+                      LATITUDE : responseJson.latitude,
+                      LONGITUDE : responseJson.longitude
+                    }
+                  }, () => {
+                    this.getGeoCode_sender();
+                    this.getGeoCode_parcel();
+                  })
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+              });
+            },
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000, distanceFilter: 50, forceRequestLocation: true }
+          );
+        });
+      }
+
+      getGeoCode_sender = async () => {
+        console.log(this.state.sender_coords);
+        Platform.OS === 'ios' ? RNGeocoder.fallbackToGoogle(key.google_map_ios):
+                                RNGeocoder.fallbackToGoogle(key.google_map_android);
+        RNGeocoder.geocodePosition({lat: this.state.sender_coords.latitude, lng: this.state.sender_coords.longitude}).then(res => {
+          console.log("geocoding", res);
+          res.forEach((item, index) => {
+            this.setState({
+              sender_address_name : item.formattedAddress != null ? item.formattedAddress : null,
+              sender_email: null,
+              sender_phone: null,
+              sender_street: item.streetName != null ? item.streetName : null,
+              sender_street_nr: item.streetNumber != null ? item.streetNumber: null,
+              sender_city: item.locality != null ? item.locality : null,
+              sender_postal_code: item.postalCode != null ? item.postalCode : null,
+              sender_country: item.country != null ? item.country : null,
+              })
+            if (index + 1 === res.length){
+                Platform.OS === 'ios' ? Geocoder.init(key.google_map_ios):
+                                        Geocoder.init(key.google_map_android);
+                Geocoder.from(this.state.sender_coords.latitude, this.state.sender_coords.longitude)
+                .then(json => {
+                  console.log(json)
+                  json.results.forEach((array_component) => {
+                    array_component.types.forEach((type, index) => {
+                      if (type == 'country') {
+                        this.setState({
+                          sender_country: array_component.formatted_address
+                        })
+                      }
+                      if (type == 'street_address') {
+                        array_component.address_components.forEach((item_address) => {
+                          item_address.types.forEach((type) => {
+                            if (type == "postal_code") {
+                              this.setState({
+                                sender_postal_code: item_address.long_name
+                              })
+                            }
+                          })
+                        })
+                      }
+                  })
+                });
+              })
+              .catch(error => console.warn(error));
+            }
+          })
+        })        
+      }
+
+      getGeoCode_parcel = async () => {
+        console.log(this.state.parcel_coords);
+        Platform.OS === 'ios' ? RNGeocoder.fallbackToGoogle(key.google_map_ios):
+                                RNGeocoder.fallbackToGoogle(key.google_map_android);
+        RNGeocoder.geocodePosition({lat: this.state.parcel_coords.latitude, lng: this.state.parcel_coords.longitude}).then(res => {
+          console.log("geocoding_parcel", res);
+          res.forEach((item, index) => {
+            this.setState({
+              parcel_address_name : item.formattedAddress != null ? item.formattedAddress : null,
+              parcel_email: null,
+              parcel_phone: null,
+              parcel_street: item.streetName != null ? item.streetName : null,
+              parcel_street_nr: item.streetNumber != null ? item.streetNumber: null,
+              parcel_city: item.locality != null ? item.locality : null,
+              parcel_postal_code: item.postalCode != null ? item.postalCode : null,
+              parcel_country: item.country != null ? item.country : null,
+              })
+            if (index + 1 === res.length){
+                Platform.OS === 'ios' ? Geocoder.init(key.google_map_ios):
+                                        Geocoder.init(key.google_map_android);
+                Geocoder.from(this.state.parcel_coords.latitude, this.state.parcel_coords.longitude)
+                .then(json => {
+                  console.log(json)
+                  json.results.forEach((array_component) => {
+                    array_component.types.forEach((type, index) => {
+                      if (type == 'country') {
+                        this.setState({
+                          parcel_country: array_component.formatted_address
+                        })
+                      }
+                      if (type == 'street_address') {
+                        array_component.address_components.forEach((item_address) => {
+                          item_address.types.forEach((type) => {
+                            if (type == "postal_code") {
+                              this.setState({
+                                parcel_postal_code: item_address.long_name
+                              })
+                            }
+                          })
+                        })
+                      }
+                  })
+                });
+              })
+              .catch(error => console.warn(error));
+            }
+          })
+        })        
+      }
+
+      getLocationUpdates = async () => {
+        const hasLocationPermission = await this.hasLocationPermission();
+
+        if (!hasLocationPermission) return;
+
+        this.setState({ updatesEnabled: true }, () => {
+          this.watchId = Geolocation.watchPosition(
+            (position) => {
+              this.setState({ location: position });
+              console.log(position);
+            },
+            (error) => {
+              this.setState({ location: error });
+              console.log(error);
+            },
+            { enableHighAccuracy: true, distanceFilter: 0, interval: 5000, fastestInterval: 2000 }
+          );
+        });
+      }
+
+      removeLocationUpdates = () => {
+          if (this.watchId !== null) {
+              Geolocation.clearWatch(this.watchId);
+              this.setState({ updatesEnabled: false })
+          }
+      }
+
 
     selectPhotoTapped() {
       const options = {
@@ -103,6 +402,7 @@ class RegisterParcel extends Component {
         },{
             value: 'EUR'
         }];
+        const { loading, location, updatesEnabled } = this.state;
         return (
             <View style={styles.container}>
                 <Header
@@ -141,19 +441,19 @@ class RegisterParcel extends Component {
                           provider={this.props.provider}
                           style={styles.map}
                           initialRegion={{
-                            latitude: LATITUDE,
-                            longitude: LONGITUDE,
+                            latitude: this.state.sender_coords.LATITUDE,
+                            longitude: this.state.sender_coords.LONGITUDE,
                             latitudeDelta: LATITUDE_DELTA,
                             longitudeDelta: LONGITUDE_DELTA,
                           }}
                         >
                           <Marker
-                            coordinate={this.state.coords}
-                            onSelect={e => log('onSelect', e)}
-                            onDrag={e => log('onDrag', e)}
-                            onDragStart={e => log('onDragStart', e)}
-                            onDragEnd={e => log('onDragEnd', e)}
-                            onPress={e => log('onPress', e)}
+                            coordinate={this.state.sender_coords}
+                            onSelect={e => this.map_sender_log('onSelect', e)}
+                            onDrag={e => this.map_sender_log('onDrag', e)}
+                            onDragStart={e => this.map_sender_log('onDragStart', e)}
+                            onDragEnd={e => this.map_sender_log('onDragEnd', e)}
+                            onPress={e => this.map_sender_log('onPress', e)}
                             draggable
                           />
                         </MapView>
@@ -163,6 +463,8 @@ class RegisterParcel extends Component {
                       <View style={styles.col}>                  
                         <Input
                             placeholder='Address Name/ID'
+                            value={this.state.sender_address_name}
+                            onChangeText={(sender_address_name) => this.setState({sender_address_name})}
                          />
                       </View>
                     </View>
@@ -171,12 +473,16 @@ class RegisterParcel extends Component {
                         <Input
                             placeholder='E-mail'
                             keyboardType="email-address"
+                            value={this.state.sender_email}
+                            onChangeText={(sender_email) => this.setState({sender_email})}
                         />
                       </View>
                       <View style={styles.col}>
                         <Input
-                            placeholder='Number'
+                            placeholder='Phone'
                             keyboardType="numeric"
+                            value={this.state.sender_phone}
+                            onChangeText={(sender_phone) => this.setState({sender_phone})}
                         />
                       </View>
                     </View>
@@ -184,12 +490,16 @@ class RegisterParcel extends Component {
                       <View style={styles.col}>
                         <Input
                             placeholder='Street'
+                            value={this.state.sender_street}
+                            onChangeText={(sender_street) => this.setState({sender_street})}
                         />
                       </View>
                       <View style={styles.col}>
                         <Input
                             placeholder='Nr.'
                             keyboardType="numeric"
+                            value={this.state.sender_street_nr}
+                            onChangeText={(sender_street) => this.setState({sender_street_nr})}
                         />
                       </View>
                     </View>
@@ -197,18 +507,25 @@ class RegisterParcel extends Component {
                       <View style={styles.col}>                  
                         <Input
                             placeholder='City'
+                            value={this.state.sender_city}
+                            onChangeText={(sender_city) => this.setState({sender_city})}
                         />
                       </View>
                     </View>
                     <View style={styles.row}>
                       <View style={styles.col}>
                         <Input
-                            placeholder='City'
+                            placeholder='Postal Code'
+                            keyboardType="numeric"
+                            value={this.state.sender_postal_code}
+                            onChangeText={(sender_postal_code) => this.setState({sender_postal_code})}
                         />
                       </View>
                       <View style={styles.col}>
                         <Input
                             placeholder='Country'
+                            value={this.state.sender_country}
+                            onChangeText={(sender_country) => this.setState({sender_country})}
                         />
                       </View>
                     </View>
@@ -220,12 +537,31 @@ class RegisterParcel extends Component {
                          <Input
                             placeholder='Longitude'
                             keyboardType="numeric"
+                            value={this.state.sender_coords.longitude.toString()}
+                            onChangeText={(longitude) => parseFloat(longitude) > 0 && 
+                              this.setState({
+                                sender_coords : {
+                                  longitude: parseFloat(longitude),
+                                  latitude: this.state.sender_coords.latitude,
+                                  LATITUDE: parseFloat(longitude) - SPACE,
+                                  LONGITUDE: this.state.sender_coords.LONGITUDE
+                                }
+                              })}
                         />
                       </View>
                       <View style={styles.col}>
                          <Input
                             placeholder='Latitude'
                             keyboardType="numeric"
+                            value={this.state.sender_coords.latitude.toString()}
+                            onChangeText={(latitude) => parseFloat(latitude) > 0 && this.setState({
+                              sender_coords : {
+                                longitude: this.state.sender_coords.longitude,
+                                latitude:  parseFloat(latitude),
+                                LATITUDE: this.state.sender_coords.LATITUDE,
+                                LONGITUDE: parseFloat(latitude) - SPACE
+                              }
+                            })}
                         />
                       </View>
                     </View>
@@ -302,19 +638,19 @@ class RegisterParcel extends Component {
                           provider={this.props.provider}
                           style={styles.map}
                           initialRegion={{
-                            latitude: LATITUDE,
-                            longitude: LONGITUDE,
+                            latitude: this.state.parcel_coords.LATITUDE,
+                            longitude: this.state.parcel_coords.LONGITUDE,
                             latitudeDelta: LATITUDE_DELTA,
                             longitudeDelta: LONGITUDE_DELTA,
                           }}
                         >
                           <Marker
-                            coordinate={this.state.coords}
-                            onSelect={e => log('onSelect', e)}
-                            onDrag={e => log('onDrag', e)}
-                            onDragStart={e => log('onDragStart', e)}
-                            onDragEnd={e => log('onDragEnd', e)}
-                            onPress={e => log('onPress', e)}
+                            coordinate={this.state.sender_coords}
+                            onSelect={e => this.map_parcel_log('onSelect', e)}
+                            onDrag={e => this.map_parcel_log('onDrag', e)}
+                            onDragStart={e => this.map_parcel_log('onDragStart', e)}
+                            onDragEnd={e => this.map_parcel_log('onDragEnd', e)}
+                            onPress={e => this.map_parcel_log('onPress', e)}
                             draggable
                           />
                         </MapView>
@@ -324,6 +660,8 @@ class RegisterParcel extends Component {
                       <View style={styles.col}>                  
                         <Input
                             placeholder='Address Name/ID'
+                            value={this.state.parcel_address_name}
+                            onChangeText={(parcel_address_name) => this.setState({parcel_address_name})}
                          />
                       </View>
                     </View>
@@ -332,12 +670,16 @@ class RegisterParcel extends Component {
                         <Input
                             placeholder='E-mail'
                             keyboardType="email-address"
+                            value={this.state.parcel_email}
+                            onChangeText={(parcel_email) => this.setState({parcel_email})}
                         />
                       </View>
                       <View style={styles.col}>
                         <Input
-                            placeholder='Number'
+                            placeholder='Phone'
                             keyboardType="numeric"
+                            value={this.state.parcel_phone}
+                            onChangeText={(parcel_phone) => this.setState({parcel_phone})}
                         />
                       </View>
                     </View>
@@ -345,12 +687,16 @@ class RegisterParcel extends Component {
                       <View style={styles.col}>
                         <Input
                             placeholder='Street'
+                            value={this.state.parcel_street}
+                            onChangeText={(parcel_street) => this.setState({parcel_street})}
                         />
                       </View>
                       <View style={styles.col}>
                         <Input
                             placeholder='Nr.'
                             keyboardType="numeric"
+                            value={this.state.parcel_street_nr}
+                            onChangeText={(parcel_street) => this.setState({parcel_street_nr})}
                         />
                       </View>
                     </View>
@@ -358,18 +704,25 @@ class RegisterParcel extends Component {
                       <View style={styles.col}>                  
                         <Input
                             placeholder='City'
+                            value={this.state.parcel_city}
+                            onChangeText={(parcel_city) => this.setState({parcel_city})}
                         />
                       </View>
                     </View>
                     <View style={styles.row}>
                       <View style={styles.col}>
                         <Input
-                            placeholder='City'
+                            placeholder='Postal Code'
+                            keyboardType="numeric"
+                            value={this.state.parcel_postal_code}
+                            onChangeText={(parcel_postal_code) => this.setState({parcel_postal_code})}
                         />
                       </View>
                       <View style={styles.col}>
                         <Input
                             placeholder='Country'
+                            value={this.state.parcel_country}
+                            onChangeText={(parcel_country) => this.setState({parcel_country})}
                         />
                       </View>
                     </View>
@@ -381,12 +734,31 @@ class RegisterParcel extends Component {
                          <Input
                             placeholder='Longitude'
                             keyboardType="numeric"
+                            value={this.state.parcel_coords.longitude.toString()}
+                            onChangeText={(longitude) => parseFloat(longitude) > 0 && 
+                              this.setState({
+                                parcel_coords : {
+                                  longitude: parseFloat(longitude),
+                                  latitude: this.state.parcel_coords.latitude,
+                                  LATITUDE: parseFloat(longitude) - SPACE,
+                                  LONGITUDE: this.state.parcel_coords.LONGITUDE
+                                }
+                              })}
                         />
                       </View>
                       <View style={styles.col}>
                          <Input
                             placeholder='Latitude'
                             keyboardType="numeric"
+                            value={this.state.parcel_coords.latitude.toString()}
+                            onChangeText={(latitude) => parseFloat(latitude) > 0 && this.setState({
+                              parcel_coords : {
+                                longitude: this.state.parcel_coords.longitude,
+                                latitude:  parseFloat(latitude),
+                                LATITUDE: this.state.parcel_coords.LATITUDE,
+                                LONGITUDE: parseFloat(latitude) - SPACE
+                              }
+                            })}
                         />
                       </View>
                     </View>
@@ -434,19 +806,28 @@ class RegisterParcel extends Component {
                     <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
                       <Picker
                           selectedValue={this.state.country}
-                          style={{height: 50, width: 100, margin: 10}}>
+                          style={{height: 50, width: 100, margin: 10}}
+                          onValueChange={(itemValue, itemIndex) =>
+                            this.setState({country: itemValue})
+                          }>
                           <Picker.Item label="Czech" value="Czech" />
                           <Picker.Item label="Slovak" value="Slovak" />
                       </Picker>
                       <Picker
                           selectedValue={this.state.parcel_type}
-                          style={{height: 50, width: 100, margin: 10}}>
+                          style={{height: 50, width: 100, margin: 10}}
+                          onValueChange={(itemValue, itemIndex) =>
+                            this.setState({parcel_type: itemValue})
+                          }>
                           <Picker.Item label="Large" value="Large" />
                           <Picker.Item label="Normal" value="Normal" />
                       </Picker>
                       <Picker
                           selectedValue={this.state.currency}
-                          style={{height: 50, width: 100, margin: 10}}>
+                          style={{height: 50, width: 100, margin: 10}}
+                          onValueChange={(itemValue, itemIndex) =>
+                            this.setState({currency: itemValue})
+                          }>
                           <Picker.Item label="CZK" value="CZK" />
                           <Picker.Item label="EUR" value="EUR" />
                       </Picker>
@@ -474,6 +855,18 @@ class RegisterParcel extends Component {
                      placeholder='ParcelPrice'
                       keyboardType="numeric"/>
                   </View>
+                  <View style={styles.row}>
+                      <View style={styles.col}>                  
+                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]} onPress={() => this.showMap()}>
+                            <Text style={styles.lable_button}>Add parcel</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={styles.col}>
+                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]} onPress={() => this.showMap()}>
+                            <Text style={styles.lable_button}>Send transport request</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                 </KeyboardAwareScrollView>
               </View>
         );
@@ -565,16 +958,36 @@ const styles = StyleSheet.create({
         marginTop: 10,
       },
       avatarContainer: {
-    borderColor: '#9B9B9B',
-    borderWidth: 1 / PixelRatio.get(),
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatar: {
-    borderRadius: 75,
-    width: 150,
-    height: 150,
-  },
+        borderColor: '#9B9B9B',
+        borderWidth: 1 / PixelRatio.get(),
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      avatar: {
+        borderRadius: 75,
+        width: 150,
+        height: 150,
+      },
+      container_geo: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5FCFF',
+        paddingHorizontal: 12
+      },
+      result: {
+          borderWidth: 1,
+          borderColor: '#666',
+          width: '100%',
+          paddingHorizontal: 16
+      },
+      buttons: {
+          flexDirection: 'row',
+          justifyContent: 'space-around',
+          alignItems: 'center',
+          marginVertical: 12,
+          width: '100%'
+      }
 });
 
 export default RegisterParcel;

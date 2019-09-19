@@ -77,6 +77,10 @@ PODS:
     - React-cxxreact (= 0.60.5)
     - React-jsi (= 0.60.5)
   - React-jsinspector (0.60.5)
+  - react-native-geocoder (0.5.0):
+    - React
+  - react-native-geolocation (2.0.2):
+    - React
   - react-native-google-maps (0.25.0):
     - Google-Maps-iOS-Utils (= 2.1.0)
     - GoogleMaps (= 3.1.0)
@@ -84,6 +88,8 @@ PODS:
   - react-native-image-picker (1.1.0):
     - React
   - react-native-maps (0.25.0):
+    - React
+  - react-native-network-info (5.1.0):
     - React
   - React-RCTActionSheet (0.60.5):
     - React-Core (= 0.60.5)
@@ -129,9 +135,12 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
+  - react-native-geocoder (from `../node_modules/react-native-geocoder`)
+  - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-google-maps (from `../node_modules/react-native-maps`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-maps (from `../node_modules/react-native-maps`)
+  - react-native-network-info (from `../node_modules/react-native-network-info`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../node_modules/react-native/Libraries/NativeAnimation`)
   - React-RCTBlob (from `../node_modules/react-native/Libraries/Blob`)
@@ -174,12 +183,18 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
+  react-native-geocoder:
+    :path: "../node_modules/react-native-geocoder"
+  react-native-geolocation:
+    :path: "../node_modules/@react-native-community/geolocation"
   react-native-google-maps:
     :path: "../node_modules/react-native-maps"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
+  react-native-network-info:
+    :path: "../node_modules/react-native-network-info"
   React-RCTActionSheet:
     :path: "../node_modules/react-native/Libraries/ActionSheetIOS"
   React-RCTAnimation:
@@ -223,9 +238,12 @@ SPEC CHECKSUMS:
   React-jsi: 4d8c9efb6312a9725b18d6fc818ffc103f60fec2
   React-jsiexecutor: 90ad2f9db09513fc763bc757fdc3c4ff8bde2a30
   React-jsinspector: e08662d1bf5b129a3d556eb9ea343a3f40353ae4
+  react-native-geocoder: 757427682892bb256f3b3745858cc90eba148a8e
+  react-native-geolocation: cbd9d6bd06bac411eed2671810f454d4908484a8
   react-native-google-maps: 88d750ad441b19c24885f20d43a55ecac25939b5
   react-native-image-picker: 3637d63fef7e32a230141ab4660d3ceb773c824f
   react-native-maps: 190c02ca533fddac5bb49cf17bdece3644612107
+  react-native-network-info: f327b8c73bced5dc08b4da313d96a5e33e9a6dac
   React-RCTActionSheet: b0f1ea83f4bf75fb966eae9bfc47b78c8d3efd90
   React-RCTAnimation: 359ba1b5690b1e87cc173558a78e82d35919333e
   React-RCTBlob: 5e2b55f76e9a1c7ae52b826923502ddc3238df24
@@ -241,6 +259,6 @@ SPEC CHECKSUMS:
   RNVectorIcons: 0bb4def82230be1333ddaeee9fcba45f0b288ed4
   yoga: 312528f5bbbba37b4dcea5ef00e8b4033fdd9411
 
-PODFILE CHECKSUM: a311087e0b7da42fcd4a1d8376867c3915c4155c
+PODFILE CHECKSUM: 9c75447083f9bdf2343d867ef5778c880d313849
 
 COCOAPODS: 1.7.5

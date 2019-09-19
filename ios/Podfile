@@ -31,6 +31,7 @@ target 'del_X' do
   pod 'react-native-google-maps', :path => rn_maps_path
   pod 'GoogleMaps'
   pod 'Google-Maps-iOS-Utils'
+  pod 'react-native-geolocation', path: '../node_modules/@react-native-community/geolocation'
   
   target 'del_XTests' do
     inherit! :search_paths

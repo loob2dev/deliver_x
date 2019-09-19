@@ -16,7 +16,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  [GMSServices provideAPIKey:@"AIzaSyAyBRVVFURB8GJ2_snxvbadmQYgNqpA_Z8"];
+  [GMSServices provideAPIKey:@"AIzaSyDGlHzNoSA9iZmAPMIZifwo-jXiZbhZ96Y"];
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
   RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                    moduleName:@"del_X"
