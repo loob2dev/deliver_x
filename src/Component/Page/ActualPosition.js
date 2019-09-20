@@ -5,6 +5,7 @@ import { Left, Right, Icon } from 'native-base';
 import colors from '../../config/colors'
 import MapView, { Marker, ProviderPropType } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
+import ProgressScreen from '../Refer/ProgressScreen';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -18,6 +19,7 @@ class ActualPosition extends Component {
     constructor(props){
         super(props)
         this.state = {
+          isLoading: true,
           coords: {
             latitude: 37.78825 + SPACE,
             longitude: -122.4324 + SPACE,
@@ -73,11 +75,14 @@ class ActualPosition extends Component {
                   LATITUDE : position.coords.latitude,
                   LONGITUDE : position.coords.longitude
                 }
+              }, () => {
+                this.setState({isLoading: false})
               })
             },
             (error) => {
               this.setState({ location: error, loading: false });
-              console.log(error);              
+              console.log(error);
+              this.setState({isLoading: false})
             },
             { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000, distanceFilter: 50, forceRequestLocation: true }
           );
@@ -91,6 +96,9 @@ class ActualPosition extends Component {
     }
 
     render() {
+        if (this.state.isLoading) {
+          return <ProgressScreen/>
+        }
         return (
             <View style={styles.container}>
                 <Header
@@ -114,7 +122,6 @@ class ActualPosition extends Component {
                             onDragStart={e => this.map_sender_log('onDragStart', e)}
                             onDragEnd={e => this.map_sender_log('onDragEnd', e)}
                             onPress={e => this.map_sender_log('onPress', e)}
-                            draggable
                           />
                         </MapView>
             </View>
