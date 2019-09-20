@@ -117,11 +117,6 @@ class ActualPosition extends Component {
                         >
                           <Marker
                             coordinate={this.state.coords}
-                            onSelect={e => this.map_sender_log('onSelect', e)}
-                            onDrag={e => this.map_sender_log('onDrag', e)}
-                            onDragStart={e => this.map_sender_log('onDragStart', e)}
-                            onDragEnd={e => this.map_sender_log('onDragEnd', e)}
-                            onPress={e => this.map_sender_log('onPress', e)}
                           />
                         </MapView>
             </View>

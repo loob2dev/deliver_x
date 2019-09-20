@@ -430,7 +430,7 @@ class RegisterParcel extends Component {
                         </TouchableOpacity>
                       </View>
                       <View style={styles.col}>
-                        <TouchableOpacity style={[styles.buttonContainer, styles.addressButton]} onPress={() => this.showMap()}>
+                        <TouchableOpacity style={[styles.buttonContainer, styles.addressButton]}>
                           <Text style={styles.lable_button}>Address book</Text>
                         </TouchableOpacity>
                       </View>
@@ -448,7 +448,14 @@ class RegisterParcel extends Component {
                           fetchDetails={true}
                           renderDescription={row => row.description} // custom description render
                           onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                            console.log(data, details);
+                            this.setState({                              
+                              sender_coords: {
+                                latitude : details.geometry.location.lat,
+                                longitude : details.geometry.location.lng,
+                                LATITUDE : details.geometry.location.lat,
+                                LONGITUDE : details.geometry.location.lng
+                              },
+                            }, () => {this.getGeoCode_sender()})
                           }}
 
                           getDefaultValue={() => ''}
@@ -657,7 +664,7 @@ class RegisterParcel extends Component {
                       </View>
                     </View>
                     <View style={{alignItems: 'flex-end'}}>
-                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]} onPress={() => this.showMap()}>
+                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]}>
                             <Text style={styles.lable_button}>Save address</Text>
                         </TouchableOpacity>
                     </View>
@@ -681,7 +688,7 @@ class RegisterParcel extends Component {
                         </TouchableOpacity>
                       </View>
                       <View style={styles.col}>
-                        <TouchableOpacity style={[styles.buttonContainer, styles.addressButton]} onPress={() => this.showMap()}>
+                        <TouchableOpacity style={[styles.buttonContainer, styles.addressButton]}>
                           <Text style={styles.lable_button}>Address book</Text>
                         </TouchableOpacity>
                       </View>
@@ -854,7 +861,7 @@ class RegisterParcel extends Component {
                       </View>
                     </View>
                     <View style={{alignItems: 'flex-end'}}>
-                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]} onPress={() => this.showMap()}>
+                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]}>
                             <Text style={styles.lable_button}>Save address</Text>
                         </TouchableOpacity>
                     </View>
@@ -912,12 +919,12 @@ class RegisterParcel extends Component {
                   </View>
                   <View style={styles.row}>
                       <View style={styles.col}>                  
-                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]} onPress={() => this.showMap()}>
+                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]}>
                             <Text style={styles.lable_button}>Add parcel</Text>
                         </TouchableOpacity>
                       </View>
                       <View style={styles.col}>
-                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]} onPress={() => this.showMap()}>
+                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]}>
                             <Text style={styles.lable_button}>Send transport request</Text>
                         </TouchableOpacity>
                       </View>
