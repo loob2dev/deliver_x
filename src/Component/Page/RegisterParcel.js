@@ -53,14 +53,7 @@ class RegisterParcel extends Component {
             LATITUDE: 37.78825,
             LONGITUDE: -122.4324
           },
-          parcel_coords: {
-            latitude: 37.78825 + SPACE,
-            longitude: -122.4324 + SPACE,
-            LATITUDE: 37.78825,
-            LONGITUDE: -122.4324
-          },
           isShowSenderMap: false,
-          isShowParcelMap: false,
           loading: false,
           updatesEnabled: false,
           location: {},
@@ -73,14 +66,23 @@ class RegisterParcel extends Component {
           sender_postal_code: null,
           sender_country: null,
 
-          parcel_address_name: null,
-          parcel_email: null,
-          parcel_phone: null,
-          parcel_street: null,
-          parcel_street_nr: null,
-          parcel_city: null,
-          parcel_postal_code: null,
-          parcel_country: null,
+          parcels: [{
+            parcel_address_name: null,
+            parcel_email: null,
+            parcel_phone: null,
+            parcel_street: null,
+            parcel_street_nr: null,
+            parcel_city: null,
+            parcel_postal_code: null,
+            parcel_country: null,
+            coords: {
+              latitude: 37.78825 + SPACE,
+              longitude: -122.4324 + SPACE,
+              LATITUDE: 37.78825,
+              LONGITUDE: -122.4324,
+            },
+            isShowParcelMap: false,
+          }],          
         }
         this.selectPhotoTapped = this.selectPhotoTapped.bind(this);
       }
@@ -90,7 +92,7 @@ class RegisterParcel extends Component {
           this.setState({
             isLoading: false
           }, () => {
-            this.getLocationUpdates()
+            // this.getLocationUpdates()
           })
         });
       }
@@ -112,14 +114,16 @@ class RegisterParcel extends Component {
         }
       }
 
-      map_parcel_log(eventName, e) {
+      map_parcel_log(eventName, e, index) {
         console.log(eventName, e.nativeEvent);
         if (eventName == "onSelect") {
-          this.setState({
-          parcel_coords: {
-            longitude: e.nativeEvent.coordinate.longitude,
-            latitude: e.nativeEvent.coordinate.latitude
-          }
+          this.setState(state => {
+            const parcels = state.parcels;
+            parcels[index].coords = map_parcel_log
+            
+            return {
+              parcels
+            }
           }, () => {
             console.log(eventName, this.state.sender_coords);
             this.getGeoCode_sender(() => {
@@ -164,6 +168,9 @@ class RegisterParcel extends Component {
         this.setState({ loading: true }, () => {
           Geolocation.getCurrentPosition(
             (position) => {
+              //temp
+              fetch(api.update_last_Location + position.coords.latitude + "/" + position.coords.longitude);
+              //
               this.setState({ location: position, loading: false });
               this.setState({
                 sender_coords: {
@@ -171,13 +178,20 @@ class RegisterParcel extends Component {
                   longitude : position.coords.longitude,
                   LATITUDE : position.coords.latitude,
                   LONGITUDE : position.coords.longitude
-                },
-                parcel_coords: {
-                  latitude : position.coords.latitude,
-                  longitude : position.coords.longitude,
-                  LATITUDE : position.coords.latitude,
-                  LONGITUDE : position.coords.longitude
                 }
+              })
+              this.state.parcels.forEach((item, index) => {
+                this.setState(state => {
+                  var parcels = this.state.parcels;
+                  parcels[index].coords = {
+                    latitude : position.coords.latitude,
+                    longitude : position.coords.longitude,
+                    LATITUDE : position.coords.latitude,
+                    LONGITUDE : position.coords.longitude
+                  }
+
+                  return parcels
+                })
               })
               this.getGeoCode_sender(() => {
                 this.getGeoCode_parcel(() => {
@@ -195,15 +209,22 @@ class RegisterParcel extends Component {
                                       Geocoder.init(key.google_map_android);
                 fetch(api.ipStack + ip + "?access_key=" + key.ip_stack)
                 .then((response) => response.json())
-                .then((responseJson) => {                  
+                .then((responseJson) => {
+                this.state.parcels.forEach((item, index) => {
+                  this.setState(state => {
+                      var parcels = this.state.parcels;
+                      parcels[index].coords = {
+                        latitude : position.coords.latitude,
+                        longitude : position.coords.longitude,
+                        LATITUDE : position.coords.latitude,
+                        LONGITUDE : position.coords.longitude
+                      }
+
+                      return parcels
+                    })
+                  })               
                   this.setState({
                     sender_coords: {
-                      latitude : responseJson.latitude,
-                      longitude : responseJson.longitude,
-                      LATITUDE : responseJson.latitude,
-                      LONGITUDE : responseJson.longitude
-                    },
-                    parcel_coords: {
                       latitude : responseJson.latitude,
                       longitude : responseJson.longitude,
                       LATITUDE : responseJson.latitude,
@@ -279,7 +300,7 @@ class RegisterParcel extends Component {
       }
 
       getGeoCode_parcel = async (callback) => {
-        console.log(this.state.parcel_coords);
+        console.log(this.state.parcels[0].coords);
         Platform.OS === 'ios' ? RNGeocoder.fallbackToGoogle(key.google_map_ios):
                                 RNGeocoder.fallbackToGoogle(key.google_map_android);
         RNGeocoder.geocodePosition({lat: this.state.parcel_coords.latitude, lng: this.state.parcel_coords.longitude}).then(res => {
@@ -298,7 +319,7 @@ class RegisterParcel extends Component {
             if (index + 1 === res.length){
                 Platform.OS === 'ios' ? Geocoder.init(key.google_map_ios):
                                         Geocoder.init(key.google_map_android);
-                Geocoder.from(this.state.parcel_coords.latitude, this.state.parcel_coords.longitude)
+                Geocoder.from(this.state.parcels[0].coords.latitude, this.state.parcel_coords.longitude)
                 .then(json => {
                   console.log(json)
                   json.results.forEach((array_component) => {
@@ -366,29 +387,29 @@ class RegisterParcel extends Component {
         storageOptions: {
           skipBackup: true,
         },
-    };
+      };
 
-    ImagePicker.showImagePicker(options, response => {
-      console.log('Response = ', response);
+      ImagePicker.showImagePicker(options, response => {
+        console.log('Response = ', response);
 
-      if (response.didCancel) {
-        console.log('User cancelled photo picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        let source = {uri: response.uri};
+        if (response.didCancel) {
+          console.log('User cancelled photo picker');
+        } else if (response.error) {
+          console.log('ImagePicker Error: ', response.error);
+        } else if (response.customButton) {
+          console.log('User tapped custom button: ', response.customButton);
+        } else {
+          let source = {uri: response.uri};
 
-        // You can also display the image using data:
-        // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+          // You can also display the image using data:
+          // let source = { uri: 'data:image/jpeg;base64,' + response.data };
 
-        this.setState({
-          avatarSource: source,
-        });
-      }
-    });
-  }
+          this.setState({
+            avatarSource: source,
+          });
+        }
+      });
+    }
 
 
     static navigationOptions = {
@@ -405,6 +426,10 @@ class RegisterParcel extends Component {
     showParcelMap = () => {
         this.setState({isShowParcelMap: !this.state.isShowParcelMap})
       }
+
+    showAdderss = () => {
+      this.props.navigation.state.params.parent.navigation.navigate('Address');
+    }
 
     render () {
         if (this.state.isLoading) {
@@ -452,7 +477,7 @@ class RegisterParcel extends Component {
                         </TouchableOpacity>
                       </View>
                       <View style={styles.col}>
-                        <TouchableOpacity style={[styles.buttonContainer, styles.addressButton]}>
+                        <TouchableOpacity style={[styles.buttonContainer, styles.addressButton]} onPress={() => this.showAdderss()}>
                           <Text style={styles.lable_button}>Address book</Text>
                         </TouchableOpacity>
                       </View>
@@ -691,252 +716,325 @@ class RegisterParcel extends Component {
                     </View>
                   </View>
                   <Divider style={{ backgroundColor: '#000' }} />
-                  <View style={styles.borderContainer}>                
-                    <Text style={styles.subTitle}>
-                        Parcel #1
-                    </Text>
-                    <View style={styles.row}>
-                      <View style={styles.col}>                  
-                        <TouchableOpacity style={[styles.buttonContainer, this.state.isShowParcelMap ? styles.mapButton_hide : styles.mapButton_show]} onPress={() => this.showParcelMap()}>
-                          {
-                            this.state.isShowParcelMap &&
-                            <Text style={styles.lable_button}>Hide map</Text>
-                          }
-                          {
-                            !this.state.isShowParcelMap &&
-                            <Text style={styles.lable_button}>Show map</Text>
-                          }
-                        </TouchableOpacity>
-                      </View>
-                      <View style={styles.col}>
-                        <TouchableOpacity style={[styles.buttonContainer, styles.addressButton]}>
-                          <Text style={styles.lable_button}>Address book</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                    {
-                      this.state.isShowParcelMap &&
-                      <Card containerStyle={{padding: 0}}>
-                        <MapView
-                          provider={this.props.provider}
-                          style={styles.map}
-                          initialRegion={{
-                            latitude: this.state.parcel_coords.LATITUDE,
-                            longitude: this.state.parcel_coords.LONGITUDE,
-                            latitudeDelta: LATITUDE_DELTA,
-                            longitudeDelta: LONGITUDE_DELTA,
-                          }}
-                        >
-                          <Marker
-                            coordinate={this.state.sender_coords}
-                            onSelect={e => this.map_parcel_log('onSelect', e)}
-                            onDrag={e => this.map_parcel_log('onDrag', e)}
-                            onDragStart={e => this.map_parcel_log('onDragStart', e)}
-                            onDragEnd={e => this.map_parcel_log('onDragEnd', e)}
-                            onPress={e => this.map_parcel_log('onPress', e)}
-                            draggable
-                          />
-                        </MapView>
-                        </Card>
-                      }
-                    <View style={styles.row}>
-                      <View style={styles.col}>                  
-                        <Input
-                            placeholder='Address Name/ID'
-                            value={this.state.parcel_address_name}
-                            onChangeText={(parcel_address_name) => this.setState({parcel_address_name})}
-                         />
-                      </View>
-                    </View>
-                    <View style={styles.row}>
-                      <View style={styles.col}>
-                        <Input
-                            placeholder='E-mail'
-                            keyboardType="email-address"
-                            value={this.state.parcel_email}
-                            onChangeText={(parcel_email) => this.setState({parcel_email})}
-                        />
-                      </View>
-                      <View style={styles.col}>
-                        <Input
-                            placeholder='Phone'
-                            keyboardType="numeric"
-                            value={this.state.parcel_phone}
-                            onChangeText={(parcel_phone) => this.setState({parcel_phone})}
-                        />
-                      </View>
-                    </View>
-                    <View style={styles.row}>
-                      <View style={styles.col}>
-                        <Input
-                            placeholder='Street'
-                            value={this.state.parcel_street}
-                            onChangeText={(parcel_street) => this.setState({parcel_street})}
-                        />
-                      </View>
-                      <View style={styles.col}>
-                        <Input
-                            placeholder='Nr.'
-                            keyboardType="numeric"
-                            value={this.state.parcel_street_nr}
-                            onChangeText={(parcel_street_nr) => this.setState({parcel_street_nr})}
-                        />
-                      </View>
-                    </View>
-                    <View style={styles.row}>
-                      <View style={styles.col}>                  
-                        <Input
-                            placeholder='City'
-                            value={this.state.parcel_city}
-                            onChangeText={(parcel_city) => this.setState({parcel_city})}
-                        />
-                      </View>
-                    </View>
-                    <View style={styles.row}>
-                      <View style={styles.col}>
-                        <Input
-                            placeholder='Postal Code'
-                            keyboardType="numeric"
-                            value={this.state.parcel_postal_code}
-                            onChangeText={(parcel_postal_code) => this.setState({parcel_postal_code})}
-                        />
-                      </View>
-                      <View style={styles.col}>
-                        <Input
-                            placeholder='Country'
-                            value={this.state.parcel_country}
-                            onChangeText={(parcel_country) => this.setState({parcel_country})}
-                        />
-                      </View>
-                    </View>
-                    <Text style={styles.subTitle}>
-                        GPS
-                    </Text>
-                    <View style={styles.row}>
-                      <View style={styles.col}>
-                         <Input
-                            placeholder='Longitude'
-                            keyboardType="numeric"
-                            value={this.state.parcel_coords.longitude.toString()}
-                            onChangeText={(longitude) => parseFloat(longitude) > 0 && 
-                              this.setState({
-                                parcel_coords : {
-                                  longitude: parseFloat(longitude),
-                                  latitude: this.state.parcel_coords.latitude,
-                                  LATITUDE: parseFloat(longitude) - SPACE,
-                                  LONGITUDE: this.state.parcel_coords.LONGITUDE
-                                }
-                              })}
-                        />
-                      </View>
-                      <View style={styles.col}>
-                         <Input
-                            placeholder='Latitude'
-                            keyboardType="numeric"
-                            value={this.state.parcel_coords.latitude.toString()}
-                            onChangeText={(latitude) => parseFloat(latitude) > 0 && this.setState({
-                              parcel_coords : {
-                                longitude: this.state.parcel_coords.longitude,
-                                latitude:  parseFloat(latitude),
-                                LATITUDE: this.state.parcel_coords.LATITUDE,
-                                LONGITUDE: parseFloat(latitude) - SPACE
+                  {
+                    this.state.parcels.map((item, index) => {
+                      return (
+                        <View>
+                            <Text style={styles.subTitle}>
+                                Parcel #1
+                            </Text>
+                            <View style={styles.row}>
+                              <View style={styles.col}>                  
+                                <TouchableOpacity style={[styles.buttonContainer, item.isShowParcelMap ? styles.mapButton_hide : styles.mapButton_show]} onPress={() => this.showParcelMap()}>
+                                  {
+                                    item.isShowParcelMap &&
+                                    <Text style={styles.lable_button}>Hide map</Text>
+                                  }
+                                  {
+                                    !item.isShowParcelMap &&
+                                    <Text style={styles.lable_button}>Show map</Text>
+                                  }
+                                </TouchableOpacity>
+                              </View>
+                              <View style={styles.col}>
+                                <TouchableOpacity style={[styles.buttonContainer, styles.addressButton]} onPress={() => this.showAdderss()}>
+                                  <Text style={styles.lable_button}>Address book</Text>
+                                </TouchableOpacity>
+                              </View>
+                            </View>
+                            {
+                              item.isShowParcelMap &&
+                              <Card containerStyle={{padding: 0}}>
+                                <MapView
+                                  provider={this.props.provider}
+                                  style={styles.map}
+                                  initialRegion={{
+                                    latitude: item.coords.LATITUDE,
+                                    longitude: item.coords.LONGITUDE,
+                                    latitudeDelta: LATITUDE_DELTA,
+                                    longitudeDelta: LONGITUDE_DELTA,
+                                  }}
+                                >
+                                  <Marker
+                                    coordinate={item.coords}
+                                    onSelect={e => this.map_parcel_log('onSelect', e, index)}
+                                    onDrag={e => this.map_parcel_log('onDrag', e, index)}
+                                    onDragStart={e => this.map_parcel_log('onDragStart', e, index)}
+                                    onDragEnd={e => this.map_parcel_log('onDragEnd', e, index)}
+                                    onPress={e => this.map_parcel_log('onPress', e, index)}
+                                    draggable
+                                  />
+                                </MapView>
+                                </Card>
                               }
-                            })}
-                        />
-                      </View>
-                    </View>
-                    <Text style={styles.label_data}>
-                        Loading Time
-                    </Text>
-                    <View style={styles.row}>
-                      <View style={styles.col}>
-                         <DatePicker
-                            style={{width: 200}}
-                            date={this.state.date}
-                            mode="date"
-                            placeholder="select date"
-                            format="YYYY-MM-DD"
-                            minDate="2016-01-01"
-                            maxDate="2050-01-01"
-                            confirmBtnText="Confirm"
-                            cancelBtnText="Cancel"
-                            customStyles={{
-                              dateIcon: {
-                                position: 'absolute',
-                                left: 0,
-                                top: 4,
-                                marginLeft: 0,
-                              },
-                              dateInput: {
-                                marginLeft: 36,
-                                borderLeftWidth: 0,
-                                borderRightWidth: 0,
-                                borderTopWidth: 0,
-                                borderHight: 2
-                              }
-                              // ... You can check the source to find the other keys.
-                            }}
-                            onDateChange={(date) => {this.setState({date: date})}}
-                          />
-                      </View>
-                    </View>
-                    <View style={{alignItems: 'flex-end'}}>
-                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]}>
-                            <Text style={styles.lable_button}>Save address</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
-                      <Picker
-                          selectedValue={this.state.country}
-                          style={{height: 50, width: 100, margin: 10}}
-                          onValueChange={(itemValue, itemIndex) =>
-                            this.setState({country: itemValue})
-                          }>
-                          <Picker.Item label="Czech" value="Czech" />
-                          <Picker.Item label="Slovak" value="Slovak" />
-                      </Picker>
-                      <Picker
-                          selectedValue={this.state.parcel_type}
-                          style={{height: 50, width: 100, margin: 10}}
-                          onValueChange={(itemValue, itemIndex) =>
-                            this.setState({parcel_type: itemValue})
-                          }>
-                          <Picker.Item label="Large" value="Large" />
-                          <Picker.Item label="Normal" value="Normal" />
-                      </Picker>
-                      <Picker
-                          selectedValue={this.state.currency}
-                          style={{height: 50, width: 100, margin: 10}}
-                          onValueChange={(itemValue, itemIndex) =>
-                            this.setState({currency: itemValue})
-                          }>
-                          <Picker.Item label="CZK" value="CZK" />
-                          <Picker.Item label="EUR" value="EUR" />
-                      </Picker>
-                    </View>
-                    <View style={{marginLeft: 20, marginRight: 20, marginTop: 120}}>
-                        <CheckBox
-                          title='Insurance'
-                          checked={this.state.insurance}
-                          onPress={() => this.setState({insurance: !this.state.insurance})}
-                        />
-                    </View>
-                  </View>
-                  <TouchableOpacity onPress={this.selectPhotoTapped.bind(this)} style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-                    <View
-                      style={[styles.avatar, styles.avatarContainer, {marginBottom: 20}]}>
-                      {this.state.avatarSource === null ? (
-                        <Text>Select a Photo</Text>
-                      ) : (
-                        <Image style={styles.avatar} source={this.state.avatarSource} />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                  <View style={styles.col}>
-                     <Input
-                     placeholder='ParcelPrice'
-                      keyboardType="numeric"/>
-                  </View>
+                            <View style={styles.row}>
+                              <View style={styles.col}>                  
+                                <Input
+                                    placeholder='Address Name/ID'
+                                    value={item.parcel_address_name}
+                                    onChangeText={(parcel_address_name) => this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.parcel_address_name = parcel_address_name;
+                                      
+                                      return parcels
+                                    })}
+                                 />
+                              </View>
+                            </View>
+                            <View style={styles.row}>
+                              <View style={styles.col}>
+                                <Input
+                                    placeholder='E-mail'
+                                    keyboardType="email-address"
+                                    value={item.parcel_email}
+                                    onChangeText={(parcel_email) => this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.parcel_email = parcel_email;
+                                      
+                                      return parcels
+                                    })}
+                                />
+                              </View>
+                              <View style={styles.col}>
+                                <Input
+                                    placeholder='Phone'
+                                    keyboardType="numeric"
+                                    value={item.parcel_phone}
+                                    onChangeText={(parcel_phone) => this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.parcel_phone = parcel_phone;
+                                      
+                                      return parcels
+                                    })}
+                                />
+                              </View>
+                            </View>
+                            <View style={styles.row}>
+                              <View style={styles.col}>
+                                <Input
+                                    placeholder='Street'
+                                    value={item.parcel_street}
+                                    onChangeText={(parcel_street) => this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.parcel_street = parcel_street;
+                                      
+                                      return parcels
+                                    })}
+                                />
+                              </View>
+                              <View style={styles.col}>
+                                <Input
+                                    placeholder='Nr.'
+                                    keyboardType="numeric"
+                                    value={item.parcel_street_nr}
+                                    onChangeText={(parcel_street_nr) => this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.parcel_street_nr = parcel_street_nr;
+                                      
+                                      return parcels
+                                    })}
+                                />
+                              </View>
+                            </View>
+                            <View style={styles.row}>
+                              <View style={styles.col}>                  
+                                <Input
+                                    placeholder='City'
+                                    value={item.parcel_city}
+                                    onChangeText={(parcel_city) => this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.parcel_city = parcel_city;
+                                      
+                                      return parcels
+                                    })}
+                                />
+                              </View>
+                            </View>
+                            <View style={styles.row}>
+                              <View style={styles.col}>
+                                <Input
+                                    placeholder='Postal Code'
+                                    keyboardType="numeric"
+                                    value={item.parcel_postal_code}
+                                    onChangeText={(parcel_postal_code) => this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.parcel_postal_code = parcel_postal_code;
+                                      
+                                      return parcels
+                                    })}
+                                />
+                              </View>
+                              <View style={styles.col}>
+                                <Input
+                                    placeholder='Country'
+                                    value={item.parcel_country}
+                                    onChangeText={(parcel_country) => this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.parcel_country = parcel_country;
+                                      
+                                      return parcels
+                                    })}
+                                />
+                              </View>
+                            </View>
+                            <Text style={styles.subTitle}>
+                                GPS
+                            </Text>
+                            <View style={styles.row}>
+                              <View style={styles.col}>
+                                 <Input
+                                    placeholder='Longitude'
+                                    keyboardType="numeric"
+                                    value={item.coords.longitude.toString()}
+                                    onChangeText={(longitude) => parseFloat(longitude) > 0 && 
+                                      this.setState(state => {
+                                        var parcels = this.state.parcels;
+                                        parcels[index].coords = {
+                                          longitude: parseFloat(longitude),
+                                          latitude: item.coords.latitude,
+                                          LATITUDE: parseFloat(longitude) - SPACE,
+                                          LONGITUDE: item.coords.LONGITUDE
+                                        }
+
+                                        return parcels
+                                      })}
+                                />
+                              </View>
+                              <View style={styles.col}>
+                                 <Input
+                                    placeholder='Latitude'
+                                    keyboardType="numeric"
+                                    value={item.coords.latitude.toString()}
+                                    onChangeText={(latitude) => parseFloat(latitude) > 0 && 
+                                      this.setState(state => {
+                                        var parcels = this.state.parcels;
+                                        parcels[index].coords = {
+                                          longitude: item.coords.longitude,
+                                          latitude:  coords(latitude),
+                                          LATITUDE: item.coords.LATITUDE,
+                                          LONGITUDE: parseFloat(latitude) - SPACE
+                                        }
+
+                                        return parcels;
+                                    })}
+                                />
+                              </View>
+                            </View>
+                            <Text style={styles.label_data}>
+                                Loading Time
+                            </Text>
+                            <View style={styles.row}>
+                              <View style={styles.col}>
+                                 <DatePicker
+                                    style={{width: 200}}
+                                    date={item.date}
+                                    mode="date"
+                                    placeholder="select date"
+                                    format="YYYY-MM-DD"
+                                    minDate="2016-01-01"
+                                    maxDate="2050-01-01"
+                                    confirmBtnText="Confirm"
+                                    cancelBtnText="Cancel"
+                                    customStyles={{
+                                      dateIcon: {
+                                        position: 'absolute',
+                                        left: 0,
+                                        top: 4,
+                                        marginLeft: 0,
+                                      },
+                                      dateInput: {
+                                        marginLeft: 36,
+                                        borderLeftWidth: 0,
+                                        borderRightWidth: 0,
+                                        borderTopWidth: 0,
+                                        borderHight: 2
+                                      }
+                                      // ... You can check the source to find the other keys.
+                                    }}
+                                    onDateChange={(date) => {this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.date = date;
+
+                                      return parcels;
+                                    })}}
+                                  />
+                              </View>
+                            </View>
+                            <View style={{alignItems: 'flex-end'}}>
+                                <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]}>
+                                    <Text style={styles.lable_button}>Save address</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                              <Picker
+                                  selectedValue={item.country}
+                                  style={{height: 50, width: 100, margin: 10}}
+                                  onValueChange={(itemValue, itemIndex) =>
+                                    this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.country = itemValue;
+
+                                      return parcels;
+                                    })
+                                  }>
+                                  <Picker.Item label="Czech" value="Czech" />
+                                  <Picker.Item label="Slovak" value="Slovak" />
+                              </Picker>
+                              <Picker
+                                  selectedValue={item.parcel_type}
+                                  style={{height: 50, width: 100, margin: 10}}
+                                  onValueChange={(itemValue, itemIndex) =>
+                                    this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.parcel_type = itemValue;
+
+                                      return parcels;
+                                    })
+                                  }>
+                                  <Picker.Item label="Large" value="Large" />
+                                  <Picker.Item label="Normal" value="Normal" />
+                              </Picker>
+                              <Picker
+                                  selectedValue={item.currency}
+                                  style={{height: 50, width: 100, margin: 10}}
+                                  onValueChange={(itemValue, itemIndex) =>
+                                    this.setState(state => {
+                                      var parcels = this.state.parcels;
+                                      parcels.currency = itemValue;
+
+                                      return parcels;
+                                    })
+                                  }>
+                                  <Picker.Item label="CZK" value="CZK" />
+                                  <Picker.Item label="EUR" value="EUR" />
+                              </Picker>
+                            </View>
+                            <View style={{marginLeft: 20, marginRight: 20, marginTop: 120}}>
+                                <CheckBox
+                                  title='Insurance'
+                                  checked={item.insurance}
+                                  onPress={() => this.setState({insurance: !item.insurance})}
+                                />
+                            </View>
+                            <TouchableOpacity onPress={() => {this.selectPhotoTapped()}} style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                              <View
+                                style={[styles.avatar, styles.avatarContainer, {marginBottom: 20}]}>
+                                {item.avatarSource === null ? (
+                                  <Text>Select a Photo</Text>
+                                ) : (
+                                  <Image style={styles.avatar} source={item.avatarSource} />
+                                )}
+                              </View>
+                            </TouchableOpacity>
+                            <View style={styles.col}>
+                             <Input
+                             placeholder='ParcelPrice'
+                              keyboardType="numeric"/>
+                            </View>
+                        </View>
+                      )
+                    })
+                  }                     
                   <View style={styles.row}>
                       <View style={styles.col}>                  
                         <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]}>

@@ -36,7 +36,7 @@ const CustomDrawerNavigation = (props) => {
         <DrawerNavigatorItems {...props} />
       </ScrollView>
       <View style={{ alignItems: "center", bottom: 20 }}>
-        <Button title="Logout" onPress={() => {console.log(props.navigation.state.params.parent.navigation.pop())}}/>
+        <Button title="Logout" onPress={() => {props.navigation.state.params.parent.navigation.pop()}}/>
       </View>
     </SafeAreaView>
   );

@@ -103,6 +103,7 @@ class ActualPosition extends Component {
             <View style={styles.container}>
                 <Header
                     backgroundColor={colors.headerColor}
+                    centerComponent={{ text: 'Actual Position', style: { color: '#fff' } }}
                     leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
                 />
                 <MapView

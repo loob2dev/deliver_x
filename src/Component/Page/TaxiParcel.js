@@ -16,6 +16,7 @@ class TaxiParcel extends Component {
             <View style={styles.container}>
                 <Header
                     backgroundColor={colors.headerColor}
+                    centerComponent={{ text: 'Home', style: { color: '#fff' } }}
                     leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
                 />
                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>

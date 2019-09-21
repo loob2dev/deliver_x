@@ -6,6 +6,7 @@ import colors from '../../config/colors';
 import { Divider} from 'react-native-elements';
 import key from '../../config/api_keys';
 import api from '../../config/api';
+import ProgressScreen from '../Refer/ProgressScreen';
 
 function Item({ item }) {
       return (
@@ -41,6 +42,7 @@ class DataList extends Component {
     constructor(props) {
       super(props);
       this.state = {
+        isLoading: true,
         data: null
       }
     }
@@ -50,7 +52,8 @@ class DataList extends Component {
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({
-          data: responseJson
+          data: responseJson,
+          isLoading: false
         })
         console.log(responseJson)
       })
@@ -60,10 +63,14 @@ class DataList extends Component {
     }
 
     render() {
+        if (this.state.isLoading) {
+              return <ProgressScreen/>
+            }
         return (
             <View style={styles.container}>
                 <Header
                     backgroundColor={colors.headerColor}
+                    centerComponent={{ text: 'Request History', style: { color: '#fff' } }}
                     leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
                 />
                 <SafeAreaView style={styles.container}>
