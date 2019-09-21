@@ -18,7 +18,7 @@ import ActualPosition from '../Component/Page/ActualPosition';
 const { width } = Dimensions.get("window");
 
 const Logout = () => {
-    
+      
     }
 
 const CustomDrawerNavigation = (props) => {
@@ -36,7 +36,7 @@ const CustomDrawerNavigation = (props) => {
         <DrawerNavigatorItems {...props} />
       </ScrollView>
       <View style={{ alignItems: "center", bottom: 20 }}>
-        <Button title="Logout" onPress={Logout}/>
+        <Button title="Logout" onPress={() => {console.log(props.navigation.state.params.parent.navigation.pop())}}/>
       </View>
     </SafeAreaView>
   );
@@ -59,7 +59,7 @@ const Drawer = createDrawerNavigator(
     DataList: {
       screen: DataList,
       navigationOptions: {
-        title: 'Data List'
+        title: 'Request history'
       }
     },
     ActualPosition: {

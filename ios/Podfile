@@ -32,6 +32,9 @@ target 'del_X' do
   pod 'GoogleMaps'
   pod 'Google-Maps-iOS-Utils'
   pod 'react-native-geolocation', path: '../node_modules/@react-native-community/geolocation'
+  pod 'RNFirebase', :path => '../node_modules/react-native-firebase/ios'
+  pod 'Firebase/Core', '~> 6.3.0'
+  pod 'Firebase/Messaging', '~> 6.3.0'
   
   target 'del_XTests' do
     inherit! :search_paths

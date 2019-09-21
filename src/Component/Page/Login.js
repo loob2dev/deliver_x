@@ -33,7 +33,7 @@ export default class Login extends Component {
   }
 
   login = () => {
-    this.props.navigation.navigate('Drawer', {email: 'example@email.com'});
+    this.props.navigation.navigate('Drawer', {email: 'example@email.com', parent: this.props});
     // if (this.state.email == '') {
     //     this.setState({email_error: true});
     // }

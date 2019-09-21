@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "183930650699",
+    "firebase_url": "https://delx-test.firebaseio.com",
+    "project_id": "delx-test",
+    "storage_bucket": "delx-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:183930650699:android:555451d7d29af9910d4dce",
+        "android_client_info": {
+          "package_name": "com.del_x"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "183930650699-i9vvhg7k0q294opsj8gcssbrl62r6iop.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCO1_7agyaY-wm01QmrKHHQQQER0KE8TmE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "183930650699-i9vvhg7k0q294opsj8gcssbrl62r6iop.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "183930650699-jv4r7esb8m5a60pdtgrl6ekv7kag702d.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ferratt.delx",
+                "app_store_id": "1480688841"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -28,6 +28,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import colors from '../../config/colors';
 import key from '../../config/api_keys';
 import api from '../../config/api';
+import ProgressScreen from '../Refer/ProgressScreen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -43,7 +44,8 @@ class RegisterParcel extends Component {
     constructor(props){
         super(props)
         this.state = {
-          date:"2016-05-15",
+          isLoading: true,
+          date: new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate(),
           avatarSource: null,
           sender_coords: {
             latitude: 37.78825 + SPACE,
@@ -84,7 +86,13 @@ class RegisterParcel extends Component {
       }
 
       componentDidMount() {
-        this.getLocation();
+        this.getLocation(() => {
+          this.setState({
+            isLoading: false
+          }, () => {
+            this.getLocationUpdates()
+          })
+        });
       }
 
       map_sender_log(eventName, e) {
@@ -97,8 +105,9 @@ class RegisterParcel extends Component {
           }
           }, () => {
             console.log(eventName, this.state.sender_coords);
-            this.getGeoCode_sender();
-            this.getGeoCode_parcel();
+            this.getGeoCode_sender(() => {
+              this.getGeoCode_parcel();
+            });
           })
         }
       }
@@ -113,8 +122,9 @@ class RegisterParcel extends Component {
           }
           }, () => {
             console.log(eventName, this.state.sender_coords);
-            this.getGeoCode_sender();
-            this.getGeoCode_parcel();
+            this.getGeoCode_sender(() => {
+              this.getGeoCode_parcel();
+            });
           })
         }
       }
@@ -146,7 +156,7 @@ class RegisterParcel extends Component {
         return false;
       }
 
-      getLocation = async () => {
+      getLocation = async (callback) => {
         const hasLocationPermission = await this.hasLocationPermission();
 
         if (!hasLocationPermission) return;
@@ -169,8 +179,11 @@ class RegisterParcel extends Component {
                   LONGITUDE : position.coords.longitude
                 }
               })
-              this.getGeoCode_sender();
-              this.getGeoCode_parcel();
+              this.getGeoCode_sender(() => {
+                this.getGeoCode_parcel(() => {
+                  callback();
+                });
+              });              
             },
             (error) => {
               this.setState({ location: error, loading: false });
@@ -197,8 +210,11 @@ class RegisterParcel extends Component {
                       LONGITUDE : responseJson.longitude
                     }
                   }, () => {
-                    this.getGeoCode_sender();
-                    this.getGeoCode_parcel();
+                    this.getGeoCode_sender(() => {
+                      this.getGeoCode_parcel(() => {
+                        callback();
+                      });
+                    });   
                   })
                 })
                 .catch((error) => {
@@ -211,7 +227,7 @@ class RegisterParcel extends Component {
         });
       }
 
-      getGeoCode_sender = async () => {
+      getGeoCode_sender = async (callback) => {
         console.log(this.state.sender_coords);
         Platform.OS === 'ios' ? RNGeocoder.fallbackToGoogle(key.google_map_ios):
                                 RNGeocoder.fallbackToGoogle(key.google_map_android);
@@ -258,10 +274,11 @@ class RegisterParcel extends Component {
               .catch(error => console.warn(error));
             }
           })
+          callback();
         })        
       }
 
-      getGeoCode_parcel = async () => {
+      getGeoCode_parcel = async (callback) => {
         console.log(this.state.parcel_coords);
         Platform.OS === 'ios' ? RNGeocoder.fallbackToGoogle(key.google_map_ios):
                                 RNGeocoder.fallbackToGoogle(key.google_map_android);
@@ -308,6 +325,7 @@ class RegisterParcel extends Component {
               .catch(error => console.warn(error));
             }
           })
+          callback();
         })        
       }
 
@@ -318,15 +336,16 @@ class RegisterParcel extends Component {
 
         this.setState({ updatesEnabled: true }, () => {
           this.watchId = Geolocation.watchPosition(
-            (position) => {
-              this.setState({ location: position });
-              console.log(position);
-            },
-            (error) => {
-              this.setState({ location: error });
-              console.log(error);
-            },
-            { enableHighAccuracy: true, distanceFilter: 0, interval: 5000, fastestInterval: 2000 }
+              (position) => {
+                // this.setState({ location: position });
+                console.log("upldate_location", position);
+                return fetch(api.update_last_Location + position.coords.latitude + "/" + position.coords.longitude);
+              },
+              (error) => {
+                // this.setState({ location: error });
+                console.log(error);
+              },
+              { enableHighAccuracy: true, distanceFilter: 0, interval: 5000, fastestInterval: 2000 }
           );
         });
       }
@@ -388,6 +407,9 @@ class RegisterParcel extends Component {
       }
 
     render () {
+        if (this.state.isLoading) {
+          return <ProgressScreen/>
+        }
         let countries = [{
           value: 'Czech',
         }, {
@@ -561,7 +583,7 @@ class RegisterParcel extends Component {
                             placeholder='Nr.'
                             keyboardType="numeric"
                             value={this.state.sender_street_nr}
-                            onChangeText={(sender_street) => this.setState({sender_street_nr})}
+                            onChangeText={(sender_street_nr) => this.setState({sender_street_nr})}
                         />
                       </View>
                     </View>
@@ -638,8 +660,8 @@ class RegisterParcel extends Component {
                             mode="date"
                             placeholder="select date"
                             format="YYYY-MM-DD"
-                            minDate="2016-05-01"
-                            maxDate="2016-06-01"
+                            minDate="2016-01-01"
+                            maxDate="2050-01-01"
                             confirmBtnText="Confirm"
                             cancelBtnText="Cancel"
                             customStyles={{
@@ -654,7 +676,6 @@ class RegisterParcel extends Component {
                                 borderLeftWidth: 0,
                                 borderRightWidth: 0,
                                 borderTopWidth: 0,
-                                borderColor: '#007bff',
                                 borderHight: 2
                               }
                               // ... You can check the source to find the other keys.
@@ -758,7 +779,7 @@ class RegisterParcel extends Component {
                             placeholder='Nr.'
                             keyboardType="numeric"
                             value={this.state.parcel_street_nr}
-                            onChangeText={(parcel_street) => this.setState({parcel_street_nr})}
+                            onChangeText={(parcel_street_nr) => this.setState({parcel_street_nr})}
                         />
                       </View>
                     </View>
@@ -835,8 +856,8 @@ class RegisterParcel extends Component {
                             mode="date"
                             placeholder="select date"
                             format="YYYY-MM-DD"
-                            minDate="2016-05-01"
-                            maxDate="2016-06-01"
+                            minDate="2016-01-01"
+                            maxDate="2050-01-01"
                             confirmBtnText="Confirm"
                             cancelBtnText="Cancel"
                             customStyles={{
@@ -851,7 +872,6 @@ class RegisterParcel extends Component {
                                 borderLeftWidth: 0,
                                 borderRightWidth: 0,
                                 borderTopWidth: 0,
-                                borderColor: '#007bff',
                                 borderHight: 2
                               }
                               // ... You can check the source to find the other keys.
