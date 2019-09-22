@@ -171,7 +171,7 @@ class RegisterParcel extends Component {
               //temp
               fetch(api.update_last_Location + position.coords.latitude + "/" + position.coords.longitude);
               //
-              this.setState({ location: position, loading: false });
+              this.setState({ location: position, loading: false });              
               this.setState({
                 sender_coords: {
                   latitude : position.coords.latitude,
@@ -179,25 +179,26 @@ class RegisterParcel extends Component {
                   LATITUDE : position.coords.latitude,
                   LONGITUDE : position.coords.longitude
                 }
-              })
-              this.state.parcels.forEach((item, index) => {
+              }, () => {
                 this.setState(state => {
-                  var parcels = this.state.parcels;
-                  parcels[index].coords = {
+                  var parcels = state.parcels;
+                  parcels[0].coords = {
                     latitude : position.coords.latitude,
                     longitude : position.coords.longitude,
                     LATITUDE : position.coords.latitude,
                     LONGITUDE : position.coords.longitude
                   }
 
-                  return parcels
+                  return {parcels: parcels}
+                }, () => {
+                  console.log("after", this.state.parcels)
+                  this.getGeoCode_sender(() => {
+                    this.getGeoCode_parcel(() => {
+                      callback();
+                    });
+                  });  
                 })
-              })
-              this.getGeoCode_sender(() => {
-                this.getGeoCode_parcel(() => {
-                  callback();
-                });
-              });              
+              })                          
             },
             (error) => {
               this.setState({ location: error, loading: false });
@@ -210,33 +211,32 @@ class RegisterParcel extends Component {
                 fetch(api.ipStack + ip + "?access_key=" + key.ip_stack)
                 .then((response) => response.json())
                 .then((responseJson) => {
-                this.state.parcels.forEach((item, index) => {
-                  this.setState(state => {
-                      var parcels = this.state.parcels;
-                      parcels[index].coords = {
-                        latitude : position.coords.latitude,
-                        longitude : position.coords.longitude,
-                        LATITUDE : position.coords.latitude,
-                        LONGITUDE : position.coords.longitude
-                      }
-
-                      return parcels
-                    })
-                  })               
-                  this.setState({
-                    sender_coords: {
-                      latitude : responseJson.latitude,
-                      longitude : responseJson.longitude,
-                      LATITUDE : responseJson.latitude,
-                      LONGITUDE : responseJson.longitude
+                  this.setState(state => {                    
+                    var parcels = state.parcels;
+                    parcels[0].coords = {
+                      latitude : position.coords.latitude,
+                      longitude : position.coords.longitude,
+                      LATITUDE : position.coords.latitude,
+                      LONGITUDE : position.coords.longitude
                     }
-                  }, () => {
-                    this.getGeoCode_sender(() => {
-                      this.getGeoCode_parcel(() => {
-                        callback();
-                      });
-                    });   
-                  })
+
+                    return parcels
+                  }, () => {                    
+                    this.setState({
+                      sender_coords: {
+                        latitude : responseJson.latitude,
+                        longitude : responseJson.longitude,
+                        LATITUDE : responseJson.latitude,
+                        LONGITUDE : responseJson.longitude
+                      }
+                    }, () => {
+                      this.getGeoCode_sender(() => {
+                        this.getGeoCode_parcel(() => {
+                          callback();
+                        });
+                      });   
+                    })
+                  })                  
                 })
                 .catch((error) => {
                   console.error(error);
@@ -300,41 +300,49 @@ class RegisterParcel extends Component {
       }
 
       getGeoCode_parcel = async (callback) => {
-        console.log(this.state.parcels[0].coords);
         Platform.OS === 'ios' ? RNGeocoder.fallbackToGoogle(key.google_map_ios):
                                 RNGeocoder.fallbackToGoogle(key.google_map_android);
-        RNGeocoder.geocodePosition({lat: this.state.parcel_coords.latitude, lng: this.state.parcel_coords.longitude}).then(res => {
-          console.log("geocoding_parcel", res);
+        RNGeocoder.geocodePosition({lat: this.state.parcels[0].coords.latitude, lng: this.state.parcels[0].coords.longitude}).then(res => {
           res.forEach((item, index) => {
-            this.setState({
-              parcel_address_name : item.formattedAddress != null ? item.formattedAddress : null,
-              parcel_email: null,
-              parcel_phone: null,
-              parcel_street: item.streetName != null ? item.streetName : null,
-              parcel_street_nr: item.streetNumber != null ? item.streetNumber: null,
-              parcel_city: item.locality != null ? item.locality : null,
-              parcel_postal_code: item.postalCode != null ? item.postalCode : null,
-              parcel_country: item.country != null ? item.country : null,
-              })
+            this.setState(state => {
+              var parcels = state.parcels;
+              parcels[0].parcel_address_name = item.formattedAddress != null ? item.formattedAddress : null
+              parcels[0].parcel_email = null
+              parcels[0].parcel_phone = null
+              parcels[0].parcel_street = item.streetName != null ? item.streetName : null
+              parcels[0].parcel_street_nr = item.streetNumber != null ? item.streetNumber: null
+              parcels[0].parcel_city = item.locality != null ? item.locality : null
+              parcels[0].parcel_postal_code = item.postalCode != null ? item.postalCode : null
+              parcels[0].parcel_country = item.country != null ? item.country : null
+
+              return parcels
+            })
             if (index + 1 === res.length){
+                console.log(this.state.parcels)
                 Platform.OS === 'ios' ? Geocoder.init(key.google_map_ios):
                                         Geocoder.init(key.google_map_android);
-                Geocoder.from(this.state.parcels[0].coords.latitude, this.state.parcel_coords.longitude)
+                Geocoder.from(this.state.parcels[0].coords.latitude, this.state.parcels[0].coords.longitude)
                 .then(json => {
                   console.log(json)
                   json.results.forEach((array_component) => {
                     array_component.types.forEach((type, index) => {
                       if (type == 'country') {
-                        this.setState({
-                          parcel_country: array_component.formatted_address
+                        this.setState(state => {
+                          var parcels = this.state.parcels;
+                          parcels.parcel_country = array_component.formatted_address;
+
+                          return parcels
                         })
                       }
                       if (type == 'street_address') {
                         array_component.address_components.forEach((item_address) => {
                           item_address.types.forEach((type) => {
                             if (type == "postal_code") {
-                              this.setState({
-                                parcel_postal_code: item_address.long_name
+                              this.setState(state => {
+                                var parcels = state.parcels;
+                                parcels.parcel_postal_code = item_address.long_name;
+
+                                return parcels;
                               })
                             }
                           })
@@ -423,9 +431,14 @@ class RegisterParcel extends Component {
         this.setState({isShowSenderMap: !this.state.isShowSenderMap})
       }
 
-    showParcelMap = () => {
-        this.setState({isShowParcelMap: !this.state.isShowParcelMap})
-      }
+    showParcelMap = (index) => {
+      this.setState(state=>{
+        var parcels = this.state.parcels;
+        parcels[index].isShowParcelMap = !parcels[index].isShowParcelMap;
+
+        return parcels;
+      })        
+    }
 
     showAdderss = () => {
       this.props.navigation.state.params.parent.navigation.navigate('Address');
@@ -719,13 +732,13 @@ class RegisterParcel extends Component {
                   {
                     this.state.parcels.map((item, index) => {
                       return (
-                        <View>
+                        <View key={index}>
                             <Text style={styles.subTitle}>
                                 Parcel #1
                             </Text>
                             <View style={styles.row}>
                               <View style={styles.col}>                  
-                                <TouchableOpacity style={[styles.buttonContainer, item.isShowParcelMap ? styles.mapButton_hide : styles.mapButton_show]} onPress={() => this.showParcelMap()}>
+                                <TouchableOpacity style={[styles.buttonContainer, item.isShowParcelMap ? styles.mapButton_hide : styles.mapButton_show]} onPress={() => this.showParcelMap(index)}>
                                   {
                                     item.isShowParcelMap &&
                                     <Text style={styles.lable_button}>Hide map</Text>
