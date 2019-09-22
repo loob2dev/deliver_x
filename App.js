@@ -12,13 +12,29 @@ import { createAppContainer } from 'react-navigation';
 import AsyncStorage from '@react-native-community/async-storage';
 import AppNavigator from './src/router/AppNavigator';
 import firebase from 'react-native-firebase';
+import Geolocation from 'react-native-geolocation-service';
+import api from './src/config/api';
 
 const AppContainer = createAppContainer(AppNavigator)
 
 export default class App extends Component {
+	constructor(props) {
+	    super(props);
+	    this.state = {
+		    coords: {
+		    	latitude : 49.8175,
+		    	longitude: 15.4730
+		    }
+	    }
+	 }
+
+
+	watchId = null;
+
 	async componentDidMount() {
 	  this.checkPermission();
 	  this.createNotificationListeners();
+	  this.getLocationUpdates();
 	}
 
 	componentWillUnmount() {
@@ -105,7 +121,65 @@ export default class App extends Component {
 	  );
 	}
 
+	hasLocationPermission = async () => {
+        if (Platform.OS === 'ios' ||
+            (Platform.OS === 'android' && Platform.Version < 23)) {
+          return true;
+        }
+
+        const hasPermission = await PermissionsAndroid.check(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+
+        if (hasPermission) return true;
+
+        const status = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+        );
+
+        if (status === PermissionsAndroid.RESULTS.GRANTED) return true;
+
+        if (status === PermissionsAndroid.RESULTS.DENIED) {
+          ToastAndroid.show('Location permission denied by user.', ToastAndroid.LONG);
+        } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+          ToastAndroid.show('Location permission revoked by user.', ToastAndroid.LONG);
+        }
+
+        return false;
+     }
+
+	getLocationUpdates = async () => {
+        const hasLocationPermission = await this.hasLocationPermission();
+
+        if (!hasLocationPermission) return;
+
+        this.watchId = Geolocation.watchPosition(
+            (position) => {
+                this.setState({
+                	coords: {
+                		latitude: position.coords.latitude,
+                		longitude: position.coords.longitude
+                	}
+                })
+                console.log("upldate_location", position);
+                return fetch(api.update_last_Location + position.coords.latitude + "/" + position.coords.longitude);
+            },
+              (error) => {
+                // this.setState({ location: error });
+                console.log(error);
+            },
+            { enableHighAccuracy: true, distanceFilter: 0, interval: 30000, fastestInterval: 2000 }
+         );
+    }
+
+    removeLocationUpdates = () => {
+         if (this.watchId !== null) {
+              Geolocation.clearWatch(this.watchId);
+              this.setState({ updatesEnabled: false })
+         }
+     }
+
 	render() {
-		return <AppContainer />
+		return <AppContainer screenProps = {this.state.coords}/>
 	}
 }

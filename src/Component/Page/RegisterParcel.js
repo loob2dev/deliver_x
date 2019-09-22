@@ -12,7 +12,7 @@ import {
   Button,
   PermissionsAndroid,
   Platform,
-  ToastAndroid
+  ToastAndroid,
 } from 'react-native';
 import { Header, CheckBox, Input, Divider, Card } from 'react-native-elements';
 import { Left, Right, Icon } from 'native-base';
@@ -43,15 +43,17 @@ class RegisterParcel extends Component {
 
     constructor(props){
         super(props)
+
         this.state = {
           isLoading: true,
+          newParcelLoading: false,
           date: new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate(),
           avatarSource: null,
           sender_coords: {
-            latitude: 37.78825 + SPACE,
-            longitude: -122.4324 + SPACE,
-            LATITUDE: 37.78825,
-            LONGITUDE: -122.4324
+            latitude: this.props.screenProps.latitude,
+            longitude: this.props.screenProps.longitude,
+            LATITUDE: this.props.screenProps.latitude + SPACE,
+            LONGITUDE: this.props.screenProps.longitude + SPACE
           },
           isShowSenderMap: false,
           loading: false,
@@ -75,11 +77,12 @@ class RegisterParcel extends Component {
             parcel_city: null,
             parcel_postal_code: null,
             parcel_country: null,
+            avatarSource : null,
             coords: {
-              latitude: 37.78825 + SPACE,
-              longitude: -122.4324 + SPACE,
-              LATITUDE: 37.78825,
-              LONGITUDE: -122.4324,
+              latitude: this.props.screenProps.latitude,
+              longitude: this.props.screenProps.longitude,
+              LATITUDE: this.props.screenProps.latitude + SPACE,
+              LONGITUDE: this.props.screenProps.longitude + SPACE
             },
             isShowParcelMap: false,
           }],          
@@ -88,17 +91,16 @@ class RegisterParcel extends Component {
       }
 
       componentDidMount() {
-        this.getLocation(() => {
-          this.setState({
-            isLoading: false
-          }, () => {
-            // this.getLocationUpdates()
-          })
-        });
+        this.getGeoCode_sender(() => {
+          this.getGeoCode_parcel(0, () => {
+            this.setState({
+              isLoading: false
+            })
+          });
+        });  
       }
 
       map_sender_log(eventName, e) {
-        console.log(eventName, e.nativeEvent);
         if (eventName == "onSelect") {
           this.setState({
           sender_coords: {
@@ -106,7 +108,6 @@ class RegisterParcel extends Component {
             latitude: e.nativeEvent.coordinate.latitude
           }
           }, () => {
-            console.log(eventName, this.state.sender_coords);
             this.getGeoCode_sender(() => {
               this.getGeoCode_parcel();
             });
@@ -115,7 +116,6 @@ class RegisterParcel extends Component {
       }
 
       map_parcel_log(eventName, e, index) {
-        console.log(eventName, e.nativeEvent);
         if (eventName == "onSelect") {
           this.setState(state => {
             const parcels = state.parcels;
@@ -125,7 +125,6 @@ class RegisterParcel extends Component {
               parcels
             }
           }, () => {
-            console.log(eventName, this.state.sender_coords);
             this.getGeoCode_sender(() => {
               this.getGeoCode_parcel();
             });
@@ -160,100 +159,10 @@ class RegisterParcel extends Component {
         return false;
       }
 
-      getLocation = async (callback) => {
-        const hasLocationPermission = await this.hasLocationPermission();
-
-        if (!hasLocationPermission) return;
-
-        this.setState({ loading: true }, () => {
-          Geolocation.getCurrentPosition(
-            (position) => {
-              //temp
-              fetch(api.update_last_Location + position.coords.latitude + "/" + position.coords.longitude);
-              //
-              this.setState({ location: position, loading: false });              
-              this.setState({
-                sender_coords: {
-                  latitude : position.coords.latitude,
-                  longitude : position.coords.longitude,
-                  LATITUDE : position.coords.latitude,
-                  LONGITUDE : position.coords.longitude
-                }
-              }, () => {
-                this.setState(state => {
-                  var parcels = state.parcels;
-                  parcels[0].coords = {
-                    latitude : position.coords.latitude,
-                    longitude : position.coords.longitude,
-                    LATITUDE : position.coords.latitude,
-                    LONGITUDE : position.coords.longitude
-                  }
-
-                  return {parcels: parcels}
-                }, () => {
-                  console.log("after", this.state.parcels)
-                  this.getGeoCode_sender(() => {
-                    this.getGeoCode_parcel(() => {
-                      callback();
-                    });
-                  });  
-                })
-              })                          
-            },
-            (error) => {
-              this.setState({ location: error, loading: false });
-              console.log(error);
-              publicIP()
-              .then(ip => {
-                console.log(ip);
-                Platform.OS === 'ios' ? Geocoder.init(key.google_map_ios):
-                                      Geocoder.init(key.google_map_android);
-                fetch(api.ipStack + ip + "?access_key=" + key.ip_stack)
-                .then((response) => response.json())
-                .then((responseJson) => {
-                  this.setState(state => {                    
-                    var parcels = state.parcels;
-                    parcels[0].coords = {
-                      latitude : position.coords.latitude,
-                      longitude : position.coords.longitude,
-                      LATITUDE : position.coords.latitude,
-                      LONGITUDE : position.coords.longitude
-                    }
-
-                    return parcels
-                  }, () => {                    
-                    this.setState({
-                      sender_coords: {
-                        latitude : responseJson.latitude,
-                        longitude : responseJson.longitude,
-                        LATITUDE : responseJson.latitude,
-                        LONGITUDE : responseJson.longitude
-                      }
-                    }, () => {
-                      this.getGeoCode_sender(() => {
-                        this.getGeoCode_parcel(() => {
-                          callback();
-                        });
-                      });   
-                    })
-                  })                  
-                })
-                .catch((error) => {
-                  console.error(error);
-                });
-              });
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000, distanceFilter: 50, forceRequestLocation: true }
-          );
-        });
-      }
-
       getGeoCode_sender = async (callback) => {
-        console.log(this.state.sender_coords);
         Platform.OS === 'ios' ? RNGeocoder.fallbackToGoogle(key.google_map_ios):
                                 RNGeocoder.fallbackToGoogle(key.google_map_android);
         RNGeocoder.geocodePosition({lat: this.state.sender_coords.latitude, lng: this.state.sender_coords.longitude}).then(res => {
-          console.log("geocoding", res);
           res.forEach((item, index) => {
             this.setState({
               sender_address_name : item.formattedAddress != null ? item.formattedAddress : null,
@@ -270,7 +179,6 @@ class RegisterParcel extends Component {
                                         Geocoder.init(key.google_map_android);
                 Geocoder.from(this.state.sender_coords.latitude, this.state.sender_coords.longitude)
                 .then(json => {
-                  console.log(json)
                   json.results.forEach((array_component) => {
                     array_component.types.forEach((type, index) => {
                       if (type == 'country') {
@@ -299,31 +207,33 @@ class RegisterParcel extends Component {
         })        
       }
 
-      getGeoCode_parcel = async (callback) => {
+      getGeoCode_parcel = async (index, callback) => {
         Platform.OS === 'ios' ? RNGeocoder.fallbackToGoogle(key.google_map_ios):
                                 RNGeocoder.fallbackToGoogle(key.google_map_android);
-        RNGeocoder.geocodePosition({lat: this.state.parcels[0].coords.latitude, lng: this.state.parcels[0].coords.longitude}).then(res => {
-          res.forEach((item, index) => {
+        RNGeocoder.geocodePosition({lat: this.state.parcels[index].coords.latitude, lng: this.state.parcels[index].coords.longitude}).then(res => {
+          console.log(index, res)
+          res.forEach((item, i) => {
             this.setState(state => {
               var parcels = state.parcels;
-              parcels[0].parcel_address_name = item.formattedAddress != null ? item.formattedAddress : null
-              parcels[0].parcel_email = null
-              parcels[0].parcel_phone = null
-              parcels[0].parcel_street = item.streetName != null ? item.streetName : null
-              parcels[0].parcel_street_nr = item.streetNumber != null ? item.streetNumber: null
-              parcels[0].parcel_city = item.locality != null ? item.locality : null
-              parcels[0].parcel_postal_code = item.postalCode != null ? item.postalCode : null
-              parcels[0].parcel_country = item.country != null ? item.country : null
+              console.log(index, parcels[index])
+              parcels[index].parcel_address_name = item.formattedAddress != null ? item.formattedAddress : null
+              parcels[index].parcel_email = null
+              parcels[index].parcel_phone = null
+              parcels[index].parcel_street = item.streetName != null ? item.streetName : null
+              parcels[index].parcel_street_nr = item.streetNumber != null ? item.streetNumber: null
+              parcels[index].parcel_city = item.locality != null ? item.locality : null
+              parcels[index].parcel_postal_code = item.postalCode != null ? item.postalCode : null
+              parcels[index].parcel_country = item.country != null ? item.country : null
+
+              console.log(parcels)
 
               return parcels
             })
-            if (index + 1 === res.length){
-                console.log(this.state.parcels)
+            if (i + 1 === res.length){
                 Platform.OS === 'ios' ? Geocoder.init(key.google_map_ios):
                                         Geocoder.init(key.google_map_android);
-                Geocoder.from(this.state.parcels[0].coords.latitude, this.state.parcels[0].coords.longitude)
+                Geocoder.from(this.state.parcels[index].coords.latitude, this.state.parcels[index].coords.longitude)
                 .then(json => {
-                  console.log(json)
                   json.results.forEach((array_component) => {
                     array_component.types.forEach((type, index) => {
                       if (type == 'country') {
@@ -357,35 +267,6 @@ class RegisterParcel extends Component {
           callback();
         })        
       }
-
-      getLocationUpdates = async () => {
-        const hasLocationPermission = await this.hasLocationPermission();
-
-        if (!hasLocationPermission) return;
-
-        this.setState({ updatesEnabled: true }, () => {
-          this.watchId = Geolocation.watchPosition(
-              (position) => {
-                // this.setState({ location: position });
-                console.log("upldate_location", position);
-                return fetch(api.update_last_Location + position.coords.latitude + "/" + position.coords.longitude);
-              },
-              (error) => {
-                // this.setState({ location: error });
-                console.log(error);
-              },
-              { enableHighAccuracy: true, distanceFilter: 0, interval: 5000, fastestInterval: 2000 }
-          );
-        });
-      }
-
-      removeLocationUpdates = () => {
-          if (this.watchId !== null) {
-              Geolocation.clearWatch(this.watchId);
-              this.setState({ updatesEnabled: false })
-          }
-      }
-
 
     selectPhotoTapped() {
       const options = {
@@ -442,6 +323,35 @@ class RegisterParcel extends Component {
 
     showAdderss = () => {
       this.props.navigation.state.params.parent.navigation.navigate('Address');
+    }
+
+    add_parcel = () => {
+      this.setState(state => {
+        var parcels = state.parcels;
+        parcels.push({
+            parcel_address_name: null,
+            parcel_email: null,
+            parcel_phone: null,
+            parcel_street: null,
+            parcel_street_nr: null,
+            parcel_city: null,
+            parcel_postal_code: null,
+            parcel_country: null,
+            avatarSource : null,
+            coords: {
+              latitude: this.props.screenProps.latitude,
+              longitude: this.props.screenProps.longitude,
+              LATITUDE: this.props.screenProps.latitude + SPACE,
+              LONGITUDE: this.props.screenProps.longitude + SPACE
+            },
+            isShowParcelMap: false,
+          });
+
+        return parcels;
+      }, () => {
+        this.getGeoCode_parcel(this.state.parcels.length - 1, () => {
+        })
+      })
     }
 
     render () {
@@ -734,7 +644,7 @@ class RegisterParcel extends Component {
                       return (
                         <View key={index}>
                             <Text style={styles.subTitle}>
-                                Parcel #1
+                                Parcel #{index}
                             </Text>
                             <View style={styles.row}>
                               <View style={styles.col}>                  
@@ -762,8 +672,8 @@ class RegisterParcel extends Component {
                                   provider={this.props.provider}
                                   style={styles.map}
                                   initialRegion={{
-                                    latitude: item.coords.LATITUDE,
-                                    longitude: item.coords.LONGITUDE,
+                                    latitude: item.coords.latitude,
+                                    longitude: item.coords.longitude,
                                     latitudeDelta: LATITUDE_DELTA,
                                     longitudeDelta: LONGITUDE_DELTA,
                                   }}
@@ -1047,10 +957,10 @@ class RegisterParcel extends Component {
                         </View>
                       )
                     })
-                  }                     
+                  }                   
                   <View style={styles.row}>
                       <View style={styles.col}>                  
-                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]}>
+                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]} onPress={() => {this.add_parcel()}} >
                             <Text style={styles.lable_button}>Add parcel</Text>
                         </TouchableOpacity>
                       </View>
