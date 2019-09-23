@@ -13,6 +13,7 @@ import {
   PermissionsAndroid,
   Platform,
   ToastAndroid,
+  ActivityIndicator
 } from 'react-native';
 import { Header, CheckBox, Input, Divider, Card } from 'react-native-elements';
 import { Left, Right, Icon } from 'native-base';
@@ -39,16 +40,16 @@ const SPACE = 0.01;
 
 
 class RegisterParcel extends Component {
-    watchId = null;
 
     constructor(props){
         super(props)
 
         this.state = {
-          isLoading: true,
-          newParcelLoading: false,
-          date: new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate(),
+          isLoading: true,          
           avatarSource: null,
+          countries: [],
+          parcel_types: [],
+          currencies: [],
           sender_coords: {
             latitude: this.props.screenProps.latitude,
             longitude: this.props.screenProps.longitude,
@@ -67,6 +68,7 @@ class RegisterParcel extends Component {
           sender_city: null,
           sender_postal_code: null,
           sender_country: null,
+          sender_date: new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate(),
 
           parcels: [{
             parcel_address_name: null,
@@ -78,6 +80,7 @@ class RegisterParcel extends Component {
             parcel_postal_code: null,
             parcel_country: null,
             avatarSource : null,
+            parcel_date: new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate(),
             coords: {
               latitude: this.props.screenProps.latitude,
               longitude: this.props.screenProps.longitude,
@@ -85,23 +88,60 @@ class RegisterParcel extends Component {
               LONGITUDE: this.props.screenProps.longitude + SPACE
             },
             isShowParcelMap: false,
+            savingSenderAddress: false,
+            savingParcelAddress: false,
+            sendingNewRequest: false,
+            selectedCountry: null,
+            selectedCurrency: null,
+            selectedParcelType: null,
+            insurance : true
           }],          
         }
         this.selectPhotoTapped = this.selectPhotoTapped.bind(this);
       }
 
       componentDidMount() {
-        this.getGeoCode_sender(() => {
-          this.getGeoCode_parcel(0, () => {
-            this.setState({
-              isLoading: false
+        return fetch(api.get_all_countries)
+        .then((response) => response.json())
+        .then((responseJson) => {
+            this.setState({countries: responseJson})
+            console.log("countries", responseJson)
+
+            return fetch(api.get_all_parcel_types)
+            .then((response) => response.json())
+            .then((responseJson) => {
+                this.setState({parcel_types: responseJson})
+                console.log("parcel_types", responseJson)
+
+                return fetch(api.get_all_currencies)
+                .then((response) => response.json())
+                .then((responseJson) => {
+                    this.setState({currencies: responseJson})
+                    console.log("currencies", responseJson)
+
+                    this.getGeoCode_sender(() => {
+                    this.getGeoCode_parcel(0, () => {
+                      this.setState({
+                        isLoading: false
+                      })
+                    });
+                  });  
+                })
+                .catch((error) => {
+                   console.error(error);
+                });
             })
-          });
-        });  
+            .catch((error) => {
+               console.error(error);
+            });
+        })
+        .catch((error) => {
+           console.error(error);
+        });
       }
 
       map_sender_log(eventName, e) {
-        if (eventName == "onSelect") {
+        if (eventName == "onDragEnd") {
           this.setState({
           sender_coords: {
             longitude: e.nativeEvent.coordinate.longitude,
@@ -109,25 +149,26 @@ class RegisterParcel extends Component {
           }
           }, () => {
             this.getGeoCode_sender(() => {
-              this.getGeoCode_parcel();
             });
           })
         }
       }
 
       map_parcel_log(eventName, e, index) {
-        if (eventName == "onSelect") {
+        if (eventName == "onDragEnd") {   
+          console.log(index, e.nativeEvent.coordinate)
+          var latitude = e.nativeEvent.coordinate.latitude;
+          var longitude = e.nativeEvent.coordinate.longitude;
           this.setState(state => {
-            const parcels = state.parcels;
-            parcels[index].coords = map_parcel_log
-            
-            return {
-              parcels
+            var parcels = state.parcels;
+            parcels[index].coords = {
+              longitude: longitude,
+              latitude: latitude
             }
+
+            return parcels;
           }, () => {
-            this.getGeoCode_sender(() => {
-              this.getGeoCode_parcel();
-            });
+            this.getGeoCode_parcel(index, () => {});
           })
         }
       }
@@ -239,7 +280,7 @@ class RegisterParcel extends Component {
                       if (type == 'country') {
                         this.setState(state => {
                           var parcels = this.state.parcels;
-                          parcels.parcel_country = array_component.formatted_address;
+                          parcels[index].parcel_country = array_component.formatted_address;
 
                           return parcels
                         })
@@ -250,7 +291,7 @@ class RegisterParcel extends Component {
                             if (type == "postal_code") {
                               this.setState(state => {
                                 var parcels = state.parcels;
-                                parcels.parcel_postal_code = item_address.long_name;
+                                parcels[index].parcel_postal_code = item_address.long_name;
 
                                 return parcels;
                               })
@@ -345,6 +386,13 @@ class RegisterParcel extends Component {
               LONGITUDE: this.props.screenProps.longitude + SPACE
             },
             isShowParcelMap: false,
+            savingSenderAddress: false,
+            savingParcelAddress: false,
+            sendingNewRequest: false,
+            selectedCountry: null,
+            selectedCurrency: null,
+            selectedParcelType: null,
+            insurance : true
           });
 
         return parcels;
@@ -352,6 +400,146 @@ class RegisterParcel extends Component {
         this.getGeoCode_parcel(this.state.parcels.length - 1, () => {
         })
       })
+    }
+
+    removeParcel = (index) =>{
+      this.setState(state => {
+        var parcels = this.state.parcels.splice(index, 1);
+
+        return parcels
+      })
+    }
+
+    saveSenderAddress = () => {
+      console.log("saveSenderAddress", this.state);
+      this.setState({savingSenderAddress: true}, () =>{
+        return fetch(api.create_address_book_items, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json-patch+json',
+        },
+        body: JSON.stringify([
+          {
+            "city": this.state.sender_city,
+            "street": this.state.sender_street,
+            "houseNr": this.state.sender_street_nr,
+            "zip": this.state.sender_postal_code,
+            "latitude": this.state.sender_coords.latitude,
+            "longitude": this.state.sender_coords.longitude,
+            "phone": this.state.sender_phone,
+            "email": this.state.sender_email
+          }
+        ]),
+        })
+        .then((response) => response.json())
+        .then((responseJson) => {
+            this.setState({savingSenderAddress: false});
+            console.log("saveSenderAddress_response", responseJson);
+
+           return;
+        })
+        .catch((error) => {
+          this.setState({savingSenderAddress: false});
+          console.log("saveSenderAddress_response", error)
+        });
+      })      
+    }
+
+    saveParcelAddress = (item) => {
+      console.log("saveParceAddress", item);
+      this.setState({savingParcelAddress: true}, () =>{
+        return fetch(api.create_address_book_items, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json-patch+json',
+        },
+        body: JSON.stringify([
+          {
+            "city": item.parcel_city,
+            "street": item.parcel_street,
+            "houseNr": item.parcel_street_nr,
+            "zip": item.parcel_postal_code,
+            "latitude": item.coords.latitude,
+            "longitude": item.coords.longitude,
+            "phone": item.parcel_phone,
+            "email": item.parcel_email
+          }
+        ]),
+        })
+        .then((response) => response.json())
+        .then((responseJson) => {
+            this.setState({savingParcelAddress: false});
+            console.log("saveParceAddress_response", responseJson);
+
+           return;
+        })
+        .catch((error) => {
+          this.setState({savingParcelAddress: false});
+          console.log("saveParceAddress_response", error)
+        });
+      })      
+    }
+
+    sendTransportRequest = () => {
+      console.log("sendTransportRequest", this.state)
+      // this.setState({sendingNewRequest: true}, () =>{
+      //   return fetch(api.register_new_request, {
+      //   method: 'POST',
+      //   headers: {
+      //     Accept: 'application/json',
+      //     'Content-Type': 'application/json-patch+json',
+      //   },
+      //   body: JSON.stringify({[
+      //     {
+      //       "city": item.parcel_city,
+      //       "street": item.parcel_street,
+      //       "houseNr": item.parcel_street_nr,
+      //       "zip": item.parcel_postal_code,
+      //       "latitude": item.coords.latitude,
+      //       "longitude": item.coords.longitude,
+      //       "phone": item.parcel_phone,
+      //       "email": item.parcel_email
+      //     }
+      //   ]),
+      //   })
+      //   .then((response) => response.json())
+      //   .then((responseJson) => {
+      //       this.setState({sendingNewRequest: false});
+      //       console.log(responseJson);
+
+      //      return;
+      //   })
+      //   .catch((error) => {
+      //     console.log(error)
+      //   });
+      // })
+    }
+
+    autocompleteSenderAddrrss = (data, details) => {
+      this.setState({                              
+        sender_coords: {
+          latitude : details.geometry.location.lat,
+          longitude : details.geometry.location.lng,
+          LATITUDE : details.geometry.location.lat + SPACE,
+          LONGITUDE : details.geometry.location.lng + SPACE
+        },
+      }, () => {this.getGeoCode_sender()})
+    }
+
+    autocompleteParcelAddrrss = (data, details, index) => {
+      this.setState(state => {
+        var parcels = state.parcels;
+          parcels[index].coords = {
+          latitude : details.geometry.location.lat,
+          longitude : details.geometry.location.lng,
+          LATITUDE : details.geometry.location.lat + SPACE,
+          LONGITUDE : details.geometry.location.lng + SPACE
+        }
+
+         return parcels
+      }, () => {this.getGeoCode_parcel(index, () => {})})
     }
 
     render () {
@@ -414,18 +602,11 @@ class RegisterParcel extends Component {
                           autoFocus={false}
                           returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
                           keyboardAppearance={'light'} // Can be left out for default keyboardAppearance https://facebook.github.io/react-native/docs/textinput.html#keyboardappearance
-                          listViewDisplayed='auto'    // true/false/undefined
+                          listViewDisplayed='false'    // true/false/undefined
                           fetchDetails={true}
                           renderDescription={row => row.description} // custom description render
                           onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
-                            this.setState({                              
-                              sender_coords: {
-                                latitude : details.geometry.location.lat,
-                                longitude : details.geometry.location.lng,
-                                LATITUDE : details.geometry.location.lat,
-                                LONGITUDE : details.geometry.location.lng
-                              },
-                            }, () => {this.getGeoCode_sender()})
+                            this.autocompleteSenderAddrrss(data, details)
                           }}
 
                           getDefaultValue={() => ''}
@@ -494,7 +675,7 @@ class RegisterParcel extends Component {
                     <View style={styles.row}>
                       <View style={styles.col}>                  
                         <Input
-                            placeholder='Address Name/ID'
+                            label='Address Name/ID'
                             value={this.state.sender_address_name}
                             onChangeText={(sender_address_name) => this.setState({sender_address_name})}
                          />
@@ -503,7 +684,7 @@ class RegisterParcel extends Component {
                     <View style={styles.row}>
                       <View style={styles.col}>
                         <Input
-                            placeholder='E-mail'
+                            label='E-mail'
                             keyboardType="email-address"
                             value={this.state.sender_email}
                             onChangeText={(sender_email) => this.setState({sender_email})}
@@ -511,7 +692,7 @@ class RegisterParcel extends Component {
                       </View>
                       <View style={styles.col}>
                         <Input
-                            placeholder='Phone'
+                            label='Phone'
                             keyboardType="numeric"
                             value={this.state.sender_phone}
                             onChangeText={(sender_phone) => this.setState({sender_phone})}
@@ -521,14 +702,14 @@ class RegisterParcel extends Component {
                     <View style={styles.row}>
                       <View style={styles.col}>
                         <Input
-                            placeholder='Street'
+                            label='Street'
                             value={this.state.sender_street}
                             onChangeText={(sender_street) => this.setState({sender_street})}
                         />
                       </View>
                       <View style={styles.col}>
                         <Input
-                            placeholder='Nr.'
+                            label='Nr.'
                             keyboardType="numeric"
                             value={this.state.sender_street_nr}
                             onChangeText={(sender_street_nr) => this.setState({sender_street_nr})}
@@ -538,7 +719,7 @@ class RegisterParcel extends Component {
                     <View style={styles.row}>
                       <View style={styles.col}>                  
                         <Input
-                            placeholder='City'
+                            label='City'
                             value={this.state.sender_city}
                             onChangeText={(sender_city) => this.setState({sender_city})}
                         />
@@ -547,7 +728,7 @@ class RegisterParcel extends Component {
                     <View style={styles.row}>
                       <View style={styles.col}>
                         <Input
-                            placeholder='Postal Code'
+                            label='Postal Code'
                             keyboardType="numeric"
                             value={this.state.sender_postal_code}
                             onChangeText={(sender_postal_code) => this.setState({sender_postal_code})}
@@ -555,7 +736,7 @@ class RegisterParcel extends Component {
                       </View>
                       <View style={styles.col}>
                         <Input
-                            placeholder='Country'
+                            label='Country'
                             value={this.state.sender_country}
                             onChangeText={(sender_country) => this.setState({sender_country})}
                         />
@@ -567,7 +748,7 @@ class RegisterParcel extends Component {
                     <View style={styles.row}>
                       <View style={styles.col}>
                          <Input
-                            placeholder='Longitude'
+                            label='Longitude'
                             keyboardType="numeric"
                             value={this.state.sender_coords.longitude.toString()}
                             onChangeText={(longitude) => parseFloat(longitude) > 0 && 
@@ -583,15 +764,15 @@ class RegisterParcel extends Component {
                       </View>
                       <View style={styles.col}>
                          <Input
-                            placeholder='Latitude'
+                            label='Latitude'
                             keyboardType="numeric"
                             value={this.state.sender_coords.latitude.toString()}
                             onChangeText={(latitude) => parseFloat(latitude) > 0 && this.setState({
                               sender_coords : {
                                 longitude: this.state.sender_coords.longitude,
                                 latitude:  parseFloat(latitude),
-                                LATITUDE: this.state.sender_coords.LATITUDE,
-                                LONGITUDE: parseFloat(latitude) - SPACE
+                                LATITUDE: this.state.sender_coords.LATITUDE + SPACE,
+                                LONGITUDE: parseFloat(latitude) + SPACE
                               }
                             })}
                         />
@@ -604,7 +785,7 @@ class RegisterParcel extends Component {
                       <View style={styles.col}>
                          <DatePicker
                             style={{width: 200}}
-                            date={this.state.date}
+                            date={this.state.sender_date}
                             mode="date"
                             placeholder="select date"
                             format="YYYY-MM-DD"
@@ -617,7 +798,7 @@ class RegisterParcel extends Component {
                                 position: 'absolute',
                                 left: 0,
                                 top: 4,
-                                marginLeft: 0,
+                                marginLeft: 0
                               },
                               dateInput: {
                                 marginLeft: 36,
@@ -626,15 +807,23 @@ class RegisterParcel extends Component {
                                 borderTopWidth: 0,
                                 borderHight: 2
                               }
-                              // ... You can check the source to find the other keys.
                             }}
-                            onDateChange={(date) => {this.setState({date: date})}}
+                            onDateChange={(date) => {this.setState({sender_date: date})}}
                           />
                       </View>
                     </View>
                     <View style={{alignItems: 'flex-end'}}>
-                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]}>
-                            <Text style={styles.lable_button}>Save address</Text>
+                        <TouchableOpacity disabled={this.state.savingSenderAddress} style={[styles.save_addressContainer, styles.addressButton]} onPress={() => {this.saveSenderAddress()}}>
+                            {
+                              this.state.savingSenderAddress &&
+                                <ActivityIndicator 
+                                  size="small"
+                                  color={'#fff'}/>
+                            }
+                            {
+                              !this.state.savingSenderAddress &&
+                              <Text style={styles.lable_button}>Save address</Text>
+                            }    
                         </TouchableOpacity>
                     </View>
                   </View>
@@ -644,7 +833,7 @@ class RegisterParcel extends Component {
                       return (
                         <View key={index}>
                             <Text style={styles.subTitle}>
-                                Parcel #{index}
+                                Parcel #{index + 1}
                             </Text>
                             <View style={styles.row}>
                               <View style={styles.col}>                  
@@ -664,10 +853,72 @@ class RegisterParcel extends Component {
                                   <Text style={styles.lable_button}>Address book</Text>
                                 </TouchableOpacity>
                               </View>
+                              {
+                                index > 0 &&
+                                <View style={styles.col}>
+                                  <TouchableOpacity style={[styles.deleteButtonContainer, styles.deleteButton]} onPress={() => this.removeParcel(index)}>
+                                    <Text style={styles.lable_button}>Remove</Text>
+                                  </TouchableOpacity>
+                                </View>
+                              }
                             </View>
                             {
                               item.isShowParcelMap &&
                               <Card containerStyle={{padding: 0}}>
+                              <GooglePlacesAutocomplete
+                                placeholder='Search'
+                                minLength={2} // minimum length of text to search
+                                autoFocus={false}
+                                returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
+                                keyboardAppearance={'light'} // Can be left out for default keyboardAppearance https://facebook.github.io/react-native/docs/textinput.html#keyboardappearance
+                                listViewDisplayed='false'    // true/false/undefined
+                                fetchDetails={true}
+                                renderDescription={row => row.description} // custom description render
+                                onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+                                  this.autocompleteParcelAddrrss(data, details, index);
+                                }}
+
+                                getDefaultValue={() => ''}
+
+                                query={{
+                                  // available options: https://developers.google.com/places/web-service/autocomplete
+                                  key: Platform.OS === 'ios' ? key.google_map_ios: key.google_map_android,
+                                  language: 'en', // language of the results
+                                  types: '(cities)' // default: 'geocode'
+                                }}
+
+                                styles={{
+                                  textInputContainer: {
+                                    width: '100%'
+                                  },
+                                  description: {
+                                    fontWeight: 'bold'
+                                  },
+                                  predefinedPlacesDescription: {
+                                    color: '#1faadb'
+                                  }
+                                }}
+                                nearbyPlacesAPI='GooglePlacesSearch' // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
+                                GoogleReverseGeocodingQuery={{
+                                  // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
+                                }}
+                                GooglePlacesSearchQuery={{
+                                  // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
+                                  rankby: 'distance',
+                                  type: 'cafe'
+                                }}
+                                
+                                GooglePlacesDetailsQuery={{
+                                  // available options for GooglePlacesDetails API : https://developers.google.com/places/web-service/details
+                                  fields: 'formatted_address',
+                                }}
+
+                                filterReverseGeocodingByTypes={['locality', 'administrative_area_level_3']} // filter the reverse geocoding results by types - ['locality', 'administrative_area_level_3'] if you want to display only cities
+                
+
+                                debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
+                                
+                              />
                                 <MapView
                                   provider={this.props.provider}
                                   style={styles.map}
@@ -693,7 +944,7 @@ class RegisterParcel extends Component {
                             <View style={styles.row}>
                               <View style={styles.col}>                  
                                 <Input
-                                    placeholder='Address Name/ID'
+                                    label='Address Name/ID'
                                     value={item.parcel_address_name}
                                     onChangeText={(parcel_address_name) => this.setState(state => {
                                       var parcels = this.state.parcels;
@@ -707,7 +958,7 @@ class RegisterParcel extends Component {
                             <View style={styles.row}>
                               <View style={styles.col}>
                                 <Input
-                                    placeholder='E-mail'
+                                    label='E-mail'
                                     keyboardType="email-address"
                                     value={item.parcel_email}
                                     onChangeText={(parcel_email) => this.setState(state => {
@@ -720,7 +971,7 @@ class RegisterParcel extends Component {
                               </View>
                               <View style={styles.col}>
                                 <Input
-                                    placeholder='Phone'
+                                    label='Phone'
                                     keyboardType="numeric"
                                     value={item.parcel_phone}
                                     onChangeText={(parcel_phone) => this.setState(state => {
@@ -735,7 +986,7 @@ class RegisterParcel extends Component {
                             <View style={styles.row}>
                               <View style={styles.col}>
                                 <Input
-                                    placeholder='Street'
+                                    label='Street'
                                     value={item.parcel_street}
                                     onChangeText={(parcel_street) => this.setState(state => {
                                       var parcels = this.state.parcels;
@@ -747,7 +998,7 @@ class RegisterParcel extends Component {
                               </View>
                               <View style={styles.col}>
                                 <Input
-                                    placeholder='Nr.'
+                                    label='Nr.'
                                     keyboardType="numeric"
                                     value={item.parcel_street_nr}
                                     onChangeText={(parcel_street_nr) => this.setState(state => {
@@ -762,7 +1013,7 @@ class RegisterParcel extends Component {
                             <View style={styles.row}>
                               <View style={styles.col}>                  
                                 <Input
-                                    placeholder='City'
+                                    label='City'
                                     value={item.parcel_city}
                                     onChangeText={(parcel_city) => this.setState(state => {
                                       var parcels = this.state.parcels;
@@ -776,7 +1027,7 @@ class RegisterParcel extends Component {
                             <View style={styles.row}>
                               <View style={styles.col}>
                                 <Input
-                                    placeholder='Postal Code'
+                                    label='Postal Code'
                                     keyboardType="numeric"
                                     value={item.parcel_postal_code}
                                     onChangeText={(parcel_postal_code) => this.setState(state => {
@@ -789,7 +1040,7 @@ class RegisterParcel extends Component {
                               </View>
                               <View style={styles.col}>
                                 <Input
-                                    placeholder='Country'
+                                    label='Country'
                                     value={item.parcel_country}
                                     onChangeText={(parcel_country) => this.setState(state => {
                                       var parcels = this.state.parcels;
@@ -806,7 +1057,7 @@ class RegisterParcel extends Component {
                             <View style={styles.row}>
                               <View style={styles.col}>
                                  <Input
-                                    placeholder='Longitude'
+                                    label='Longitude'
                                     keyboardType="numeric"
                                     value={item.coords.longitude.toString()}
                                     onChangeText={(longitude) => parseFloat(longitude) > 0 && 
@@ -815,8 +1066,8 @@ class RegisterParcel extends Component {
                                         parcels[index].coords = {
                                           longitude: parseFloat(longitude),
                                           latitude: item.coords.latitude,
-                                          LATITUDE: parseFloat(longitude) - SPACE,
-                                          LONGITUDE: item.coords.LONGITUDE
+                                          LATITUDE: parseFloat(longitude) + SPACE,
+                                          LONGITUDE: item.coords.LONGITUDE + SPACE
                                         }
 
                                         return parcels
@@ -825,7 +1076,7 @@ class RegisterParcel extends Component {
                               </View>
                               <View style={styles.col}>
                                  <Input
-                                    placeholder='Latitude'
+                                    label='Latitude'
                                     keyboardType="numeric"
                                     value={item.coords.latitude.toString()}
                                     onChangeText={(latitude) => parseFloat(latitude) > 0 && 
@@ -834,8 +1085,8 @@ class RegisterParcel extends Component {
                                         parcels[index].coords = {
                                           longitude: item.coords.longitude,
                                           latitude:  coords(latitude),
-                                          LATITUDE: item.coords.LATITUDE,
-                                          LONGITUDE: parseFloat(latitude) - SPACE
+                                          LATITUDE: item.coords.LATITUDE + SPACE,
+                                          LONGITUDE: parseFloat(latitude) + SPACE
                                         }
 
                                         return parcels;
@@ -850,7 +1101,7 @@ class RegisterParcel extends Component {
                               <View style={styles.col}>
                                  <DatePicker
                                     style={{width: 200}}
-                                    date={item.date}
+                                    date={item.parcel_date}
                                     mode="date"
                                     placeholder="select date"
                                     format="YYYY-MM-DD"
@@ -872,11 +1123,10 @@ class RegisterParcel extends Component {
                                         borderTopWidth: 0,
                                         borderHight: 2
                                       }
-                                      // ... You can check the source to find the other keys.
                                     }}
                                     onDateChange={(date) => {this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.date = date;
+                                      parcels[index].parcel_date = date;
 
                                       return parcels;
                                     })}}
@@ -884,64 +1134,93 @@ class RegisterParcel extends Component {
                               </View>
                             </View>
                             <View style={{alignItems: 'flex-end'}}>
-                                <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]}>
-                                    <Text style={styles.lable_button}>Save address</Text>
+                                <TouchableOpacity disabled={this.state.savingParcelAddress} style={[styles.save_addressContainer, styles.addressButton]} onPress={() => this.saveParcelAddress(item)}>
+                                    {
+                                      this.state.savingParcelAddress &&
+                                      <ActivityIndicator 
+                                      size="small"
+                                      color={'#fff'}/>
+                                    }
+                                    {
+                                      !this.state.savingParcelAddress &&
+                                      <Text style={styles.lable_button}>Save address</Text>
+                                    }                                    
                                 </TouchableOpacity>
                             </View>
-                            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center'}}>
+                            <View style={{flex: 1, flexDirection: 'row', justifyContent: 'center', marginBottom: 20}}>
                               <Picker
-                                  selectedValue={item.country}
+                                  selectedValue={item.selectedCountry}
                                   style={{height: 50, width: 100, margin: 10}}
                                   onValueChange={(itemValue, itemIndex) =>
                                     this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.country = itemValue;
+                                      parcels[index].selectedCountry = itemValue;
 
                                       return parcels;
                                     })
                                   }>
-                                  <Picker.Item label="Czech" value="Czech" />
-                                  <Picker.Item label="Slovak" value="Slovak" />
+                                  {
+                                    this.state.countries.map((item, index) => {
+                                      return (
+                                        <Picker.Item label={item.label} value={item.value} key={index}/>
+                                      )
+                                    })
+                                  }
                               </Picker>
                               <Picker
-                                  selectedValue={item.parcel_type}
+                                  selectedValue={item.selectedParcelType}
                                   style={{height: 50, width: 100, margin: 10}}
                                   onValueChange={(itemValue, itemIndex) =>
                                     this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.parcel_type = itemValue;
+                                      parcels[index].selectedParcelType = itemValue;
 
                                       return parcels;
                                     })
                                   }>
-                                  <Picker.Item label="Large" value="Large" />
-                                  <Picker.Item label="Normal" value="Normal" />
+                                  {
+                                    this.state.parcel_types.map((item, index) => {
+                                      return (
+                                        <Picker.Item label={item.name} value={item.label} key={index}/>
+                                      )
+                                    })
+                                  }
                               </Picker>
                               <Picker
-                                  selectedValue={item.currency}
+                                  selectedValue={item.selectedCurrency}
                                   style={{height: 50, width: 100, margin: 10}}
                                   onValueChange={(itemValue, itemIndex) =>
                                     this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.currency = itemValue;
+                                      parcels[index].selectedCurrency = itemValue;
 
                                       return parcels;
                                     })
                                   }>
-                                  <Picker.Item label="CZK" value="CZK" />
-                                  <Picker.Item label="EUR" value="EUR" />
+                                  {
+                                    this.state.currencies.map((item, index) => {
+                                      return (
+                                        <Picker.Item label={item.label} value={item.value} key={index}/>    
+                                      )
+                                    })
+                                  }
                               </Picker>
                             </View>
                             <View style={{marginLeft: 20, marginRight: 20, marginTop: 120}}>
                                 <CheckBox
                                   title='Insurance'
                                   checked={item.insurance}
-                                  onPress={() => this.setState({insurance: !item.insurance})}
+                                  onPress={() => this.setState(state => {
+                                    var parcels = state.parcels;
+                                    parcels[index].insurance = !item.insurance
+                                    
+                                    return parcels
+                                  })}
                                 />
                             </View>
                             <TouchableOpacity onPress={() => {this.selectPhotoTapped()}} style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                               <View
-                                style={[styles.avatar, styles.avatarContainer, {marginBottom: 20}]}>
+                                style={[styles.avatar, styles.avatarContainer, {marginBottom: 20, marginTop: 20}]}>
                                 {item.avatarSource === null ? (
                                   <Text>Select a Photo</Text>
                                 ) : (
@@ -949,23 +1228,23 @@ class RegisterParcel extends Component {
                                 )}
                               </View>
                             </TouchableOpacity>
-                            <View style={styles.col}>
+                            <View style={[styles.col, {marginBottom: 20}]}>
                              <Input
-                             placeholder='ParcelPrice'
+                             label='ParcelPrice'
                               keyboardType="numeric"/>
                             </View>
                         </View>
                       )
                     })
                   }                   
-                  <View style={styles.row}>
+                  <View style={[styles.row, {marginTop: 20, marginBottom: 20}]}>
                       <View style={styles.col}>                  
-                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]} onPress={() => {this.add_parcel()}} >
+                        <TouchableOpacity style={[styles.buttonContainer, styles.button]} onPress={() => {this.add_parcel()}} >
                             <Text style={styles.lable_button}>Add parcel</Text>
                         </TouchableOpacity>
                       </View>
                       <View style={styles.col}>
-                        <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]}>
+                        <TouchableOpacity style={[styles.buttonContainer, styles.button]} onPress={() => {this.sendTransportRequest()}}>
                             <Text style={styles.lable_button}>Send transport request</Text>
                         </TouchableOpacity>
                       </View>
@@ -1010,7 +1289,7 @@ const styles = StyleSheet.create({
       subTitle: {
         margin: 10,
         color: '#6a737d',
-        fontSize: 20,
+        fontSize: 25,
         fontWeight: 'bold',
       },
       labelStyle: {
@@ -1024,17 +1303,20 @@ const styles = StyleSheet.create({
         fontWeight: 'normal',
       },
       label_data: {
-        color: '#007bff',
-        fontSize: 15,
-        fontWeight: 'normal',
+        color: '#7d8690',
+        fontSize: 16,
+        fontWeight: 'bold',
         marginTop: 30,
-        marginLeft: 25
+        marginLeft: 18
       },
       buttonContainer: {
         height:38,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius:5,
+      },
+      button: {
+        backgroundColor: "#007bff",
       },
       mapButton_show: {
         backgroundColor: "#007bff",
@@ -1090,7 +1372,16 @@ const styles = StyleSheet.create({
           alignItems: 'center',
           marginVertical: 12,
           width: '100%'
-      }
+      },
+      deleteButton: {
+        backgroundColor: "#ff0000",
+      },
+      deleteButtonContainer: {
+          height:38,
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius:5,
+      },
 });
 
 export default RegisterParcel;
