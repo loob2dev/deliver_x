@@ -20,9 +20,9 @@ export default class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: '',
-      email_error: false,
-      password: '',
+      email: 'test@email.cz',
+      password: 'heslo123',
+      email_error: false,      
       password_error: false,
       isLoading: false
     }
@@ -33,48 +33,53 @@ export default class Login extends Component {
   }
 
   login = () => {
-    this.props.navigation.navigate('Drawer', {email: 'example@email.com', parent: this.props});
-    // if (this.state.email == '') {
-    //     this.setState({email_error: true});
-    // }
-    // if (this.state.password == '') {
-    //     this.setState({password_error: true});
-    // }
-    // if (this.state.email == '' || this.state.password == '') {
-    //     return;
-    // }
+    if (this.state.email == '') {
+        this.setState({email_error: true});
+    }
+    if (this.state.password == '') {
+        this.setState({password_error: true});
+    }
+    if (this.state.email == '' || this.state.password == '') {
+        return;
+    }
 
-    // this.setState({isLoading: true});
-    // return fetch(api.authenticate, {
-    //   method: 'POST',
-    //   headers: {
-    //     Accept: 'application/json',
-    //     'Content-Type': 'application/json-patch+json',
-    //   },
-    //   body: JSON.stringify({
-    //       "email": this.state.email,
-    //       "password": this.state.password,
-    //       "mobilePhoneNr": null,
-    //       "token": null,
-    //       "deviceID": null
-    //   }),
-    // })
-    // .then((response) => response.json())
-    // .then((responseJson) => {
-    //     this.setState({isLoading: false});
+    this.setState({isLoading: true});
+    return fetch(api.authenticate, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json-patch+json',
+      },
+      body: JSON.stringify({
+          "email": this.state.email,
+          "password": this.state.password,
+          "mobilePhoneNr": null,
+          "token": null,
+          "deviceID": null
+      }),
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+        this.setState({isLoading: false});
 
-    //     if (responseJson.message){
-    //         Alert.alert("Error", responseJson.message);
+        if (responseJson.message){
+            Alert.alert("Error", responseJson.message);
        
-    //         return;
-    //     }
-    //    this.props.navigation.navigate('Drawer', {email: responseJson.email});
+            return;
+        }
+       this.props.navigation.navigate('Drawer', {person_info : {
+        email: responseJson.email,
+        mobilePhoneNr: responseJson.mobilePhoneNr,
+        token: responseJson.token,
+        deviceID: responseJson.deviceID,
+        transporter: responseJson.transporter,
+       }, parent: this.props});
 
-    //    return;
-    // })
-    // .catch((error) => {
-    //   Alert.alert("Alert", error);
-    // });
+       return;
+    })
+    .catch((error) => {
+      Alert.alert("Alert", error);
+    });
   }
 
   render() {
@@ -92,8 +97,9 @@ export default class Login extends Component {
                   name='mail'
                   size={24}
                   color='#82847c'
-               />
+               />               
               }
+              value={this.state.email}
               onChangeText={(email) => this.setState({email, email_error: false})}
              />
             </View>
@@ -113,6 +119,7 @@ export default class Login extends Component {
                   color='#82847c'
                />
               }
+              value={this.state.password}
               onChangeText={(password) => this.setState({password, password_error: false})}
              />
             </View>

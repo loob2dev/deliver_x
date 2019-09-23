@@ -29,7 +29,7 @@ const CustomDrawerNavigation = (props) => {
           <Image source={require('../assets/no-image.png')} style={{ height: 150, width: 150, borderRadius: 60 }} />
         </View>
         <View style={{ height: 50, backgroundColor: 'Green', alignItems: 'center', justifyContent: 'center' }}>
-          <Text>{props.navigation.state.params.email}</Text>
+          <Text>{props.navigation.state.params.person_info.email}</Text>
         </View>
       </View>
       <ScrollView>

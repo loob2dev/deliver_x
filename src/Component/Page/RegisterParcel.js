@@ -45,8 +45,7 @@ class RegisterParcel extends Component {
         super(props)
 
         this.state = {
-          isLoading: true,          
-          avatarSource: null,
+          isLoading: true,
           countries: [],
           parcel_types: [],
           currencies: [],
@@ -94,7 +93,8 @@ class RegisterParcel extends Component {
             selectedCountry: null,
             selectedCurrency: null,
             selectedParcelType: null,
-            insurance : true
+            insurance : true,
+            parcel_price: "0"
           }],          
         }
         this.selectPhotoTapped = this.selectPhotoTapped.bind(this);
@@ -309,7 +309,7 @@ class RegisterParcel extends Component {
         })        
       }
 
-    selectPhotoTapped() {
+    selectPhotoTapped(index) {
       const options = {
         quality: 1.0,
         maxWidth: 500,
@@ -334,8 +334,11 @@ class RegisterParcel extends Component {
           // You can also display the image using data:
           // let source = { uri: 'data:image/jpeg;base64,' + response.data };
 
-          this.setState({
-            avatarSource: source,
+          this.setState(state => {
+            var parcels = state.parcels;
+            parcels[index].avatarSource = source;
+
+            return parcels;
           });
         }
       });
@@ -483,38 +486,97 @@ class RegisterParcel extends Component {
     }
 
     sendTransportRequest = () => {
-      console.log("sendTransportRequest", this.state)
-      // this.setState({sendingNewRequest: true}, () =>{
-      //   return fetch(api.register_new_request, {
-      //   method: 'POST',
-      //   headers: {
-      //     Accept: 'application/json',
-      //     'Content-Type': 'application/json-patch+json',
-      //   },
-      //   body: JSON.stringify({[
-      //     {
-      //       "city": item.parcel_city,
-      //       "street": item.parcel_street,
-      //       "houseNr": item.parcel_street_nr,
-      //       "zip": item.parcel_postal_code,
-      //       "latitude": item.coords.latitude,
-      //       "longitude": item.coords.longitude,
-      //       "phone": item.parcel_phone,
-      //       "email": item.parcel_email
-      //     }
-      //   ]),
-      //   })
-      //   .then((response) => response.json())
-      //   .then((responseJson) => {
-      //       this.setState({sendingNewRequest: false});
-      //       console.log(responseJson);
+      this.setState({sendingNewRequest: true}, () => {
+        var body = {
+        // "id": "string",
+        senderAddressID: this.state.sender_address_name,
+        senderCity: this.state.sender_city,
+        senderStreet: this.state.sender_street,
+        senderHouseNr: this.state.sender_street_nr,
+        senderZip: this.state.sender_postal_code,
+        senderCountry: this.state.sender_country,
+        senderLatitude: this.state.sender_coords.latitude,
+        senderLongitude: this.state.sender_coords.longitude,
+        requestedLoadingTime: this.sender_date,
+        senderEmail: this.sender_email,
+        senderPhone: this.sender_phone,
+        deviceID: this.props.navigation.state.params.person_info.mobilePhoneNr,
+        // deviceType: "",
+        // paymentUrl: "",
+        // totalDistance: "",
+        // totalPrice: "",
+        currency: {
+          // code: "",
+          // id: "string",
+          creator: "",
+          // created: "",
+          // owner: ""
+        },
+        transporter: {
+          // id: "string",
+          // firstName: "",
+          // lastName: "",
+          // mobilePhoneNr: "",
+          // licencePlate: "",
+          latitude: 0,
+          longitude: 0
+        },
+        // routePolyline: "",
+        // loadAcceptedByOwner: "",
+        // loadAcceptedByTransporter: "",
+        status: 0,
+        loadConfirmedByOwner: true
+        }
+        body.items = [];
+        this.state.parcels.forEach(item => {
+          body.items.push({
+            // id: null,
+            receiverAddressID: item.parcel_address_name,
+            receiverCity: item.parcel_city,
+            receiverStreet: item.parcel_street,
+            receiverHouseNr: item.parcel_street_nr,
+            receiverZip: item.parcel_postal_code,
+            receiverLatitude: item.coords.latitude,
+            receiverLongitude: item.coords.longitude,
+            requestedDeliveryTime: item.parcel_date,
+            receiverPhone: item.parcel_phone,
+            receiverEmail: item.parcel_email,
+            parcelType: item.selectedParcelType,
+            parcelValue: item.parcel_price,
+            parcelValueCurrency: item.selectedCurrency,
+            insuranceRequested: item.insurance,
+            receiverCountry: item.selectedCountry,
+            parcelPicture: item.parcelPicture,
+            // deliveryStatus: "",
+            // deliveryOrder: "",
+            currentLatitude: this.props.screenProps.latitude,
+            currentLongitude: this.props.screenProps.longitude
+          })
+        })
+        console.log("new transport request", body)
+        this.setState({sendingNewRequest: true}, () =>{
+          return fetch(api.register_new_request, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json-patch+json',
+            'Authorization': this.props.navigation.state.params.person_info.token
+          },
+          body: JSON.stringify(body),
+          })
+          .then((response) => response.json())
+          .then((responseJson) => {
+              this.setState({sendingNewRequest: false});
+              console.log(responseJson);
 
-      //      return;
-      //   })
-      //   .catch((error) => {
-      //     console.log(error)
-      //   });
-      // })
+              return;
+          })
+          .catch((error) => {
+            console.log(error)
+            this.setState({sendingNewRequest: false});
+          });
+        })
+      })
     }
 
     autocompleteSenderAddrrss = (data, details) => {
@@ -1218,7 +1280,7 @@ class RegisterParcel extends Component {
                                   })}
                                 />
                             </View>
-                            <TouchableOpacity onPress={() => {this.selectPhotoTapped()}} style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                            <TouchableOpacity onPress={() => {this.selectPhotoTapped(index)}} style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                               <View
                                 style={[styles.avatar, styles.avatarContainer, {marginBottom: 20, marginTop: 20}]}>
                                 {item.avatarSource === null ? (
@@ -1231,7 +1293,15 @@ class RegisterParcel extends Component {
                             <View style={[styles.col, {marginBottom: 20}]}>
                              <Input
                              label='ParcelPrice'
-                              keyboardType="numeric"/>
+                              keyboardType="numeric"
+                              value={item.parcel_price}
+                              onChangeText={(parcel_country) => this.setState(state => {
+                                var parcels = this.state.parcels;
+                                parcels.parcel_price = parcel_price;
+                                
+                                return parcels
+                              })}
+                              />
                             </View>
                         </View>
                       )
@@ -1244,8 +1314,17 @@ class RegisterParcel extends Component {
                         </TouchableOpacity>
                       </View>
                       <View style={styles.col}>
-                        <TouchableOpacity style={[styles.buttonContainer, styles.button]} onPress={() => {this.sendTransportRequest()}}>
+                        <TouchableOpacity disabled={this.state.sendingNewRequest} style={[styles.buttonContainer, styles.button]} onPress={() => {this.sendTransportRequest()}}>
+                          {
+                            this.state.sendingNewRequest &&
+                            <ActivityIndicator 
+                            size="small"
+                            color={'#fff'}/>
+                          }
+                          {
+                            !this.state.sendingNewRequest &&
                             <Text style={styles.lable_button}>Send transport request</Text>
+                          }
                         </TouchableOpacity>
                       </View>
                     </View>
