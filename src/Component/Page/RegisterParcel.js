@@ -55,7 +55,8 @@ class RegisterParcel extends Component {
             LATITUDE: this.props.screenProps.latitude + SPACE,
             LONGITUDE: this.props.screenProps.longitude + SPACE
           },
-          isShowSenderMap: false,
+          isShowSenderMapContainer: false,
+          isShowSenderMap: true,
           loading: false,
           updatesEnabled: false,
           location: {},
@@ -67,7 +68,7 @@ class RegisterParcel extends Component {
           sender_city: null,
           sender_postal_code: null,
           sender_country: null,
-          sender_date: new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate(),
+          sender_date: new Date(),
 
           parcels: [{
             parcel_address_name: null,
@@ -79,14 +80,15 @@ class RegisterParcel extends Component {
             parcel_postal_code: null,
             parcel_country: null,
             avatarSource : null,
-            parcel_date: new Date().getFullYear() + "-" + (new Date().getMonth() + 1) + "-" + new Date().getDate(),
+            parcel_date: new Date(),
             coords: {
               latitude: this.props.screenProps.latitude,
               longitude: this.props.screenProps.longitude,
               LATITUDE: this.props.screenProps.latitude + SPACE,
               LONGITUDE: this.props.screenProps.longitude + SPACE
             },
-            isShowParcelMap: false,
+            isShowParcelMapContainer: false,
+            isShowParcelMap: true,
             savingSenderAddress: false,
             savingParcelAddress: false,
             sendingNewRequest: false,
@@ -353,20 +355,20 @@ class RegisterParcel extends Component {
 
 
     showSenderMap = () => {
-        this.setState({isShowSenderMap: !this.state.isShowSenderMap})
+        this.setState({isShowSenderMapContainer: !this.state.isShowSenderMapContainer})
       }
 
     showParcelMap = (index) => {
       this.setState(state=>{
         var parcels = this.state.parcels;
-        parcels[index].isShowParcelMap = !parcels[index].isShowParcelMap;
+        parcels[index].isShowParcelMapContainer = !parcels[index].isShowParcelMapContainer;
 
         return parcels;
       })        
     }
 
     showAdderss = () => {
-      this.props.navigation.state.params.parent.navigation.navigate('Address');
+      this.props.navigation.state.params.parent.navigation.navigate('Address', {person_info: this.props.navigation.state.params.person_info});
     }
 
     add_parcel = () => {
@@ -388,7 +390,7 @@ class RegisterParcel extends Component {
               LATITUDE: this.props.screenProps.latitude + SPACE,
               LONGITUDE: this.props.screenProps.longitude + SPACE
             },
-            isShowParcelMap: false,
+            isShowParcelMapContainer: false,
             savingSenderAddress: false,
             savingParcelAddress: false,
             sendingNewRequest: false,
@@ -560,7 +562,7 @@ class RegisterParcel extends Component {
           headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json-patch+json',
-            'Authorization': this.props.navigation.state.params.person_info.token
+            'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
           },
           body: JSON.stringify(body),
           })
@@ -587,7 +589,11 @@ class RegisterParcel extends Component {
           LATITUDE : details.geometry.location.lat + SPACE,
           LONGITUDE : details.geometry.location.lng + SPACE
         },
-      }, () => {this.getGeoCode_sender()})
+        isShowSenderMap: false
+      }, () => {
+        this.getGeoCode_sender();
+        this.setState({isShowSenderMap: true})
+      })
     }
 
     autocompleteParcelAddrrss = (data, details, index) => {
@@ -606,23 +612,17 @@ class RegisterParcel extends Component {
 
     render () {
         if (this.state.isLoading) {
-          return <ProgressScreen/>
+          return (
+                <View style={styles.container}>
+                     <Header
+                      backgroundColor={colors.headerColor}
+                      centerComponent={{ text: 'Register transport request', style: { color: '#fff' } }}
+                      leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
+                    />
+                    <ProgressScreen/>
+                </View>            
+            )
         }
-        let countries = [{
-          value: 'Czech',
-        }, {
-          value: 'Slovak',
-        }];
-        let parcel_types = [{
-            value: 'Large'
-        },{
-            value: 'Normal'
-        }];
-        let currencies = [{
-            value: 'CZK'
-        },{
-            value: 'EUR'
-        }];
         const { loading, location, updatesEnabled } = this.state;
         return (
             <View style={styles.container}>
@@ -638,13 +638,13 @@ class RegisterParcel extends Component {
                     </Text>
                     <View style={styles.row}>
                       <View style={styles.col}>                  
-                        <TouchableOpacity style={[styles.buttonContainer, this.state.isShowSenderMap ? styles.mapButton_hide : styles.mapButton_show]} onPress={() => this.showSenderMap()}>
+                        <TouchableOpacity style={[styles.buttonContainer, this.state.isShowSenderMapContainer ? styles.mapButton_hide : styles.mapButton_show]} onPress={() => this.showSenderMap()}>
                           {
-                            this.state.isShowSenderMap &&
+                            this.state.isShowSenderMapContainer &&
                             <Text style={styles.lable_button}>Hide map</Text>
                           }
                           {
-                            !this.state.isShowSenderMap &&
+                            !this.state.isShowSenderMapContainer &&
                             <Text style={styles.lable_button}>Show map</Text>
                           }
                         </TouchableOpacity>
@@ -656,7 +656,7 @@ class RegisterParcel extends Component {
                       </View>
                     </View>
                     {
-                      this.state.isShowSenderMap &&
+                      this.state.isShowSenderMapContainer &&
                       <Card containerStyle={{padding: 0}}>
                         <GooglePlacesAutocomplete
                           placeholder='Search'
@@ -677,7 +677,6 @@ class RegisterParcel extends Component {
                             // available options: https://developers.google.com/places/web-service/autocomplete
                             key: Platform.OS === 'ios' ? key.google_map_ios: key.google_map_android,
                             language: 'en', // language of the results
-                            types: '(cities)' // default: 'geocode'
                           }}
 
                           styles={{
@@ -712,7 +711,9 @@ class RegisterParcel extends Component {
                           debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
                           
                         />
-                        <MapView
+                        {
+                          this.state.isShowSenderMap && 
+                          <MapView
                           provider={this.props.provider}
                           style={styles.map}
                           initialRegion={{
@@ -721,17 +722,18 @@ class RegisterParcel extends Component {
                             latitudeDelta: LATITUDE_DELTA,
                             longitudeDelta: LONGITUDE_DELTA,
                           }}
-                        >
-                          <Marker
-                            coordinate={this.state.sender_coords}
-                            onSelect={e => this.map_sender_log('onSelect', e)}
-                            onDrag={e => this.map_sender_log('onDrag', e)}
-                            onDragStart={e => this.map_sender_log('onDragStart', e)}
-                            onDragEnd={e => this.map_sender_log('onDragEnd', e)}
-                            onPress={e => this.map_sender_log('onPress', e)}
-                            draggable
-                          />
-                        </MapView>
+                          >
+                            <Marker
+                              coordinate={this.state.sender_coords}
+                              onSelect={e => this.map_sender_log('onSelect', e)}
+                              onDrag={e => this.map_sender_log('onDrag', e)}
+                              onDragStart={e => this.map_sender_log('onDragStart', e)}
+                              onDragEnd={e => this.map_sender_log('onDragEnd', e)}
+                              onPress={e => this.map_sender_log('onPress', e)}
+                              draggable
+                            />
+                          </MapView>
+                        }                        
                         </Card>
                       }
                     <View style={styles.row}>
@@ -820,7 +822,10 @@ class RegisterParcel extends Component {
                                   latitude: this.state.sender_coords.latitude,
                                   LATITUDE: parseFloat(longitude) - SPACE,
                                   LONGITUDE: this.state.sender_coords.LONGITUDE
-                                }
+                                },
+                                isShowSenderMap: false
+                              }, () => {
+                                this.setState({isShowSenderMap: true})
                               })}
                         />
                       </View>
@@ -848,9 +853,9 @@ class RegisterParcel extends Component {
                          <DatePicker
                             style={{width: 200}}
                             date={this.state.sender_date}
-                            mode="date"
+                            mode="datetime"
                             placeholder="select date"
-                            format="YYYY-MM-DD"
+                            format="YYYY/MM/DD hh:mm"
                             minDate="2016-01-01"
                             maxDate="2050-01-01"
                             confirmBtnText="Confirm"
@@ -899,13 +904,13 @@ class RegisterParcel extends Component {
                             </Text>
                             <View style={styles.row}>
                               <View style={styles.col}>                  
-                                <TouchableOpacity style={[styles.buttonContainer, item.isShowParcelMap ? styles.mapButton_hide : styles.mapButton_show]} onPress={() => this.showParcelMap(index)}>
+                                <TouchableOpacity style={[styles.buttonContainer, item.isShowParcelMapContainer ? styles.mapButton_hide : styles.mapButton_show]} onPress={() => this.showParcelMap(index)}>
                                   {
-                                    item.isShowParcelMap &&
+                                    item.isShowParcelMapContainer &&
                                     <Text style={styles.lable_button}>Hide map</Text>
                                   }
                                   {
-                                    !item.isShowParcelMap &&
+                                    !item.isShowParcelMapContainer &&
                                     <Text style={styles.lable_button}>Show map</Text>
                                   }
                                 </TouchableOpacity>
@@ -925,7 +930,7 @@ class RegisterParcel extends Component {
                               }
                             </View>
                             {
-                              item.isShowParcelMap &&
+                              item.isShowParcelMapContainer &&
                               <Card containerStyle={{padding: 0}}>
                               <GooglePlacesAutocomplete
                                 placeholder='Search'
@@ -946,7 +951,6 @@ class RegisterParcel extends Component {
                                   // available options: https://developers.google.com/places/web-service/autocomplete
                                   key: Platform.OS === 'ios' ? key.google_map_ios: key.google_map_android,
                                   language: 'en', // language of the results
-                                  types: '(cities)' // default: 'geocode'
                                 }}
 
                                 styles={{
@@ -981,6 +985,8 @@ class RegisterParcel extends Component {
                                 debounce={200} // debounce the requests in ms. Set to 0 to remove debounce. By default 0ms.
                                 
                               />
+                              {
+                                item.isShowParcelMap &&
                                 <MapView
                                   provider={this.props.provider}
                                   style={styles.map}
@@ -990,17 +996,18 @@ class RegisterParcel extends Component {
                                     latitudeDelta: LATITUDE_DELTA,
                                     longitudeDelta: LONGITUDE_DELTA,
                                   }}
-                                >
-                                  <Marker
-                                    coordinate={item.coords}
-                                    onSelect={e => this.map_parcel_log('onSelect', e, index)}
-                                    onDrag={e => this.map_parcel_log('onDrag', e, index)}
-                                    onDragStart={e => this.map_parcel_log('onDragStart', e, index)}
-                                    onDragEnd={e => this.map_parcel_log('onDragEnd', e, index)}
-                                    onPress={e => this.map_parcel_log('onPress', e, index)}
-                                    draggable
-                                  />
-                                </MapView>
+                                  >
+                                    <Marker
+                                      coordinate={item.coords}
+                                      onSelect={e => this.map_parcel_log('onSelect', e, index)}
+                                      onDrag={e => this.map_parcel_log('onDrag', e, index)}
+                                      onDragStart={e => this.map_parcel_log('onDragStart', e, index)}
+                                      onDragEnd={e => this.map_parcel_log('onDragEnd', e, index)}
+                                      onPress={e => this.map_parcel_log('onPress', e, index)}
+                                      draggable
+                                    />
+                                  </MapView>
+                                }                               
                                 </Card>
                               }
                             <View style={styles.row}>
@@ -1131,8 +1138,16 @@ class RegisterParcel extends Component {
                                           LATITUDE: parseFloat(longitude) + SPACE,
                                           LONGITUDE: item.coords.LONGITUDE + SPACE
                                         }
+                                        parcels[index].isShowParcelMap = false;
 
                                         return parcels
+                                      }, () => {
+                                        this.setState(state => {
+                                          var parcels = state.parcels;
+                                          parcels[index].isShowParcelMap = true;
+
+                                          return parcels;
+                                        })
                                       })}
                                 />
                               </View>
@@ -1151,8 +1166,17 @@ class RegisterParcel extends Component {
                                           LONGITUDE: parseFloat(latitude) + SPACE
                                         }
 
-                                        return parcels;
-                                    })}
+                                        parcels[index].isShowParcelMap = false;
+
+                                        return parcels
+                                      }, () => {
+                                        this.setState(state => {
+                                          var parcels = state.parcels;
+                                          parcels[index].isShowParcelMap = true;
+
+                                          return parcels;
+                                        })
+                                      })}
                                 />
                               </View>
                             </View>
@@ -1164,9 +1188,9 @@ class RegisterParcel extends Component {
                                  <DatePicker
                                     style={{width: 200}}
                                     date={item.parcel_date}
-                                    mode="date"
+                                    mode="datetime"
                                     placeholder="select date"
-                                    format="YYYY-MM-DD"
+                                    format="YYYY/MM/DD hh:mm"
                                     minDate="2016-01-01"
                                     maxDate="2050-01-01"
                                     confirmBtnText="Confirm"
@@ -1295,9 +1319,9 @@ class RegisterParcel extends Component {
                              label='ParcelPrice'
                               keyboardType="numeric"
                               value={item.parcel_price}
-                              onChangeText={(parcel_country) => this.setState(state => {
+                              onChangeText={(parcel_price) => this.setState(state => {
                                 var parcels = this.state.parcels;
-                                parcels.parcel_price = parcel_price;
+                                parcels[index].parcel_price = parcel_price;
                                 
                                 return parcels
                               })}

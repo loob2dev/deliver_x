@@ -24,7 +24,7 @@
 		3C0B22398EB4444F822D130A /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 44F516180FD1496B94AEA607 /* SimpleLineIcons.ttf */; };
 		4D899B0FF27845898717A850 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2ECBE75AC1704901B607F89D /* Zocial.ttf */; };
 		60559310F66E5BFE1C2A3294 /* libPods-del_XTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D6B58BE1C1596E1A8FB0517 /* libPods-del_XTests.a */; };
-		61427788233507D400C7AB35 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 61427787233507D400C7AB35 /* GoogleService-Info.plist */; };
+		61199CF923390A6800BE6105 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 61199CF823390A6800BE6105 /* GoogleService-Info.plist */; };
 		7C1665803896E29BA1D69A19 /* libPods-del_X-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F9D65E06426C80063387A4B8 /* libPods-del_X-tvOSTests.a */; };
 		7DB3D5B247114EA3BB02BBDE /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1462293E5EAD447185C6792E /* Ionicons.ttf */; };
 		8C23C9C6251F4FE3A740A411 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9FDC8A23E579412FAF4DCA49 /* MaterialCommunityIcons.ttf */; };
@@ -81,8 +81,9 @@
 		44F516180FD1496B94AEA607 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/native-base/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		45A50AB861834C9CAE6B5CCC /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/native-base/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		5D6B58BE1C1596E1A8FB0517 /* libPods-del_XTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-del_XTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		61199CF823390A6800BE6105 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		61199CFA23390B0F00BE6105 /* libRNFirebase.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libRNFirebase.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		614277862334F9DE00C7AB35 /* del_X.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = del_X.entitlements; path = del_X/del_X.entitlements; sourceTree = "<group>"; };
-		61427787233507D400C7AB35 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		6A5A3D55942B8D6882D4B1A1 /* libPods-del_X.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-del_X.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7771E90F06BF14AE2EB12F25 /* Pods-del_X-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-del_X-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-del_X-tvOSTests/Pods-del_X-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		78CF778FAC424C3D99706693 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Regular.ttf; path = "../node_modules/native-base/Fonts/FontAwesome5_Regular.ttf"; sourceTree = "<group>"; };
@@ -165,7 +166,7 @@
 		13B07FAE1A68108700A75B9A /* del_X */ = {
 			isa = PBXGroup;
 			children = (
-				61427787233507D400C7AB35 /* GoogleService-Info.plist */,
+				61199CF823390A6800BE6105 /* GoogleService-Info.plist */,
 				614277862334F9DE00C7AB35 /* del_X.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -196,6 +197,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				61199CFA23390B0F00BE6105 /* libRNFirebase.a */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				6A5A3D55942B8D6882D4B1A1 /* libPods-del_X.a */,
@@ -437,7 +439,7 @@
 				C98BBC5AB5F74D368B1DBC0F /* Roboto_medium.ttf in Resources */,
 				064FF0FDDEBE4C43AA46ED40 /* Roboto.ttf in Resources */,
 				EC94D29442C34C8D9F8D0DC8 /* rubicon-icon-font.ttf in Resources */,
-				61427788233507D400C7AB35 /* GoogleService-Info.plist in Resources */,
+				61199CF923390A6800BE6105 /* GoogleService-Info.plist in Resources */,
 				3C0B22398EB4444F822D130A /* SimpleLineIcons.ttf in Resources */,
 				4D899B0FF27845898717A850 /* Zocial.ttf in Resources */,
 			);
@@ -788,7 +790,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.TaxiParcel.nextdaysoft;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ferratt.delx;
 				PRODUCT_NAME = del_X;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -809,7 +811,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.TaxiParcel.nextdaysoft;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ferratt.delx;
 				PRODUCT_NAME = del_X;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

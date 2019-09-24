@@ -43,12 +43,18 @@ class DataList extends Component {
       super(props);
       this.state = {
         isLoading: true,
-        data: null
+        data: null    
       }
     }
 
     componentDidMount() {
-      return fetch(api.get_all_countries, {method: 'POST',})
+      console.log('Authorization', this.props.navigation.state.params.person_info.token)
+      return fetch(api.get_all_own_undelivered_transport_requests, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
+        }
+      })
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState({
@@ -64,7 +70,16 @@ class DataList extends Component {
 
     render() {
         if (this.state.isLoading) {
-              return <ProgressScreen/>
+              return (
+                <View style={styles.container}>
+                     <Header
+                      backgroundColor={colors.headerColor}
+                      centerComponent={{ text: 'Register transport request', style: { color: '#fff' } }}
+                      leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
+                    />
+                    <ProgressScreen/>
+                </View> 
+              )
             }
         return (
             <View style={styles.container}>

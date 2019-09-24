@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>183930650699-kaj22oc0ckako3d7a444roulirkfeehm.apps.googleusercontent.com</string>
+	<string>183930650699-jv4r7esb8m5a60pdtgrl6ekv7kag702d.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.183930650699-kaj22oc0ckako3d7a444roulirkfeehm</string>
+	<string>com.googleusercontent.apps.183930650699-jv4r7esb8m5a60pdtgrl6ekv7kag702d</string>
 	<key>API_KEY</key>
 	<string>AIzaSyAaBuIJIo6RmJH-GNlNstrj81HCrWc-CrY</string>
 	<key>GCM_SENDER_ID</key>
@@ -13,7 +13,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.TaxiParcel.nextdaysoft</string>
+	<string>com.ferratt.delx</string>
 	<key>PROJECT_ID</key>
 	<string>delx-test</string>
 	<key>STORAGE_BUCKET</key>
@@ -29,7 +29,7 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:183930650699:ios:d46c59ea0d3c64080d4dce</string>
+	<string>1:183930650699:ios:3decb0af9856069f0d4dce</string>
 	<key>DATABASE_URL</key>
 	<string>https://delx-test.firebaseio.com</string>
 </dict>
