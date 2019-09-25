@@ -13,7 +13,8 @@ import {
   PermissionsAndroid,
   Platform,
   ToastAndroid,
-  ActivityIndicator
+  ActivityIndicator,
+  Keyboard
 } from 'react-native';
 import { Header, CheckBox, Input, Divider, Card } from 'react-native-elements';
 import { Left, Right, Icon } from 'native-base';
@@ -26,6 +27,8 @@ import RNGeocoder from 'react-native-geocoder';
 import Geocoder from 'react-native-geocoding';
 import publicIP from 'react-native-public-ip';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import Toast, {DURATION} from 'react-native-easy-toast'
+
 import colors from '../../config/colors';
 import key from '../../config/api_keys';
 import api from '../../config/api';
@@ -103,19 +106,43 @@ class RegisterParcel extends Component {
       }
 
       componentDidMount() {
-        return fetch(api.get_all_countries)
-        .then((response) => response.json())
+        return fetch(api.get_all_countries, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json-patch+json',
+            'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
+          }})
+        .then((response) => response.json(), {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json-patch+json',
+            'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
+          }})
         .then((responseJson) => {
             this.setState({countries: responseJson})
             console.log("countries", responseJson)
 
-            return fetch(api.get_all_parcel_types)
+            return fetch(api.get_all_parcel_types, {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json-patch+json',
+              'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
+            }})
             .then((response) => response.json())
             .then((responseJson) => {
                 this.setState({parcel_types: responseJson})
                 console.log("parcel_types", responseJson)
 
-                return fetch(api.get_all_currencies)
+                return fetch(api.get_all_currencies, {
+                method: 'GET',
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json-patch+json',
+                  'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
+                }})
                 .then((response) => response.json())
                 .then((responseJson) => {
                     this.setState({currencies: responseJson})
@@ -441,12 +468,14 @@ class RegisterParcel extends Component {
         .then((responseJson) => {
             this.setState({savingSenderAddress: false});
             console.log("saveSenderAddress_response", responseJson);
+            this.refs.toast.show('Save a sender address is success', 3500);
 
            return;
         })
         .catch((error) => {
           this.setState({savingSenderAddress: false});
           console.log("saveSenderAddress_response", error)
+          this.refs.toast.show('Save a sender address is faild', 3500);
         });
       })      
     }
@@ -477,17 +506,22 @@ class RegisterParcel extends Component {
         .then((responseJson) => {
             this.setState({savingParcelAddress: false});
             console.log("saveParceAddress_response", responseJson);
+            this.refs.toast.show('Save a parcel address is success', 3500);
 
            return;
         })
         .catch((error) => {
           this.setState({savingParcelAddress: false});
           console.log("saveParceAddress_response", error)
+          this.refs.toast.show('Save a parcel address is faild', 3500);
         });
       })      
     }
 
     sendTransportRequest = () => {
+      Keyboard.dismiss();
+      console.log(this.state)
+      return
       this.setState({sendingNewRequest: true}, () => {
         var body = {
         // "id": "string",
@@ -548,7 +582,7 @@ class RegisterParcel extends Component {
             parcelValueCurrency: item.selectedCurrency,
             insuranceRequested: item.insurance,
             receiverCountry: item.selectedCountry,
-            parcelPicture: item.parcelPicture,
+            parcelPicture: item.avatarSource,
             // deliveryStatus: "",
             // deliveryOrder: "",
             currentLatitude: this.props.screenProps.latitude,
@@ -556,6 +590,11 @@ class RegisterParcel extends Component {
           })
         })
         console.log("new transport request", body)
+
+         this.setState({sendingNewRequest: false});
+        return;
+
+
         this.setState({sendingNewRequest: true}, () =>{
           return fetch(api.register_new_request, {
           method: 'POST',
@@ -570,12 +609,14 @@ class RegisterParcel extends Component {
           .then((responseJson) => {
               this.setState({sendingNewRequest: false});
               console.log(responseJson);
+              this.refs.toast.show('Request transer is success', 3500);
 
               return;
           })
           .catch((error) => {
             console.log(error)
             this.setState({sendingNewRequest: false});
+            this.refs.toast.show('Request transer is faild', 3500);
           });
         })
       })
@@ -631,7 +672,17 @@ class RegisterParcel extends Component {
                     centerComponent={{ text: 'Register transport request', style: { color: '#fff' } }}
                     leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
                 />
-               <KeyboardAwareScrollView enabledOnAndroid>
+                <Toast 
+                ref="toast"
+                style={{backgroundColor:'#000'}}
+                position='top'
+                positionValue={100}
+                fadeInDuration={750}
+                fadeOutDuration={1000}
+                opacity={0.8}
+                textStyle={{color:'white', fontSize: 15}}
+                />
+               <KeyboardAwareScrollView enabledOnAndroid keyboardShouldPersistTaps={'handled'}>
                 <View style={styles.borderContainer}>                
                     <Text style={styles.subTitle}>
                         Sender
@@ -741,6 +792,8 @@ class RegisterParcel extends Component {
                         <Input
                             label='Address Name/ID'
                             value={this.state.sender_address_name}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.sender_address_name == null || this.state.sender_address_name == "" ? 'It is necessary.' : ''}
                             onChangeText={(sender_address_name) => this.setState({sender_address_name})}
                          />
                       </View>
@@ -751,6 +804,8 @@ class RegisterParcel extends Component {
                             label='E-mail'
                             keyboardType="email-address"
                             value={this.state.sender_email}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.sender_email == null || this.state.sender_email == "" ? 'It is necessary.' : ''}
                             onChangeText={(sender_email) => this.setState({sender_email})}
                         />
                       </View>
@@ -759,6 +814,8 @@ class RegisterParcel extends Component {
                             label='Phone'
                             keyboardType="numeric"
                             value={this.state.sender_phone}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.sender_phone == null || this.state.sender_phone == "" ? 'It is necessary.' : ''}
                             onChangeText={(sender_phone) => this.setState({sender_phone})}
                         />
                       </View>
@@ -768,6 +825,7 @@ class RegisterParcel extends Component {
                         <Input
                             label='Street'
                             value={this.state.sender_street}
+                            errorMessage={this.state.sender_street == null || this.state.sender_street == "" ? 'It is necessary.' : ''}
                             onChangeText={(sender_street) => this.setState({sender_street})}
                         />
                       </View>
@@ -776,6 +834,8 @@ class RegisterParcel extends Component {
                             label='Nr.'
                             keyboardType="numeric"
                             value={this.state.sender_street_nr}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.sender_street_nr == null || this.state.sender_street_nr == "" ? 'It is necessary.' : ''}
                             onChangeText={(sender_street_nr) => this.setState({sender_street_nr})}
                         />
                       </View>
@@ -785,6 +845,8 @@ class RegisterParcel extends Component {
                         <Input
                             label='City'
                             value={this.state.sender_city}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.sender_city == null || this.state.sender_city == "" ? 'It is necessary.' : ''}
                             onChangeText={(sender_city) => this.setState({sender_city})}
                         />
                       </View>
@@ -795,6 +857,8 @@ class RegisterParcel extends Component {
                             label='Postal Code'
                             keyboardType="numeric"
                             value={this.state.sender_postal_code}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.sender_postal_code == null || this.state.sender_postal_code == "" ? 'It is necessary.' : ''}
                             onChangeText={(sender_postal_code) => this.setState({sender_postal_code})}
                         />
                       </View>
@@ -802,6 +866,8 @@ class RegisterParcel extends Component {
                         <Input
                             label='Country'
                             value={this.state.sender_country}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.sender_country == null || this.state.sender_country == "" ? 'It is necessary.' : ''}
                             onChangeText={(sender_country) => this.setState({sender_country})}
                         />
                       </View>
@@ -1015,6 +1081,8 @@ class RegisterParcel extends Component {
                                 <Input
                                     label='Address Name/ID'
                                     value={item.parcel_address_name}
+                                    errorStyle={{ color: 'red' }}
+                                    errorMessage={item.parcel_address_name == null || item.parcel_address_name == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_address_name) => this.setState(state => {
                                       var parcels = this.state.parcels;
                                       parcels.parcel_address_name = parcel_address_name;
@@ -1030,6 +1098,8 @@ class RegisterParcel extends Component {
                                     label='E-mail'
                                     keyboardType="email-address"
                                     value={item.parcel_email}
+                                    errorStyle={{ color: 'red' }}
+                                    errorMessage={item.parcel_email == null || item.parcel_email == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_email) => this.setState(state => {
                                       var parcels = this.state.parcels;
                                       parcels.parcel_email = parcel_email;
@@ -1042,8 +1112,10 @@ class RegisterParcel extends Component {
                                 <Input
                                     label='Phone'
                                     keyboardType="numeric"
-                                    value={item.parcel_phone}
-                                    onChangeText={(parcel_phone) => this.setState(state => {
+                                    value={item.parcel_email}
+                                    errorStyle={{ color: 'red' }}
+                                    errorMessage={item.parcel_email == null || item.parcel_email == "" ? 'It is necessary.' : ''}
+                                    onChangeText={(parcel_parcel_emailphone) => this.setState(state => {
                                       var parcels = this.state.parcels;
                                       parcels.parcel_phone = parcel_phone;
                                       
@@ -1057,6 +1129,8 @@ class RegisterParcel extends Component {
                                 <Input
                                     label='Street'
                                     value={item.parcel_street}
+                                    errorStyle={{ color: 'red' }}
+                                    errorMessage={item.parcel_street == null || item.parcel_street == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_street) => this.setState(state => {
                                       var parcels = this.state.parcels;
                                       parcels.parcel_street = parcel_street;
@@ -1070,6 +1144,7 @@ class RegisterParcel extends Component {
                                     label='Nr.'
                                     keyboardType="numeric"
                                     value={item.parcel_street_nr}
+                                    errorMessage={item.parcel_street_nr == null || item.parcel_street_nr == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_street_nr) => this.setState(state => {
                                       var parcels = this.state.parcels;
                                       parcels.parcel_street_nr = parcel_street_nr;
@@ -1084,6 +1159,8 @@ class RegisterParcel extends Component {
                                 <Input
                                     label='City'
                                     value={item.parcel_city}
+                                    errorStyle={{ color: 'red' }}
+                                    errorMessage={item.parcel_city == null || item.parcel_city == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_city) => this.setState(state => {
                                       var parcels = this.state.parcels;
                                       parcels.parcel_city = parcel_city;
@@ -1099,6 +1176,8 @@ class RegisterParcel extends Component {
                                     label='Postal Code'
                                     keyboardType="numeric"
                                     value={item.parcel_postal_code}
+                                    errorStyle={{ color: 'red' }}
+                                    errorMessage={item.parcel_postal_code == null || item.parcel_postal_code == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_postal_code) => this.setState(state => {
                                       var parcels = this.state.parcels;
                                       parcels.parcel_postal_code = parcel_postal_code;
@@ -1111,6 +1190,8 @@ class RegisterParcel extends Component {
                                 <Input
                                     label='Country'
                                     value={item.parcel_country}
+                                    errorStyle={{ color: 'red' }}
+                                    errorMessage={item.parcel_country == null || item.parcel_country == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_country) => this.setState(state => {
                                       var parcels = this.state.parcels;
                                       parcels.parcel_country = parcel_country;
@@ -1319,6 +1400,8 @@ class RegisterParcel extends Component {
                              label='ParcelPrice'
                               keyboardType="numeric"
                               value={item.parcel_price}
+                              errorStyle={{ color: 'red' }}
+                              errorMessage={item.parcel_price == null || item.parcel_price == "" ? 'It is necessary.' : ''}
                               onChangeText={(parcel_price) => this.setState(state => {
                                 var parcels = this.state.parcels;
                                 parcels[index].parcel_price = parcel_price;

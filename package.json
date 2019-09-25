@@ -16,6 +16,7 @@
     "react": "16.8.6",
     "react-native": "0.60.5",
     "react-native-datepicker": "^1.7.2",
+    "react-native-easy-toast": "^1.2.0",
     "react-native-elements": "^1.2.0",
     "react-native-firebase": "^5.5.6",
     "react-native-geocoder": "^0.5.0",

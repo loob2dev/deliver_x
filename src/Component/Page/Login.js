@@ -7,7 +7,8 @@ import {
   Button,
   TouchableOpacity,
   Image,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { Input } from 'react-native-elements';
 import { Icon } from 'native-base';
@@ -83,11 +84,7 @@ export default class Login extends Component {
   }
 
   render() {
-    if(this.state.isLoading) {  
-      return <ProgressScreen/>
-    }
-    else {
-        return (
+    return (
           <View style={styles.container}>
             <View style={styles.inputContainer}>
               <Input
@@ -129,8 +126,17 @@ export default class Login extends Component {
                       Password is required!
                   </Text>
             }
-            <TouchableOpacity style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.login()}>
+            <TouchableOpacity disabled={this.state.isLoading} style={[styles.buttonContainer, styles.loginButton]} onPress={() => this.login()}>
+            {
+              this.state.isLoading && 
+              <ActivityIndicator 
+                size="small"
+                color={'#fff'}/>
+            }
+            {
+              !this.state.isLoading && 
               <Text style={styles.loginText}>Login</Text>
+            }
             </TouchableOpacity>
 
              <TouchableOpacity style={styles.buttonContainer} onPress={() => this.onClickListener('restore_password')}>
@@ -142,7 +148,6 @@ export default class Login extends Component {
             </TouchableOpacity>
           </View>
         );
-    }
   }
 }
 

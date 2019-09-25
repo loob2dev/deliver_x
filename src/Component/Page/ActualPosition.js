@@ -21,72 +21,12 @@ class ActualPosition extends Component {
         this.state = {
           isLoading: true,
           coords: {
-            latitude: 37.78825 + SPACE,
-            longitude: -122.4324 + SPACE,
-            LATITUDE: 37.78825,
-            LONGITUDE: -122.4324
+            latitude: this.props.screenProps.latitude,
+            longitude: this.props.screenProps.longitude,
+            LATITUDE: this.props.screenProps.latitude,
+            LONGITUDE: this.props.screenProps.longitude
           }
         }
-      }
-
-      componentDidMount() {
-        this.getLocation();
-      }
-
-      hasLocationPermission = async () => {
-        if (Platform.OS === 'ios' ||
-            (Platform.OS === 'android' && Platform.Version < 23)) {
-          return true;
-        }
-
-        const hasPermission = await PermissionsAndroid.check(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        );
-
-        if (hasPermission) return true;
-
-        const status = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-        );
-
-        if (status === PermissionsAndroid.RESULTS.GRANTED) return true;
-
-        if (status === PermissionsAndroid.RESULTS.DENIED) {
-          ToastAndroid.show('Location permission denied by user.', ToastAndroid.LONG);
-        } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-          ToastAndroid.show('Location permission revoked by user.', ToastAndroid.LONG);
-        }
-
-        return false;
-      }
-      getLocation = async () => {
-        const hasLocationPermission = await this.hasLocationPermission();
-
-        if (!hasLocationPermission) return;
-
-        this.setState({ loading: true }, () => {
-          Geolocation.getCurrentPosition(
-            (position) => {
-              this.setState({ location: position, loading: false });
-              this.setState({
-                coords: {
-                  latitude : position.coords.latitude,
-                  longitude : position.coords.longitude,
-                  LATITUDE : position.coords.latitude,
-                  LONGITUDE : position.coords.longitude
-                }
-              }, () => {
-                this.setState({isLoading: false})
-              })
-            },
-            (error) => {
-              this.setState({ location: error, loading: false });
-              console.log(error);
-              this.setState({isLoading: false})
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000, distanceFilter: 50, forceRequestLocation: true }
-          );
-        });
       }
 
     static navigationOptions = {
@@ -96,9 +36,6 @@ class ActualPosition extends Component {
     }
 
     render() {
-        if (this.state.isLoading) {
-          return <ProgressScreen/>
-        }
         return (
             <View style={styles.container}>
                 <Header
@@ -132,7 +69,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     map: {
-      height: 600,
+      height: height,
     },
 });
 

@@ -1,34 +1,34 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList } from 'react-native';
-import { Header } from 'react-native-elements';
+import { Header, Card } from 'react-native-elements';
 import { Left, Right, Icon } from 'native-base';
 import colors from '../../config/colors';
 import { Divider} from 'react-native-elements';
 import key from '../../config/api_keys';
 import api from '../../config/api';
 import ProgressScreen from '../Refer/ProgressScreen';
+import { getDeliveryStatus } from "../../utils/requestStatus";
 
 function Item({ item }) {
       return (
-        <View style={styles.item}>
+        <Card>
           <View style={styles.item_container}>
-            <Text style={styles.label}>ParcelNr: </Text>
-            <Text>{item.id}</Text>
+            <Text style={styles.label}>Created: </Text>
+            <Text style={styles.value}>{new Date(item.created).toLocaleString()}</Text>
           </View>
           <View style={styles.item_container}>
-            <Text style={styles.label}>AddressName: </Text>
+            <Text style={styles.label}>Address: </Text>
+            <Text style={styles.value}>{item.senderStreet + item.senderHouseNr + ", " + item.senderCity}</Text>
           </View>
           <View style={styles.item_container}>
-            <Text style={styles.label}>receiverEmail: </Text>
+            <Text style={styles.label}>E-mail: </Text>
+            <Text style={styles.value}>{item.senderEmail}</Text>
           </View>
           <View style={styles.item_container}>
-            <Text style={styles.label}>DeliveryStatus: </Text>
+            <Text style={styles.label}>Status: </Text>
+            <Text style={styles.value}>{getDeliveryStatus(item.status)}</Text>
           </View>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>receiverNumber: </Text>
-          </View>
-          <Divider style={{ backgroundColor: '#000' }} />
-        </View>
+        </Card>
       );
     }
 
@@ -48,9 +48,8 @@ class DataList extends Component {
     }
 
     componentDidMount() {
-      console.log('Authorization', this.props.navigation.state.params.person_info.token)
-      return fetch(api.get_all_own_undelivered_transport_requests, {
-        method: 'GET',
+      return fetch(api.get_all_transport_requests, {
+        method: 'POST',
         headers: {
           'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
         }
@@ -102,22 +101,23 @@ class DataList extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
-    },
-    item: {
-      padding: 10,
-      marginVertical: 8,
-      marginHorizontal: 8,
+        flex: 1,
     },
     item_container: {
-      flex: 1,
-      flexDirection: 'row'
+      flexGrow: 1,
+      margin:5
     },
     title: {
       fontSize: 32,
     },
     label: {
-      width: 120
+      width: 120,
+      fontSize: 12
+    },
+    value: {
+      marginTop: 5,
+      marginLeft: 35,
+      fontSize: 15
     }
 });
 

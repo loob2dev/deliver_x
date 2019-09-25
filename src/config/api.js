@@ -8,6 +8,7 @@ const api = {
 	get_all_parcel_types: "https://del-xtestapi.azurewebsites.net/api/CodeList/GetAllParcelTypes",
 	get_all_currencies: "https://del-xtestapi.azurewebsites.net/api/CodeList/GetAllCurrencies",
     authenticate: "https://del-xtestapi.azurewebsites.net/Users/authenticate",
+    get_all_transport_requests: "https://del-xtestapi.azurewebsites.net/api/Request/GetAllTransportRequests",
     get_all_own_undelivered_transport_requests: "https://del-xtestapi.azurewebsites.net/api/Transporter/GetAllOwnUndeliveredTransportRequests",
     update_last_Location: "https://del-xtestapi.azurewebsites.net/api/Transporter/UpdateLastLocation/",
     get_all_address_book_items: "https://del-xtestapi.azurewebsites.net/api/Request/GetAllAddressBookItems",

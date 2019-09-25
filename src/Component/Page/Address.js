@@ -27,6 +27,7 @@ import RNGeocoder from 'react-native-geocoder';
 import Geocoder from 'react-native-geocoding';
 import publicIP from 'react-native-public-ip';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import Toast, {DURATION} from 'react-native-easy-toast'
 
 import colors from '../../config/colors'
 import api from '../../config/api';
@@ -177,7 +178,7 @@ class Address extends Component {
             headers: {
               Accept: 'application/json',
               'Content-Type': 'application/json-patch+json',
-              'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
+              // 'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
             },
             body: JSON.stringify([
               {
@@ -196,6 +197,7 @@ class Address extends Component {
             .then((responseJson) => {
                 this.setState({savingAddress: false});
                 console.log("saveAddress_response", responseJson);
+                this.refs.toast.show('Save an address is success', 3500);
                 this.fetchAllAddress(() => {})
 
                return;
@@ -203,6 +205,7 @@ class Address extends Component {
             .catch((error) => {
               this.setState({savingAddress: false});
               console.log("saveAddress_response", error)
+              this.refs.toast.show('Save an address is faild', 3500);
             });
         })      
     }
@@ -271,7 +274,7 @@ class Address extends Component {
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json-patch+json',
-            'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
+            // 'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
         },
         body: JSON.stringify([
             item.id
@@ -330,6 +333,16 @@ class Address extends Component {
                     backgroundColor={colors.headerColor}
                     centerComponent={{ text: 'New Address', style: { color: '#fff' } }}
                     leftComponent={<Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />}                 
+                />
+                <Toast 
+                ref="toast"
+                style={{backgroundColor:'#000'}}
+                position='top'
+                positionValue={100}
+                fadeInDuration={750}
+                fadeOutDuration={1000}
+                opacity={0.8}
+                textStyle={{color:'white', fontSize: 15}}
                 />
                <KeyboardAwareScrollView enabledOnAndroid>
                 <View style={styles.borderContainer}>
