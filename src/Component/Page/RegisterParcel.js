@@ -33,6 +33,7 @@ import colors from '../../config/colors';
 import key from '../../config/api_keys';
 import api from '../../config/api';
 import ProgressScreen from '../Refer/ProgressScreen';
+import { getDeviceType } from "../../utils/deviceType";
 
 const { width, height } = Dimensions.get('window');
 
@@ -95,9 +96,9 @@ class RegisterParcel extends Component {
             savingSenderAddress: false,
             savingParcelAddress: false,
             sendingNewRequest: false,
-            selectedCountry: null,
-            selectedCurrency: null,
-            selectedParcelType: null,
+            selectedCountry: 0,
+            selectedCurrency: 0,
+            selectedParcelType: 0,
             insurance : true,
             parcel_price: "0"
           }],          
@@ -411,6 +412,7 @@ class RegisterParcel extends Component {
             parcel_postal_code: null,
             parcel_country: null,
             avatarSource : null,
+            parcel_date: new Date(),
             coords: {
               latitude: this.props.screenProps.latitude,
               longitude: this.props.screenProps.longitude,
@@ -418,13 +420,15 @@ class RegisterParcel extends Component {
               LONGITUDE: this.props.screenProps.longitude + SPACE
             },
             isShowParcelMapContainer: false,
+            isShowParcelMap: true,
             savingSenderAddress: false,
             savingParcelAddress: false,
             sendingNewRequest: false,
-            selectedCountry: null,
-            selectedCurrency: null,
-            selectedParcelType: null,
-            insurance : true
+            selectedCountry: 0,
+            selectedCurrency: 0,
+            selectedParcelType: 0,
+            insurance : true,
+            parcel_price: "0"
           });
 
         return parcels;
@@ -445,14 +449,46 @@ class RegisterParcel extends Component {
     saveSenderAddress = () => {
       console.log("saveSenderAddress", this.state);
       this.setState({savingSenderAddress: true}, () =>{
+        let error_cnt = 0;
+        if (this.state.sender_address_name == null || this.state.sender_address_name == "") {
+          error_cnt++;
+        }
+        if (this.state.sender_city == null || this.state.sender_city == "") {
+          error_cnt++;
+        }
+        if (this.state.sender_street == null || this.state.sender_street == "") {
+          error_cnt++;
+        }
+        if (this.state.sender_street_nr == null || this.state.sender_street_nr == "") {
+          error_cnt++;
+        }
+        if (this.state.sender_postal_code == null || this.state.sender_postal_code == "") {
+          error_cnt++;
+        }
+        if (this.state.sender_phone == null || this.state.sender_phone == "") {
+          error_cnt++;
+        }
+        if (this.state.sender_email == null || this.state.sender_email == "") {
+          error_cnt++;
+        }
+        if (error_cnt > 0) {
+          this.setState({savingSenderAddress: false});
+          this.refs.toast.show('Please insert all fields of a sender.', 3500);
+          console.log(this.state)
+
+          return
+        }
+
         return fetch(api.create_address_book_items, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json-patch+json',
+          'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
         },
         body: JSON.stringify([
           {
+            "addressID": this.state.sender_address_name,
             "city": this.state.sender_city,
             "street": this.state.sender_street,
             "houseNr": this.state.sender_street_nr,
@@ -483,14 +519,44 @@ class RegisterParcel extends Component {
     saveParcelAddress = (item) => {
       console.log("saveParceAddress", item);
       this.setState({savingParcelAddress: true}, () =>{
+        let error_cnt = 0;
+        if (item.parcel_address_name == null || item.parcel_address_name == "") {
+          error_cnt++;
+        }
+        if (item.parcel_city == null || item.parcel_city == "") {
+          error_cnt++;
+        }
+        if (item.parcel_street == null || item.parcel_street == "") {
+          error_cnt++;
+        }
+        if (item.parcel_street_nr == null || item.parcel_street_nr == "") {
+          error_cnt++;
+        }
+        if (item.parcel_postal_code == null || item.parcel_postal_code == "") {
+          error_cnt++;
+        }
+        if (item.parcel_phone == null || item.parcel_phone == "") {
+          error_cnt++;
+        }
+        if (item.parcel_email == null || item.parcel_email == "") {
+          error_cnt++;
+        }
+        if (error_cnt > 0) {
+          this.setState({savingParcelAddress: false});
+          this.refs.toast.show('Please insert all fields of this parcel.', 3500);
+
+          return
+        }
         return fetch(api.create_address_book_items, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json-patch+json',
+          'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
         },
         body: JSON.stringify([
           {
+            "addressID": item.parcel_address_name,
             "city": item.parcel_city,
             "street": item.parcel_street,
             "houseNr": item.parcel_street_nr,
@@ -519,10 +585,33 @@ class RegisterParcel extends Component {
     }
 
     sendTransportRequest = () => {
-      Keyboard.dismiss();
-      console.log(this.state)
-      return
       this.setState({sendingNewRequest: true}, () => {
+        let error_cnt = 0;
+
+        if(this.state.sender_address_name == null || this.state.sender_address_name == ""){
+          error_cnt++;
+        }
+        if(this.state.sender_city == null || this.state.sender_city == ""){
+          error_cnt++;
+        }
+        if(this.state.sender_street == null || this.state.sender_street == ""){
+          error_cnt++;
+        }
+        if(this.state.sender_street_nr == null || this.state.sender_street_nr == ""){
+          error_cnt++;
+        }
+        if(this.state.sender_postal_code == null || this.state.sender_postal_code == ""){
+          error_cnt++;
+        }
+        if(this.state.sender_country == null || this.state.sender_country == ""){
+          error_cnt++;
+        }
+        if(this.state.sender_email == null || this.state.sender_email == ""){
+          error_cnt++;
+        }
+        if(this.state.sender_phone == null || this.state.sender_phone == ""){
+          error_cnt++;
+        }
         var body = {
         // "id": "string",
         senderAddressID: this.state.sender_address_name,
@@ -533,38 +622,67 @@ class RegisterParcel extends Component {
         senderCountry: this.state.sender_country,
         senderLatitude: this.state.sender_coords.latitude,
         senderLongitude: this.state.sender_coords.longitude,
-        requestedLoadingTime: this.sender_date,
-        senderEmail: this.sender_email,
-        senderPhone: this.sender_phone,
-        deviceID: this.props.navigation.state.params.person_info.mobilePhoneNr,
-        // deviceType: "",
+        requestedLoadingTime: this.state.sender_date,
+        senderEmail: this.state.sender_email,
+        senderPhone: this.state.sender_phone,
+        deviceID: this.props.navigation.state.params.person_info.deviceID,
+        deviceType: getDeviceType(Platform.OS),
         // paymentUrl: "",
         // totalDistance: "",
         // totalPrice: "",
-        currency: {
-          // code: "",
-          // id: "string",
-          creator: "",
-          // created: "",
-          // owner: ""
-        },
-        transporter: {
-          // id: "string",
-          // firstName: "",
-          // lastName: "",
-          // mobilePhoneNr: "",
-          // licencePlate: "",
-          latitude: 0,
-          longitude: 0
-        },
+        // currency: {
+        //   code: this.state.currencies[this.state.selectedCurrency].code,
+        //   id: this.state.currencies[this.state.selectedCurrency].id,
+        //   creator: this.state.currencies[this.state.selectedCurrency].creator,
+        //   created: this.state.currencies[this.state.selectedCurrency].created,
+        //   owner: this.state.currencies[this.state.selectedCurrency].owner
+        // },
+        // transporter: {
+        //   id: "string",
+        //   firstName: "",
+        //   lastName: "",
+        //   mobilePhoneNr: "",
+        //   licencePlate: "",
+        //   latitude: 0,
+        //   longitude: 0
+        // },
         // routePolyline: "",
         // loadAcceptedByOwner: "",
         // loadAcceptedByTransporter: "",
-        status: 0,
-        loadConfirmedByOwner: true
+        // status: 0,
+        // loadConfirmedByOwner: true,
+        // navigationRouteLink: "string",
+        // created: "2019-09-25T11:24:35.514Z"
         }
         body.items = [];
         this.state.parcels.forEach(item => {
+          if(item.parcel_address_name == null || item.parcel_address_name == ""){
+            error_cnt++;
+          }
+          if(item.parcel_city == null || item.parcel_city == ""){
+            error_cnt++;
+          }
+          if(item.parcel_city == null || item.parcel_city == ""){
+            error_cnt++;
+          }
+          if(item.parcel_street_nr == null || item.parcel_street_nr == ""){
+            error_cnt++;
+          }
+          if(item.parcel_postal_code == null || item.parcel_postal_code == ""){
+            error_cnt++;
+          }          
+          if(item.parcel_phone == null || item.parcel_phone == ""){
+            error_cnt++;
+          }
+          if(item.parcel_email == null || item.parcel_email == ""){
+            error_cnt++;
+          }
+          if(item.parcel_price == null || item.parcel_price == ""){
+            error_cnt++;
+          }
+          if(item.avatarSource == null || item.avatarSource == ""){
+            error_cnt++;
+          }
           body.items.push({
             // id: null,
             receiverAddressID: item.parcel_address_name,
@@ -577,23 +695,34 @@ class RegisterParcel extends Component {
             requestedDeliveryTime: item.parcel_date,
             receiverPhone: item.parcel_phone,
             receiverEmail: item.parcel_email,
-            parcelType: item.selectedParcelType,
+            parcelType: this.state.parcel_types[item.selectedParcelType].label,
             parcelValue: item.parcel_price,
-            parcelValueCurrency: item.selectedCurrency,
+            parcelValueCurrency: this.state.currencies[item.selectedCurrency].label,
             insuranceRequested: item.insurance,
-            receiverCountry: item.selectedCountry,
+            receiverCountry: this.state.countries[item.selectedCountry].label,
             parcelPicture: item.avatarSource,
             // deliveryStatus: "",
             // deliveryOrder: "",
             currentLatitude: this.props.screenProps.latitude,
-            currentLongitude: this.props.screenProps.longitude
+            currentLongitude: this.props.screenProps.longitude,
+            // carriedByTransporter: {
+            //   id: null,
+            //   firstName: null,
+            //   lastName: null,
+            //   mobilePhoneNr: null,
+            //   licencePlate: null,
+            //   latitude: 0,
+            //   longitude: 0
+            // }
           })
         })
         console.log("new transport request", body)
 
-         this.setState({sendingNewRequest: false});
-        return;
-
+        if (error_cnt > 0) {
+          this.refs.toast.show('Please, insert all fields.', 3500);
+          this.setState({sendingNewRequest: false});
+          return;
+        }
 
         this.setState({sendingNewRequest: true}, () =>{
           return fetch(api.register_new_request, {
@@ -682,7 +811,7 @@ class RegisterParcel extends Component {
                 opacity={0.8}
                 textStyle={{color:'white', fontSize: 15}}
                 />
-               <KeyboardAwareScrollView enabledOnAndroid keyboardShouldPersistTaps={'handled'}>
+               <KeyboardAwareScrollView enabledOnAndroid>
                 <View style={styles.borderContainer}>                
                     <Text style={styles.subTitle}>
                         Sender
@@ -1085,7 +1214,7 @@ class RegisterParcel extends Component {
                                     errorMessage={item.parcel_address_name == null || item.parcel_address_name == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_address_name) => this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.parcel_address_name = parcel_address_name;
+                                      parcels[index].parcel_address_name = parcel_address_name;
                                       
                                       return parcels
                                     })}
@@ -1102,7 +1231,7 @@ class RegisterParcel extends Component {
                                     errorMessage={item.parcel_email == null || item.parcel_email == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_email) => this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.parcel_email = parcel_email;
+                                      parcels[index].parcel_email = parcel_email;
                                       
                                       return parcels
                                     })}
@@ -1112,12 +1241,12 @@ class RegisterParcel extends Component {
                                 <Input
                                     label='Phone'
                                     keyboardType="numeric"
-                                    value={item.parcel_email}
+                                    value={item.state}
                                     errorStyle={{ color: 'red' }}
-                                    errorMessage={item.parcel_email == null || item.parcel_email == "" ? 'It is necessary.' : ''}
-                                    onChangeText={(parcel_parcel_emailphone) => this.setState(state => {
+                                    errorMessage={item.parcel_phone == null || item.parcel_phone == "" ? 'It is necessary.' : ''}
+                                    onChangeText={(parcel_phone) => this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.parcel_phone = parcel_phone;
+                                      parcels[index].parcel_phone = parcel_phone;
                                       
                                       return parcels
                                     })}
@@ -1133,7 +1262,7 @@ class RegisterParcel extends Component {
                                     errorMessage={item.parcel_street == null || item.parcel_street == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_street) => this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.parcel_street = parcel_street;
+                                      parcels[index].parcel_street = parcel_street;
                                       
                                       return parcels
                                     })}
@@ -1147,7 +1276,7 @@ class RegisterParcel extends Component {
                                     errorMessage={item.parcel_street_nr == null || item.parcel_street_nr == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_street_nr) => this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.parcel_street_nr = parcel_street_nr;
+                                      parcels[index].parcel_street_nr = parcel_street_nr;
                                       
                                       return parcels
                                     })}
@@ -1163,7 +1292,7 @@ class RegisterParcel extends Component {
                                     errorMessage={item.parcel_city == null || item.parcel_city == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_city) => this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.parcel_city = parcel_city;
+                                      parcels[index].parcel_city = parcel_city;
                                       
                                       return parcels
                                     })}
@@ -1180,7 +1309,7 @@ class RegisterParcel extends Component {
                                     errorMessage={item.parcel_postal_code == null || item.parcel_postal_code == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_postal_code) => this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.parcel_postal_code = parcel_postal_code;
+                                      parcels[index].parcel_postal_code = parcel_postal_code;
                                       
                                       return parcels
                                     })}
@@ -1194,7 +1323,7 @@ class RegisterParcel extends Component {
                                     errorMessage={item.parcel_country == null || item.parcel_country == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_country) => this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels.parcel_country = parcel_country;
+                                      parcels[index].parcel_country = parcel_country;
                                       
                                       return parcels
                                     })}
@@ -1321,7 +1450,7 @@ class RegisterParcel extends Component {
                                   onValueChange={(itemValue, itemIndex) =>
                                     this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels[index].selectedCountry = itemValue;
+                                      parcels[index].selectedCountry = itemIndex;
 
                                       return parcels;
                                     })
@@ -1329,7 +1458,7 @@ class RegisterParcel extends Component {
                                   {
                                     this.state.countries.map((item, index) => {
                                       return (
-                                        <Picker.Item label={item.label} value={item.value} key={index}/>
+                                        <Picker.Item label={item.label} value={index} key={index}/>
                                       )
                                     })
                                   }
@@ -1340,7 +1469,7 @@ class RegisterParcel extends Component {
                                   onValueChange={(itemValue, itemIndex) =>
                                     this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels[index].selectedParcelType = itemValue;
+                                      parcels[index].selectedParcelType = itemIndex;
 
                                       return parcels;
                                     })
@@ -1348,7 +1477,7 @@ class RegisterParcel extends Component {
                                   {
                                     this.state.parcel_types.map((item, index) => {
                                       return (
-                                        <Picker.Item label={item.name} value={item.label} key={index}/>
+                                        <Picker.Item label={item.label} value={index} key={index}/>
                                       )
                                     })
                                   }
@@ -1359,7 +1488,7 @@ class RegisterParcel extends Component {
                                   onValueChange={(itemValue, itemIndex) =>
                                     this.setState(state => {
                                       var parcels = this.state.parcels;
-                                      parcels[index].selectedCurrency = itemValue;
+                                      parcels[index].selectedCurrency = itemIndex;
 
                                       return parcels;
                                     })
@@ -1367,7 +1496,7 @@ class RegisterParcel extends Component {
                                   {
                                     this.state.currencies.map((item, index) => {
                                       return (
-                                        <Picker.Item label={item.label} value={item.value} key={index}/>    
+                                        <Picker.Item label={item.label} value={index} key={index}/>    
                                       )
                                     })
                                   }
@@ -1385,6 +1514,14 @@ class RegisterParcel extends Component {
                                   })}
                                 />
                             </View>
+                            {
+                              item.avatarSource == null &&
+                              <View style={{alignItems: 'center', justifyContent: 'center', marginTop: 20}}>
+                                <Text style={{color: 'red', fontSize: 12}}>
+                                  Please, insert image.
+                                </Text>
+                              </View>  
+                            }                                                      
                             <TouchableOpacity onPress={() => {this.selectPhotoTapped(index)}} style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
                               <View
                                 style={[styles.avatar, styles.avatarContainer, {marginBottom: 20, marginTop: 20}]}>

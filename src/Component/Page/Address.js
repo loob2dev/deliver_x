@@ -92,7 +92,13 @@ class Address extends Component {
 
     fetchAllAddress = (callback) =>
     {
-        return fetch(api.get_all_address_book_items)
+        return fetch(api.get_all_address_book_items, {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json-patch+json',
+            'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
+        }})
         .then((response) => response.json())
         .then((responseJson) => {
             this.setState({
@@ -173,15 +179,45 @@ class Address extends Component {
     saveAddress = () => {
         console.log("saveAddress", this.state);
         this.setState({savingAddress: true}, () =>{
+            let error_cnt = 0;
+            if (this.state.address_name == null || this.state.address_name == "") {
+                error_cnt++;
+            }
+            if (this.state.city == null || this.state.city == "") {
+                error_cnt++;
+            }
+            if (this.state.street == null || this.state.street == "") {
+                error_cnt++;
+            }
+            if (this.state.street_nr == null || this.state.street_nr == "") {
+                error_cnt++;
+            }
+            if (this.state.postal_code == null || this.state.postal_code == "") {
+                error_cnt++;
+            }
+            if (this.state.phone == null || this.state.phone == "") {
+                error_cnt++;
+            }
+            if (this.state.email == null || this.state.email == "") {
+                error_cnt++;
+            }
+            if (error_cnt > 0) {
+                this.setState({savingAddress: false});
+                this.refs.toast.show('Please, insert all fiedls.', 3500);
+
+                return;
+            }
+
             return fetch(api.create_address_book_items, {
             method: 'POST',
             headers: {
               Accept: 'application/json',
               'Content-Type': 'application/json-patch+json',
-              // 'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
+              'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
             },
             body: JSON.stringify([
               {
+                "addressID": this.state.address_name,
                 "city": this.state.city,
                 "street": this.state.street,
                 "houseNr": this.state.street_nr,
@@ -274,7 +310,7 @@ class Address extends Component {
         headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json-patch+json',
-            // 'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
+            'Authorization': 'Bearer ' + this.props.navigation.state.params.person_info.token
         },
         body: JSON.stringify([
             item.id
@@ -429,6 +465,8 @@ class Address extends Component {
                         <Input
                             label='Address Name/ID'
                             value={this.state.address_name}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.address_name == null || this.state.address_name == "" ? 'It is necessary.' : ''}
                             onChangeText={(address_name) => this.setState({address_name})}
                          />
                       </View>
@@ -439,6 +477,8 @@ class Address extends Component {
                             label='E-mail'
                             keyboardType="email-address"
                             value={this.state.email}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.email == null || this.state.email == "" ? 'It is necessary.' : ''}
                             onChangeText={(email) => this.setState({email})}
                         />
                       </View>
@@ -447,6 +487,8 @@ class Address extends Component {
                             label='Phone'
                             keyboardType="numeric"
                             value={this.state.phone}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.phone == null || this.state.phone == "" ? 'It is necessary.' : ''}
                             onChangeText={(phone) => this.setState({phone})}
                         />
                       </View>
@@ -456,6 +498,8 @@ class Address extends Component {
                         <Input
                             label='Street'
                             value={this.state.street}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.street == null || this.state.street == "" ? 'It is necessary.' : ''}
                             onChangeText={(street) => this.setState({street})}
                         />
                       </View>
@@ -464,6 +508,8 @@ class Address extends Component {
                             label='Nr.'
                             keyboardType="numeric"
                             value={this.state.street_nr}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.street_nr == null || this.state.street_nr == "" ? 'It is necessary.' : ''}
                             onChangeText={(street_nr) => this.setState({street_nr})}
                         />
                       </View>
@@ -473,6 +519,8 @@ class Address extends Component {
                         <Input
                             label='City'
                             value={this.state.city}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.city == null || this.state.city == "" ? 'It is necessary.' : ''}
                             onChangeText={(city) => this.setState({city})}
                         />
                       </View>
@@ -483,6 +531,8 @@ class Address extends Component {
                             label='Postal Code'
                             keyboardType="numeric"
                             value={this.state.postal_code}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.postal_code == null || this.state.postal_code == "" ? 'It is necessary.' : ''}
                             onChangeText={(postal_code) => this.setState({postal_code})}
                         />
                       </View>
@@ -490,6 +540,8 @@ class Address extends Component {
                         <Input
                             label='Country'
                             value={this.state.country}
+                            errorStyle={{ color: 'red' }}
+                            errorMessage={this.state.country == null || this.state.country == "" ? 'It is necessary.' : ''}
                             onChangeText={(country) => this.setState({country})}
                         />
                       </View>

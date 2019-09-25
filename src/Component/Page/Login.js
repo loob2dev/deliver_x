@@ -13,6 +13,20 @@ import {
 import { Input } from 'react-native-elements';
 import { Icon } from 'native-base';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import DeviceInfo from 'react-native-device-info';
+import {
+  getUniqueId,
+  getUniqueIdSync,
+  getManufacturer,
+  getManufacturerSync,
+  getBrand,
+  getBrandSync,
+  getModel,
+  getModelSync,
+  getDeviceId,
+  getDeviceIdSync,
+} from 'react-native-device-info';
+
 import api from '../../config/api';
 import ProgressScreen from '../Refer/ProgressScreen';
 
@@ -23,11 +37,22 @@ export default class Login extends Component {
     this.state = {
       email: 'test@email.cz',
       password: 'heslo123',
+      deviceID: null,
       email_error: false,      
       password_error: false,
       isLoading: false
     }
   }
+
+  async componentDidMount() {
+     try {
+      let uniqueId = await getUniqueId();
+      this.setState({deviceID: uniqueId});
+    } catch (e) {
+      console.log('Trouble getting device info ', e);
+    }
+  }
+
 
   onClickListener = (viewId) => {
     Alert.alert("Alert", "Button pressed "+viewId);
@@ -56,7 +81,7 @@ export default class Login extends Component {
           "password": this.state.password,
           "mobilePhoneNr": null,
           "token": null,
-          "deviceID": null
+          "deviceID": this.state.deviceID
       }),
     })
     .then((response) => response.json())
