@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, FlatList } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity } from 'react-native';
 import { Header, Card } from 'react-native-elements';
 import { Left, Right, Icon } from 'native-base';
 import colors from '../../config/colors';
@@ -8,29 +8,6 @@ import key from '../../config/api_keys';
 import api from '../../config/api';
 import ProgressScreen from '../Refer/ProgressScreen';
 import { getDeliveryStatus } from "../../utils/requestStatus";
-
-function Item({ item }) {
-      return (
-        <Card>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>Created: </Text>
-            <Text style={styles.value}>{new Date(item.created).toLocaleString()}</Text>
-          </View>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>Address: </Text>
-            <Text style={styles.value}>{item.senderStreet + item.senderHouseNr + ", " + item.senderCity}</Text>
-          </View>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>E-mail: </Text>
-            <Text style={styles.value}>{item.senderEmail}</Text>
-          </View>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>Status: </Text>
-            <Text style={styles.value}>{getDeliveryStatus(item.status)}</Text>
-          </View>
-        </Card>
-      );
-    }
 
 class DataList extends Component {
     static navigationOptions = {
@@ -46,7 +23,7 @@ class DataList extends Component {
         data: null    
       }
     }
-
+    
     componentDidMount() {
       return fetch(api.get_all_transport_requests, {
         method: 'POST',
@@ -65,6 +42,29 @@ class DataList extends Component {
       .catch((error) => {
         console.error(error);
       });
+    }
+
+    Item = ({ item }) => {
+      return (
+        <Card>
+          <TouchableOpacity style={styles.item_container} onPress={() => this.props.navigation.state.params.parent.navigation.navigate('RequestDetail', {data: item, person_info: this.props.navigation.state.params.person_info})}>
+            <Text style={styles.label}>Created: </Text>
+            <Text style={styles.value}>{new Date(item.created).toLocaleString()}</Text>
+          </TouchableOpacity>
+          <View style={styles.item_container}>
+            <Text style={styles.label}>Address: </Text>
+            <Text style={styles.value}>{item.senderStreet + item.senderHouseNr + ", " + item.senderCity}</Text>
+          </View>
+          <View style={styles.item_container}>
+            <Text style={styles.label}>E-mail: </Text>
+            <Text style={styles.value}>{item.senderEmail}</Text>
+          </View>
+          <View style={styles.item_container}>
+            <Text style={styles.label}>Status: </Text>
+            <Text style={styles.value}>{getDeliveryStatus(item.status)}</Text>
+          </View>
+        </Card>
+      );
     }
 
     render() {
@@ -92,7 +92,7 @@ class DataList extends Component {
                 <SafeAreaView style={styles.container}>
                   <FlatList
                     data={this.state.data}
-                    renderItem={({ item }) => <Item item={item} />}
+                    renderItem={({ item }) => <this.Item item={item} />}
                     keyExtractor={item => item.id}
                   />
                 </SafeAreaView>

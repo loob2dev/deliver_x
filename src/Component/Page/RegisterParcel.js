@@ -1274,7 +1274,7 @@ class RegisterParcel extends Component {
                                 <Input
                                     label='Phone'
                                     keyboardType="numeric"
-                                    value={item.state}
+                                    value={item.parcel_phone}
                                     errorStyle={{ color: 'red' }}
                                     errorMessage={item.parcel_phone == null || item.parcel_phone == "" ? 'It is necessary.' : ''}
                                     onChangeText={(parcel_phone) => this.setState(state => {
