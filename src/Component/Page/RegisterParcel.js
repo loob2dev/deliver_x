@@ -233,16 +233,17 @@ class RegisterParcel extends Component {
         Platform.OS === 'ios' ? RNGeocoder.fallbackToGoogle(key.google_map_ios):
                                 RNGeocoder.fallbackToGoogle(key.google_map_android);
         RNGeocoder.geocodePosition({lat: this.state.sender_coords.latitude, lng: this.state.sender_coords.longitude}).then(res => {
+          console.log(res);
           res.forEach((item, index) => {
             this.setState({
-              sender_address_name : item.formattedAddress != null ? item.formattedAddress : null,
-              sender_email: null,
-              sender_phone: null,
-              sender_street: item.streetName != null ? item.streetName : null,
-              sender_street_nr: item.streetNumber != null ? item.streetNumber: null,
-              sender_city: item.locality != null ? item.locality : null,
-              sender_postal_code: item.postalCode != null ? item.postalCode : null,
-              sender_country: item.country != null ? item.country : null,
+              sender_address_name : item.formattedAddress != null ? item.formattedAddress : this.state.sender_address_name,
+              sender_email: this.state.sender_email,
+              sender_phone: this.state.sender_phone,
+              sender_street: item.streetName != null ? item.streetName : this.state.sender_street,
+              sender_street_nr: item.streetNumber != null ? item.streetNumber: this.state.sender_street_nr,
+              sender_city: item.locality != null ? item.locality : this.state.sender_city,
+              sender_postal_code: item.postalCode != null ? item.postalCode : this.state.sender_postal_code,
+              sender_country: item.country != null ? item.country : this.state.sender_country,
               })
             if (index + 1 === res.length){
                 Platform.OS === 'ios' ? Geocoder.init(key.google_map_ios):
@@ -286,14 +287,14 @@ class RegisterParcel extends Component {
             this.setState(state => {
               var parcels = state.parcels;
               console.log(index, parcels[index])
-              parcels[index].parcel_address_name = item.formattedAddress != null ? item.formattedAddress : null
-              parcels[index].parcel_email = null
-              parcels[index].parcel_phone = null
-              parcels[index].parcel_street = item.streetName != null ? item.streetName : null
-              parcels[index].parcel_street_nr = item.streetNumber != null ? item.streetNumber: null
-              parcels[index].parcel_city = item.locality != null ? item.locality : null
-              parcels[index].parcel_postal_code = item.postalCode != null ? item.postalCode : null
-              parcels[index].parcel_country = item.country != null ? item.country : null
+              parcels[index].parcel_address_name = item.formattedAddress != null ? item.formattedAddress : parcels[index].parcel_address_name
+              parcels[index].parcel_email = parcels[index].parcel_email
+              parcels[index].parcel_phone = parcels[index].parcel_phone
+              parcels[index].parcel_street = item.streetName != null ? item.streetName : parcels[index].parcel_street
+              parcels[index].parcel_street_nr = item.streetNumber != null ? item.streetNumber: parcels[index].parcel_street_nr
+              parcels[index].parcel_city = item.locality != null ? item.locality : parcels[index].parcel_city
+              parcels[index].parcel_postal_code = item.postalCode != null ? item.postalCode : parcels[index].parcel_postal_code
+              parcels[index].parcel_country = item.country != null ? item.country : parcels[index].parcel_country
 
               console.log(parcels)
 
@@ -1024,7 +1025,7 @@ class RegisterParcel extends Component {
                          <Input
                             label='Longitude'
                             keyboardType="numeric"
-                            disabled='true'
+                            disabled={true}
                             value={this.state.sender_coords.longitude.toString()}
                             onChangeText={(longitude) =>
                               this.setState({
@@ -1044,7 +1045,7 @@ class RegisterParcel extends Component {
                          <Input
                             label='Latitude'
                             keyboardType="numeric"
-                            disabled='true'
+                            disabled={true}
                             value={this.state.sender_coords.latitude.toString()}
                             onChangeText={(latitude) => 
                               this.setState({
@@ -1370,7 +1371,7 @@ class RegisterParcel extends Component {
                                  <Input
                                     label='Longitude'
                                     keyboardType="numeric"
-                                    disabled='true'
+                                    disabled={true}
                                     value={item.coords.longitude.toString()}
                                     onChangeText={(longitude) =>
                                       this.setState(state => {
@@ -1398,7 +1399,7 @@ class RegisterParcel extends Component {
                                  <Input
                                     label='Latitude'
                                     keyboardType="numeric"
-                                    disabled='true'
+                                    disabled={true}
                                     value={item.coords.latitude.toString()}
                                     onChangeText={(latitude) =>
                                       this.setState(state => {
