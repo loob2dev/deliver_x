@@ -73,6 +73,7 @@ class DataList extends Component {
                 <View style={styles.container}>
                      <Header
                       backgroundColor={colors.headerColor}
+                      containerStyle={{marginTop: Platform.OS === 'ios' ? 0 : - 24}}
                       centerComponent={{ text: 'Register transport request', style: { color: '#fff' } }}
                       leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
                     />
@@ -84,6 +85,7 @@ class DataList extends Component {
             <View style={styles.container}>
                 <Header
                     backgroundColor={colors.headerColor}
+                    containerStyle={{marginTop: Platform.OS === 'ios' ? 0 : - 24}}
                     centerComponent={{ text: 'Request History', style: { color: '#fff' } }}
                     leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
                 />

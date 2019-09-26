@@ -3,32 +3,15 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput,
-  Button,
   TouchableOpacity,
-  Image,
   Alert,
   ActivityIndicator
 } from 'react-native';
 import { Input } from 'react-native-elements';
 import { Icon } from 'native-base';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
-import DeviceInfo from 'react-native-device-info';
-import {
-  getUniqueId,
-  getUniqueIdSync,
-  getManufacturer,
-  getManufacturerSync,
-  getBrand,
-  getBrandSync,
-  getModel,
-  getModelSync,
-  getDeviceId,
-  getDeviceIdSync,
-} from 'react-native-device-info';
+import { getUniqueId } from 'react-native-device-info';
 
 import api from '../../config/api';
-import ProgressScreen from '../Refer/ProgressScreen';
 
 export default class Login extends Component {
 

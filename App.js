@@ -7,7 +7,7 @@
  */
 
 import React, { Component } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Platform , PermissionsAndroid } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import AsyncStorage from '@react-native-community/async-storage';
 import AppNavigator from './src/router/AppNavigator';
@@ -38,8 +38,9 @@ export default class App extends Component {
 	}
 
 	componentWillUnmount() {
-	  this.notificationListener();
-	  this.notificationOpenedListener();
+	  	this.notificationListener();
+	  	this.notificationOpenedListener();
+		this.removeLocationUpdates();
 	}
 
 	  //1

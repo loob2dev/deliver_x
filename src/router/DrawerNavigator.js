@@ -7,7 +7,7 @@
  */
 
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, SafeAreaView, ScrollView, Dimensions, Image, Button } from 'react-native';
+import { Platform, StyleSheet, Text, View, SafeAreaView, ScrollView, Dimensions, Image, Button, StatusBar } from 'react-native';
 import { createDrawerNavigator, DrawerNavigatorItems } from 'react-navigation-drawer';
 import { Icon } from 'native-base';
 import TaxiParcel from '../Component/Page/TaxiParcel';
@@ -15,15 +15,15 @@ import RegisterParcel from '../Component/Page/RegisterParcel';
 import DataList from '../Component/Page/DataList';
 import ActualPosition from '../Component/Page/ActualPosition';
 
+import colors from '../config/colors';
+
 const { width } = Dimensions.get("window");
 
-const Logout = () => {
-      
-    }
 
 const CustomDrawerNavigation = (props) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar backgroundColor={colors.headerColor} barStyle="light-content" />
       <View style={{ height: 250, opacity: 0.9 }}>
         <View style={{ height: 200, backgroundColor: 'Green', alignItems: 'center', justifyContent: 'center' }}>
           <Image source={require('../assets/no-image.png')} style={{ height: 150, width: 150, borderRadius: 60 }} />

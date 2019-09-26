@@ -335,6 +335,7 @@ class Address extends Component {
                 <View style={styles.container}>
                     <Header
                         backgroundColor={colors.headerColor}
+                        containerStyle={{marginTop: Platform.OS === 'ios' ? 0 : - 24}}
                         centerComponent={{ text: 'Address Book', style: { color: '#fff' } }}
                         leftComponent={<Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />}                 
                     />
@@ -346,6 +347,7 @@ class Address extends Component {
                 <View style={styles.container}>
                     <Header
                         backgroundColor={colors.headerColor}
+                        containerStyle={{marginTop: Platform.OS === 'ios' ? 0 : - 24}}
                         centerComponent={{ text: 'Address Book', style: { color: '#fff' } }}
                         leftComponent={<Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />}                 
                     />
@@ -367,6 +369,7 @@ class Address extends Component {
             <View style={styles.container}>
                 <Header
                     backgroundColor={colors.headerColor}
+                    containerStyle={{marginTop: Platform.OS === 'ios' ? 0 : - 24}}
                     centerComponent={{ text: 'New Address', style: { color: '#fff' } }}
                     leftComponent={<Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />}                 
                 />

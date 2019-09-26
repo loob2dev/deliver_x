@@ -3,18 +3,15 @@ import {
   View, 
   Text,
   StyleSheet, 
-  TouchableOpacity, 
-  Alert, 
+  TouchableOpacity,
   Picker, 
   Image, 
   PixelRatio, 
   Dimensions,
-  Button,
   PermissionsAndroid,
   Platform,
   ToastAndroid,
-  ActivityIndicator,
-  Keyboard
+  ActivityIndicator
 } from 'react-native';
 import { Header, CheckBox, Input, Divider, Card } from 'react-native-elements';
 import { Left, Right, Icon } from 'native-base';
@@ -50,6 +47,7 @@ class RegisterParcel extends Component {
 
         this.state = {
           isLoading: true,
+          listViewDisplayed_sender: false,
           countries: [],
           parcel_types: [],
           currencies: [],
@@ -75,6 +73,7 @@ class RegisterParcel extends Component {
           sender_date: new Date(),
 
           parcels: [{
+            listViewDisplayed: false,
             parcel_address_name: null,
             parcel_email: null,
             parcel_phone: null,
@@ -403,6 +402,7 @@ class RegisterParcel extends Component {
       this.setState(state => {
         var parcels = state.parcels;
         parcels.push({
+            listViewDisplayed: false,
             parcel_address_name: null,
             parcel_email: null,
             parcel_phone: null,
@@ -775,9 +775,18 @@ class RegisterParcel extends Component {
           LATITUDE : details.geometry.location.lat + SPACE,
           LONGITUDE : details.geometry.location.lng + SPACE
         }
+        parcels[index].isShowParcelMap = false
 
-         return parcels
-      }, () => {this.getGeoCode_parcel(index, () => {})})
+        return parcels
+      }, () => {
+        this.getGeoCode_parcel(index, () => {})
+        this.setState(state => {
+          var parcels = state.parcels;
+          parcels[index].isShowParcelMap = true
+
+          return parcels
+        })
+      })
     }
 
     render () {
@@ -786,6 +795,7 @@ class RegisterParcel extends Component {
                 <View style={styles.container}>
                      <Header
                       backgroundColor={colors.headerColor}
+                      containerStyle={{marginTop: Platform.OS === 'ios' ? 0 : - 24}}
                       centerComponent={{ text: 'Register transport request', style: { color: '#fff' } }}
                       leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
                     />
@@ -798,6 +808,7 @@ class RegisterParcel extends Component {
             <View style={styles.container}>
                 <Header
                     backgroundColor={colors.headerColor}
+                    containerStyle={{marginTop: Platform.OS === 'ios' ? 0 : - 24}}
                     centerComponent={{ text: 'Register transport request', style: { color: '#fff' } }}
                     leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
                 />
@@ -844,10 +855,14 @@ class RegisterParcel extends Component {
                           autoFocus={false}
                           returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
                           keyboardAppearance={'light'} // Can be left out for default keyboardAppearance https://facebook.github.io/react-native/docs/textinput.html#keyboardappearance
-                          listViewDisplayed='false'    // true/false/undefined
+                          listViewDisplayed={this.state.listViewDisplayed_sender}    // true/false/undefined
                           fetchDetails={true}
                           renderDescription={row => row.description} // custom description render
+                          textInputProps={{
+                            onFocus: () => this.setState({listViewDisplayed_sender: true})
+                          }}
                           onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+                          this.setState({listViewDisplayed_sender: false})
                             this.autocompleteSenderAddrrss(data, details)
                           }}
 
@@ -1009,8 +1024,9 @@ class RegisterParcel extends Component {
                          <Input
                             label='Longitude'
                             keyboardType="numeric"
+                            disabled='true'
                             value={this.state.sender_coords.longitude.toString()}
-                            onChangeText={(longitude) => parseFloat(longitude) > 0 && 
+                            onChangeText={(longitude) =>
                               this.setState({
                                 sender_coords : {
                                   longitude: parseFloat(longitude),
@@ -1028,8 +1044,10 @@ class RegisterParcel extends Component {
                          <Input
                             label='Latitude'
                             keyboardType="numeric"
+                            disabled='true'
                             value={this.state.sender_coords.latitude.toString()}
-                            onChangeText={(latitude) => parseFloat(latitude) > 0 && this.setState({
+                            onChangeText={(latitude) => 
+                              this.setState({
                               sender_coords : {
                                 longitude: this.state.sender_coords.longitude,
                                 latitude:  parseFloat(latitude),
@@ -1133,10 +1151,24 @@ class RegisterParcel extends Component {
                                 autoFocus={false}
                                 returnKeyType={'search'} // Can be left out for default return key https://facebook.github.io/react-native/docs/textinput.html#returnkeytype
                                 keyboardAppearance={'light'} // Can be left out for default keyboardAppearance https://facebook.github.io/react-native/docs/textinput.html#keyboardappearance
-                                listViewDisplayed='false'    // true/false/undefined
+                                listViewDisplayed={item.listViewDisplayed}    // true/false/undefined
                                 fetchDetails={true}
                                 renderDescription={row => row.description} // custom description render
+                                textInputProps={{
+                                  onFocus: () => this.setState(state => {
+                                    var parcels = state.parcels;
+                                    parcels[index].listViewDisplayed = true;
+
+                                    return parcels;
+                                  })
+                                }}
                                 onPress={(data, details = null) => { // 'details' is provided when fetchDetails = true
+                                  this.setState(state => {
+                                    var parcels = state.parcels;
+                                    parcels[index].listViewDisplayed = false;
+
+                                    return parcels;
+                                  })
                                   this.autocompleteParcelAddrrss(data, details, index);
                                 }}
 
@@ -1338,8 +1370,9 @@ class RegisterParcel extends Component {
                                  <Input
                                     label='Longitude'
                                     keyboardType="numeric"
+                                    disabled='true'
                                     value={item.coords.longitude.toString()}
-                                    onChangeText={(longitude) => parseFloat(longitude) > 0 && 
+                                    onChangeText={(longitude) =>
                                       this.setState(state => {
                                         var parcels = this.state.parcels;
                                         parcels[index].coords = {
@@ -1365,8 +1398,9 @@ class RegisterParcel extends Component {
                                  <Input
                                     label='Latitude'
                                     keyboardType="numeric"
+                                    disabled='true'
                                     value={item.coords.latitude.toString()}
-                                    onChangeText={(latitude) => parseFloat(latitude) > 0 && 
+                                    onChangeText={(latitude) =>
                                       this.setState(state => {
                                         var parcels = this.state.parcels;
                                         parcels[index].coords = {
