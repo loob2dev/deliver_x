@@ -47,10 +47,12 @@ class DataList extends Component {
     Item = ({ item }) => {
       return (
         <Card>
-          <TouchableOpacity style={styles.item_container} onPress={() => this.props.navigation.state.params.parent.navigation.navigate('RequestDetail', {data: item, person_info: this.props.navigation.state.params.person_info})}>
+          <View style={styles.item_container}>
             <Text style={styles.label}>Created: </Text>
-            <Text style={styles.value}>{new Date(item.created).toLocaleString()}</Text>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.props.navigation.state.params.parent.navigation.navigate('RequestDetail', {data: item, person_info: this.props.navigation.state.params.person_info})}>
+              <Text style={[styles.value, {color: 'blue'}]}>{new Date(item.created).toLocaleString()}</Text>
+            </TouchableOpacity>            
+          </View>
           <View style={styles.item_container}>
             <Text style={styles.label}>Address: </Text>
             <Text style={styles.value}>{item.senderStreet + item.senderHouseNr + ", " + item.senderCity}</Text>
