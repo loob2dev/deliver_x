@@ -76,7 +76,6 @@ class Address extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props)
         this.fetchAllAddress(() => {
             this.getGeoCode(() => {
                 this.setState({
@@ -264,41 +263,43 @@ class Address extends Component {
     Item = ({ item }) => {
       return (
         <Card>
-            <View style={styles.item_container}>
-                <Text style={styles.label}>Address ID: </Text>
-                <Text style={styles.value}>{item.addressID}</Text>
-            </View>
-              <View style={styles.item_container}>
-                <Text style={styles.label}>Street: </Text>
-                <Text style={styles.value}>{item.street}</Text>
-            </View>
-            <View style={styles.item_container}>
-                <Text style={styles.label}>Nr.: </Text>
-                <Text style={styles.value}>{item.houseNr}</Text>
-            </View>
-            <View style={styles.item_container}>
-                <Text style={styles.label}>City: </Text>
-                <Text style={styles.value}>{item.city}</Text>
-            </View>
-            <View style={styles.item_container}>
-                <Text style={styles.label}>Postal code: </Text>
-                <Text style={styles.value}>{item.zip}</Text>
-            </View>
-            <View style={styles.item_container}>
-                <Text style={styles.label}>Phone: </Text>
-                <Text style={styles.value}>{item.phone}</Text>
-            </View>
-            <View style={styles.item_container}>
-                <Text style={styles.label}>Latitude: </Text>
-                <Text style={styles.value}>{item.latitude}</Text>
-            </View>
-            <View style={styles.item_container}>
-                <Text style={styles.label}>Longitude: </Text>
-                <Text style={styles.value}>{item.longitude}</Text>
-            </View>
+            <TouchableOpacity onPress={() => {this.props.navigation.pop(); this.props.navigation.state.params.updateData(item, this.props.navigation.state.params.info);}}>
+                <View style={styles.item_container}>
+                    <Text style={styles.label}>Address ID: </Text>
+                    <Text style={styles.value}>{item.addressID}</Text>
+                </View>
+                <View style={styles.item_container}>
+                    <Text style={styles.label}>Street: </Text>
+                    <Text style={styles.value}>{item.street}</Text>
+                </View>
+                <View style={styles.item_container}>
+                    <Text style={styles.label}>Nr.: </Text>
+                    <Text style={styles.value}>{item.houseNr}</Text>
+                </View>
+                <View style={styles.item_container}>
+                    <Text style={styles.label}>City: </Text>
+                    <Text style={styles.value}>{item.city}</Text>
+                </View>
+                <View style={styles.item_container}>
+                    <Text style={styles.label}>Postal code: </Text>
+                    <Text style={styles.value}>{item.zip}</Text>
+                </View>
+                <View style={styles.item_container}>
+                    <Text style={styles.label}>Phone: </Text>
+                    <Text style={styles.value}>{item.phone}</Text>
+                </View>
+                <View style={styles.item_container}>
+                    <Text style={styles.label}>Latitude: </Text>
+                    <Text style={styles.value}>{item.latitude}</Text>
+                </View>
+                <View style={styles.item_container}>
+                    <Text style={styles.label}>Longitude: </Text>
+                    <Text style={styles.value}>{item.longitude}</Text>
+                </View>                
+            </TouchableOpacity>
             <TouchableOpacity style={[styles.deleteButtonContainer, styles.deleteButton]} onPress={() => this.deleteItem(item)}>
                 <Text style={styles.lable_button}>Delete</Text>        
-            </TouchableOpacity>
+            </TouchableOpacity>          
         </Card>
       );
     }
@@ -557,6 +558,7 @@ class Address extends Component {
                          <Input
                             label='Longitude'
                             keyboardType="numeric"
+                            disabled={true}
                             value={this.state.coords.longitude.toString()}
                             onChangeText={(longitude) => parseFloat(longitude) > 0 && 
                               this.setState({
@@ -576,6 +578,7 @@ class Address extends Component {
                          <Input
                             label='Latitude'
                             keyboardType="numeric"
+                            disabled={true}
                             value={this.state.coords.latitude.toString()}
                             onChangeText={(latitude) => parseFloat(latitude) > 0 && this.setState({
                               coords : {
