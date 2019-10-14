@@ -100,7 +100,11 @@ class RequestDetail extends Component {
                     backgroundColor={colors.headerColor}
                     containerStyle={{marginTop: Platform.OS === 'ios' ? 0 : - 24}}
                     centerComponent={{ text: 'Request Detail', style: { color: '#fff' } }}
-                    leftComponent={<Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />}
+                    leftComponent={
+                      <View style={{width: 50}}>
+                        <Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />
+                      </View>
+                    }
                 />
                 <KeyboardAwareScrollView enabledOnAndroid>
                 <View style={styles.borderContainer}>                

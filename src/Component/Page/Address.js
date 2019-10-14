@@ -338,7 +338,11 @@ class Address extends Component {
                         backgroundColor={colors.headerColor}
                         containerStyle={{marginTop: Platform.OS === 'ios' ? 0 : - 24}}
                         centerComponent={{ text: 'Address Book', style: { color: '#fff' } }}
-                        leftComponent={<Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />}                 
+                        leftComponent={
+                            <View style={{width: 50}}>
+                              <Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />
+                            </View>
+                          }
                     />
                     <ProgressScreen/>
                 </View>            
@@ -350,7 +354,11 @@ class Address extends Component {
                         backgroundColor={colors.headerColor}
                         containerStyle={{marginTop: Platform.OS === 'ios' ? 0 : - 24}}
                         centerComponent={{ text: 'Address Book', style: { color: '#fff' } }}
-                        leftComponent={<Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />}                 
+                        leftComponent={
+                            <View style={{width: 50}}>
+                              <Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />
+                            </View>
+                          }
                     />
                     <TouchableOpacity style={[styles.save_addressContainer, styles.addressButton]} onPress={() => this.setState({addAddress: true})}>
                         <Text style={styles.lable_button}>Add address</Text>
@@ -372,7 +380,11 @@ class Address extends Component {
                     backgroundColor={colors.headerColor}
                     containerStyle={{marginTop: Platform.OS === 'ios' ? 0 : - 24}}
                     centerComponent={{ text: 'New Address', style: { color: '#fff' } }}
-                    leftComponent={<Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />}                 
+                    leftComponent={
+                        <View style={{width: 50}}>
+                          <Icon name="arrow-back" style={{ color: '#fff' }} onPress={() => this.props.navigation.goBack()} />
+                        </View>
+                      }
                 />
                 <Toast 
                 ref="toast"

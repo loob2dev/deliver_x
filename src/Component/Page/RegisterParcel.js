@@ -784,7 +784,7 @@ class RegisterParcel extends Component {
             parcelValueCurrency: this.state.currencies[item.selectedCurrency].label,
             insuranceRequested: item.insurance,
             receiverCountry: this.state.countries[item.selectedCountry].label,
-            parcelPicture: item.avatarSource,
+            parcelPicture: item.avatarSource.uri,
             // deliveryStatus: "",
             // deliveryOrder: "",
             currentLatitude: this.props.screenProps.latitude,
