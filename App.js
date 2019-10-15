@@ -83,7 +83,8 @@ export default class App extends Component {
 	  * Triggered when a particular notification has been received in foreground
 	  * */
 	  this.notificationListener = firebase.notifications().onNotification((notification) => {
-	      const { title, body } = notification;
+		  const { title, body } = notification;
+		  console.log(title, body);
 	      this.showAlert(title, body);
 	  });
 
@@ -91,7 +92,8 @@ export default class App extends Component {
 	  * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
 	  * */
 	  this.notificationOpenedListener = firebase.notifications().onNotificationOpened((notificationOpen) => {
-	      const { title, body } = notificationOpen.notification;
+		  const { title, body } = notificationOpen.notification;
+		  console.log(title, body);
 	      this.showAlert(title, body);
 	  });
 
@@ -100,14 +102,16 @@ export default class App extends Component {
 	  * */
 	  const notificationOpen = await firebase.notifications().getInitialNotification();
 	  if (notificationOpen) {
-	      const { title, body } = notificationOpen.notification;
+		  const { title, body } = notificationOpen.notification;
+		  console.log(title, body);
 	      this.showAlert(title, body);
 	  }
 	  /*
 	  * Triggered for data only payload in foreground
 	  * */
 	  this.messageListener = firebase.messaging().onMessage((message) => {
-	    //process data message
+		//process data message
+		console.log("fcm", message);
 	    console.log(JSON.stringify(message));
 	  });
 	}

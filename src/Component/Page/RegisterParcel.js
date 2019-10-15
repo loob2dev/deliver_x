@@ -442,10 +442,8 @@ class RegisterParcel extends Component {
         } else if (response.customButton) {
           console.log('User tapped custom button: ', response.customButton);
         } else {
-          let source = {uri: response.uri};
-
-          // You can also display the image using data:
-          // let source = { uri: 'data:image/jpeg;base64,' + response.data };
+          let source = { uri: 'data:image/jpeg;base64,' + response.data };
+          console.log("pick image", source);
 
           this.setState(state => {
             var parcels = state.parcels;
