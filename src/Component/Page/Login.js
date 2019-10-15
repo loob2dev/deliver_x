@@ -10,6 +10,7 @@ import {
 import { Input } from 'react-native-elements';
 import { Icon } from 'native-base';
 import { getUniqueId } from 'react-native-device-info';
+import firebase from 'react-native-firebase';
 
 import api from '../../config/api';
 
@@ -42,6 +43,8 @@ export default class Login extends Component {
   }
 
   login = () => {
+    firebase.crashlytics().crash();
+    return;
     if (this.state.email == '') {
         this.setState({email_error: true});
     }
