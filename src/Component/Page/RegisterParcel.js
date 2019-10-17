@@ -40,6 +40,8 @@ const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const SPACE = 0.01;
 
+const error_msg = 'It is required.'
+
 
 class RegisterParcel extends Component {
 
@@ -1030,7 +1032,7 @@ class RegisterParcel extends Component {
                             label='Address Name/ID'
                             value={this.state.sender_address_name}
                             errorStyle={{ color: 'red' }}
-                            errorMessage={this.state.sender_address_name == null || this.state.sender_address_name == "" ? 'It is necessary.' : ''}
+                            errorMessage={this.state.sender_address_name == null || this.state.sender_address_name == "" ? error_msg : ''}
                             onChangeText={(sender_address_name) => this.setState({sender_address_name})}
                          />
                       </View>
@@ -1042,7 +1044,7 @@ class RegisterParcel extends Component {
                             keyboardType="email-address"
                             value={this.state.sender_email}
                             errorStyle={{ color: 'red' }}
-                            errorMessage={this.state.sender_email == null || this.state.sender_email == "" ? 'It is necessary.' : ''}
+                            errorMessage={this.state.sender_email == null || this.state.sender_email == "" ? error_msg : ''}
                             onChangeText={(sender_email) => this.setState({sender_email})}
                         />
                       </View>
@@ -1052,7 +1054,7 @@ class RegisterParcel extends Component {
                             keyboardType="numeric"
                             value={this.state.sender_phone}
                             errorStyle={{ color: 'red' }}
-                            errorMessage={this.state.sender_phone == null || this.state.sender_phone == "" ? 'It is necessary.' : ''}
+                            errorMessage={this.state.sender_phone == null || this.state.sender_phone == "" ? error_msg : ''}
                             onChangeText={(sender_phone) => this.setState({sender_phone})}
                         />
                       </View>
@@ -1062,7 +1064,7 @@ class RegisterParcel extends Component {
                         <Input
                             label='Street'
                             value={this.state.sender_street}
-                            errorMessage={this.state.sender_street == null || this.state.sender_street == "" ? 'It is necessary.' : ''}
+                            errorMessage={this.state.sender_street == null || this.state.sender_street == "" ? error_msg : ''}
                             onChangeText={(sender_street) => this.setState({sender_street})}
                         />
                       </View>
@@ -1072,7 +1074,7 @@ class RegisterParcel extends Component {
                             keyboardType="numeric"
                             value={this.state.sender_street_nr}
                             errorStyle={{ color: 'red' }}
-                            errorMessage={this.state.sender_street_nr == null || this.state.sender_street_nr == "" ? 'It is necessary.' : ''}
+                            errorMessage={this.state.sender_street_nr == null || this.state.sender_street_nr == "" ? error_msg : ''}
                             onChangeText={(sender_street_nr) => this.setState({sender_street_nr})}
                         />
                       </View>
@@ -1083,7 +1085,7 @@ class RegisterParcel extends Component {
                             label='City'
                             value={this.state.sender_city}
                             errorStyle={{ color: 'red' }}
-                            errorMessage={this.state.sender_city == null || this.state.sender_city == "" ? 'It is necessary.' : ''}
+                            errorMessage={this.state.sender_city == null || this.state.sender_city == "" ? error_msg : ''}
                             onChangeText={(sender_city) => this.setState({sender_city})}
                         />
                       </View>
@@ -1095,7 +1097,7 @@ class RegisterParcel extends Component {
                             keyboardType="numeric"
                             value={this.state.sender_postal_code}
                             errorStyle={{ color: 'red' }}
-                            errorMessage={this.state.sender_postal_code == null || this.state.sender_postal_code == "" ? 'It is necessary.' : ''}
+                            errorMessage={this.state.sender_postal_code == null || this.state.sender_postal_code == "" ? error_msg : ''}
                             onChangeText={(sender_postal_code) => this.setState({sender_postal_code})}
                         />
                       </View>
@@ -1104,7 +1106,7 @@ class RegisterParcel extends Component {
                             label='Country'
                             value={this.state.sender_country}
                             errorStyle={{ color: 'red' }}
-                            errorMessage={this.state.sender_country == null || this.state.sender_country == "" ? 'It is necessary.' : ''}
+                            errorMessage={this.state.sender_country == null || this.state.sender_country == "" ? error_msg : ''}
                             onChangeText={(sender_country) => this.setState({sender_country})}
                         />
                       </View>
@@ -1349,7 +1351,7 @@ class RegisterParcel extends Component {
                                         label='Address Name/ID'
                                         value={item.parcel_address_name}
                                         errorStyle={{ color: 'red' }}
-                                        errorMessage={item.parcel_address_name == null || item.parcel_address_name == "" ? 'It is necessary.' : ''}
+                                        errorMessage={item.parcel_address_name == null || item.parcel_address_name == "" ? error_msg : ''}
                                         onChangeText={(parcel_address_name) => this.setState(state => {
                                           var parcels = this.state.parcels;
                                           parcels[index].parcel_address_name = parcel_address_name;
@@ -1366,7 +1368,7 @@ class RegisterParcel extends Component {
                                         keyboardType="email-address"
                                         value={item.parcel_email}
                                         errorStyle={{ color: 'red' }}
-                                        errorMessage={item.parcel_email == null || item.parcel_email == "" ? 'It is necessary.' : ''}
+                                        errorMessage={item.parcel_email == null || item.parcel_email == "" ? error_msg : ''}
                                         onChangeText={(parcel_email) => this.setState(state => {
                                           var parcels = this.state.parcels;
                                           parcels[index].parcel_email = parcel_email;
@@ -1381,7 +1383,7 @@ class RegisterParcel extends Component {
                                         keyboardType="numeric"
                                         value={item.parcel_phone}
                                         errorStyle={{ color: 'red' }}
-                                        errorMessage={item.parcel_phone == null || item.parcel_phone == "" ? 'It is necessary.' : ''}
+                                        errorMessage={item.parcel_phone == null || item.parcel_phone == "" ? error_msg : ''}
                                         onChangeText={(parcel_phone) => this.setState(state => {
                                           var parcels = this.state.parcels;
                                           parcels[index].parcel_phone = parcel_phone;
@@ -1397,7 +1399,7 @@ class RegisterParcel extends Component {
                                         label='Street'
                                         value={item.parcel_street}
                                         errorStyle={{ color: 'red' }}
-                                        errorMessage={item.parcel_street == null || item.parcel_street == "" ? 'It is necessary.' : ''}
+                                        errorMessage={item.parcel_street == null || item.parcel_street == "" ? error_msg : ''}
                                         onChangeText={(parcel_street) => this.setState(state => {
                                           var parcels = this.state.parcels;
                                           parcels[index].parcel_street = parcel_street;
@@ -1411,7 +1413,7 @@ class RegisterParcel extends Component {
                                         label='Nr.'
                                         keyboardType="numeric"
                                         value={item.parcel_street_nr}
-                                        errorMessage={item.parcel_street_nr == null || item.parcel_street_nr == "" ? 'It is necessary.' : ''}
+                                        errorMessage={item.parcel_street_nr == null || item.parcel_street_nr == "" ? error_msg : ''}
                                         onChangeText={(parcel_street_nr) => this.setState(state => {
                                           var parcels = this.state.parcels;
                                           parcels[index].parcel_street_nr = parcel_street_nr;
@@ -1427,7 +1429,7 @@ class RegisterParcel extends Component {
                                         label='City'
                                         value={item.parcel_city}
                                         errorStyle={{ color: 'red' }}
-                                        errorMessage={item.parcel_city == null || item.parcel_city == "" ? 'It is necessary.' : ''}
+                                        errorMessage={item.parcel_city == null || item.parcel_city == "" ? error_msg : ''}
                                         onChangeText={(parcel_city) => this.setState(state => {
                                           var parcels = this.state.parcels;
                                           parcels[index].parcel_city = parcel_city;
@@ -1444,7 +1446,7 @@ class RegisterParcel extends Component {
                                         keyboardType="numeric"
                                         value={item.parcel_postal_code}
                                         errorStyle={{ color: 'red' }}
-                                        errorMessage={item.parcel_postal_code == null || item.parcel_postal_code == "" ? 'It is necessary.' : ''}
+                                        errorMessage={item.parcel_postal_code == null || item.parcel_postal_code == "" ? error_msg : ''}
                                         onChangeText={(parcel_postal_code) => this.setState(state => {
                                           var parcels = this.state.parcels;
                                           parcels[index].parcel_postal_code = parcel_postal_code;
@@ -1458,7 +1460,7 @@ class RegisterParcel extends Component {
                                         label='Country'
                                         value={item.parcel_country}
                                         errorStyle={{ color: 'red' }}
-                                        errorMessage={item.parcel_country == null || item.parcel_country == "" ? 'It is necessary.' : ''}
+                                        errorMessage={item.parcel_country == null || item.parcel_country == "" ? error_msg : ''}
                                         onChangeText={(parcel_country) => this.setState(state => {
                                           var parcels = this.state.parcels;
                                           parcels[index].parcel_country = parcel_country;
@@ -1678,7 +1680,7 @@ class RegisterParcel extends Component {
                                   keyboardType="numeric"
                                   value={item.parcel_price}
                                   errorStyle={{ color: 'red' }}
-                                  errorMessage={item.parcel_price == null || item.parcel_price == "" ? 'It is necessary.' : ''}
+                                  errorMessage={item.parcel_price == null || item.parcel_price == "" ? error_msg : ''}
                                   onChangeText={(parcel_price) => this.setState(state => {
                                     var parcels = this.state.parcels;
                                     parcels[index].parcel_price = parcel_price;

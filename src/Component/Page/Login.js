@@ -43,8 +43,6 @@ export default class Login extends Component {
   }
 
   login = () => {
-    firebase.crashlytics().crash();
-    return;
     if (this.state.email == '') {
         this.setState({email_error: true});
     }
