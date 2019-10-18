@@ -1,5 +1,5 @@
 /**
- * React Native App
+ * Sample React Native App
  * https://github.com/facebook/react-native
  *
  * @format
@@ -57,13 +57,14 @@ export default class App extends Component {
 	async getToken() {
 	  let fcmToken = await AsyncStorage.getItem('fcmToken');
 	  console.log("fcmToken", fcmToken);
-	  if (!fcmToken) {
-	      fcmToken = await firebase.messaging().getToken();
-	      if (fcmToken) {
-	          // user has a device token
-	          await AsyncStorage.setItem('fcmToken', fcmToken);
-	      }
-	  }
+	  	if (!fcmToken) {
+			  fcmToken = await firebase.messaging().getToken();
+			  console.log("fcmToken", fcmToken);
+	      	if (fcmToken) {
+	          	// user has a device token
+				await AsyncStorage.setItem('fcmToken', fcmToken);				
+	      	}
+    	}
 	}
 
 	  //2
