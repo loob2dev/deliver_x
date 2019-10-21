@@ -92,6 +92,7 @@ class RegisterParcel extends Component {
           listViewDisplayed: false,
           isShowParcelMapContainer: false,
           isShowParcelMap: true,
+          isLoadingImage: false,
           savingParcelAddress: false,
           sendingNewRequest: false,
           selectedCountry: 0,
@@ -193,9 +194,12 @@ class RegisterParcel extends Component {
             longitude: e.nativeEvent.coordinate.longitude,
             latitude: e.nativeEvent.coordinate.latitude,
           },
+          isSenderLoading: true,
         },
         () => {
-          this.getGeoCode_sender(() => {});
+          this.getGeoCode_sender(() => {
+            this.setState({ isSenderLoading: false });
+          });
         }
       );
     }
@@ -213,11 +217,19 @@ class RegisterParcel extends Component {
             longitude: longitude,
             latitude: latitude,
           };
+          parcels[index].isParcelLoading = true;
 
           return parcels;
         },
         () => {
-          this.getGeoCode_parcel(index, () => {});
+          this.getGeoCode_parcel(index, () => {
+            this.setState(state => {
+              var parcels = state.parcels;
+              parcels[index].isParcelLoading = false;
+
+              return parcels;
+            });
+          });
         }
       );
     }
@@ -362,10 +374,14 @@ class RegisterParcel extends Component {
         skipBackup: true,
       },
     };
+    this.setState(state => {
+      var parcels = state.parcels;
+      parcels[index].isLoadingImage = true;
+
+      return parcels;
+    });
 
     ImagePicker.showImagePicker(options, response => {
-      console.log('Response = ', response);
-
       if (response.didCancel) {
         console.log('User cancelled photo picker');
       } else if (response.error) {
@@ -383,6 +399,12 @@ class RegisterParcel extends Component {
           return parcels;
         });
       }
+      this.setState(state => {
+        var parcels = state.parcels;
+        parcels[index].isLoadingImage = false;
+
+        return parcels;
+      });
     });
   }
 
@@ -429,6 +451,7 @@ class RegisterParcel extends Component {
         },
         isShowParcelMapContainer: false,
         isShowParcelMap: true,
+        isLoadingImage: false,
         savingSenderAddress: false,
         savingParcelAddress: false,
         sendingNewRequest: false,
@@ -569,160 +592,167 @@ class RegisterParcel extends Component {
 
   sendTransportRequest = () => {
     console.log('new transport request', this.state);
-    this.setState({ sendingNewRequest: true }, async () => {
-      let error_cnt = 0;
+    try {
+      this.setState({ sendingNewRequest: true }, async () => {
+        let error_cnt = 0;
 
-      if (this.state.sender_address_name == null || this.state.sender_address_name === '') {
-        error_cnt++;
-      }
-      if (this.state.sender_city == null || this.state.sender_city === '') {
-        error_cnt++;
-      }
-      if (this.state.sender_street == null || this.state.sender_street === '') {
-        error_cnt++;
-      }
-      if (this.state.sender_street_nr == null || this.state.sender_street_nr === '') {
-        error_cnt++;
-      }
-      if (this.state.sender_postal_code == null || this.state.sender_postal_code === '') {
-        error_cnt++;
-      }
-      if (this.state.sender_country == null || this.state.sender_country === '') {
-        error_cnt++;
-      }
-      if (this.state.sender_email == null || this.state.sender_email === '') {
-        error_cnt++;
-      }
-      if (this.state.sender_phone == null || this.state.sender_phone === '') {
-        error_cnt++;
-      }
-      var body = {
-        // "id": "string",
-        senderAddressID: this.state.sender_address_name,
-        senderCity: this.state.sender_city,
-        senderStreet: this.state.sender_street,
-        senderHouseNr: this.state.sender_street_nr,
-        senderZip: this.state.sender_postal_code,
-        senderCountry: this.state.sender_country,
-        senderLatitude: this.state.sender_coords.latitude,
-        senderLongitude: this.state.sender_coords.longitude,
-        requestedLoadingTime: this.state.sender_date,
-        senderEmail: this.state.sender_email,
-        senderPhone: this.state.sender_phone,
-        deviceID: this.props.person_info.deviceID,
-        deviceType: getDeviceType(Platform.OS),
-        // paymentUrl: "",
-        // totalDistance: "",
-        // totalPrice: "",
-        // currency: {
-        //   code: this.state.currencies[this.state.selectedCurrency].code,
-        //   id: this.state.currencies[this.state.selectedCurrency].id,
-        //   creator: this.state.currencies[this.state.selectedCurrency].creator,
-        //   created: this.state.currencies[this.state.selectedCurrency].created,
-        //   owner: this.state.currencies[this.state.selectedCurrency].owner
-        // },
-        // transporter: {
-        //   id: "string",
-        //   firstName: "",
-        //   lastName: "",
-        //   mobilePhoneNr: "",
-        //   licencePlate: "",
-        //   latitude: 0,
-        //   longitude: 0
-        // },
-        // routePolyline: "",
-        // loadAcceptedByOwner: "",
-        // loadAcceptedByTransporter: "",
-        // status: 0,
-        // loadConfirmedByOwner: true,
-        // navigationRouteLink: "string",
-        // created: "2019-09-25T11:24:35.514Z"
-      };
-      body.items = [];
-      await this.state.parcels.forEach(item => {
-        if (item.parcel_address_name == null || item.parcel_address_name === '') {
+        if (this.state.sender_address_name == null || this.state.sender_address_name === '') {
           error_cnt++;
         }
-        if (item.parcel_city == null || item.parcel_city === '') {
+        if (this.state.sender_city == null || this.state.sender_city === '') {
           error_cnt++;
         }
-        if (item.parcel_city == null || item.parcel_city === '') {
+        if (this.state.sender_street == null || this.state.sender_street === '') {
           error_cnt++;
         }
-        if (item.parcel_street_nr == null || item.parcel_street_nr === '') {
+        if (this.state.sender_street_nr == null || this.state.sender_street_nr === '') {
           error_cnt++;
         }
-        if (item.parcel_postal_code == null || item.parcel_postal_code === '') {
+        if (this.state.sender_postal_code == null || this.state.sender_postal_code === '') {
           error_cnt++;
         }
-        if (item.parcel_phone == null || item.parcel_phone === '') {
+        if (this.state.sender_country == null || this.state.sender_country === '') {
           error_cnt++;
         }
-        if (item.parcel_email == null || item.parcel_email === '') {
+        if (this.state.sender_email == null || this.state.sender_email === '') {
           error_cnt++;
         }
-        if (item.parcel_price == null || item.parcel_price === '') {
+        if (this.state.sender_phone == null || this.state.sender_phone === '') {
           error_cnt++;
         }
-        if (item.avatarSource == null || item.avatarSource === '') {
-          error_cnt++;
-        }
-        body.items.push({
-          // id: null,
-          receiverAddressID: item.parcel_address_name,
-          receiverCity: item.parcel_city,
-          receiverStreet: item.parcel_street,
-          receiverHouseNr: item.parcel_street_nr,
-          receiverZip: item.parcel_postal_code,
-          receiverLatitude: item.coords.latitude,
-          receiverLongitude: item.coords.longitude,
-          requestedDeliveryTime: item.parcel_date,
-          receiverPhone: item.parcel_phone,
-          receiverEmail: item.parcel_email,
-          parcelType: this.props.parcels[item.selectedParcelType].label,
-          parcelValue: item.parcel_price,
-          parcelValueCurrency: this.props.currencies[item.selectedCurrency].label,
-          insuranceRequested: item.insurance,
-          receiverCountry: this.props.countries[item.selectedCountry].label,
-          parcelPicture: item.avatarSource.uri,
-          // deliveryStatus: "",
-          // deliveryOrder: "",
-          currentLatitude: this.props.coords.latitude,
-          currentLongitude: this.props.coords.longitude,
-          // carriedByTransporter: {
-          //   id: null,
-          //   firstName: null,
-          //   lastName: null,
-          //   mobilePhoneNr: null,
-          //   licencePlate: null,
+        var body = {
+          // "id": "string",
+          senderAddressID: this.state.sender_address_name,
+          senderCity: this.state.sender_city,
+          senderStreet: this.state.sender_street,
+          senderHouseNr: this.state.sender_street_nr,
+          senderZip: this.state.sender_postal_code,
+          senderCountry: this.state.sender_country,
+          senderLatitude: this.state.sender_coords.latitude,
+          senderLongitude: this.state.sender_coords.longitude,
+          requestedLoadingTime: this.state.sender_date,
+          senderEmail: this.state.sender_email,
+          senderPhone: this.state.sender_phone,
+          deviceID: this.props.person_info.deviceID,
+          deviceType: getDeviceType(Platform.OS),
+          // paymentUrl: "",
+          // totalDistance: "",
+          // totalPrice: "",
+          // currency: {
+          //   code: this.state.currencies[this.state.selectedCurrency].code,
+          //   id: this.state.currencies[this.state.selectedCurrency].id,
+          //   creator: this.state.currencies[this.state.selectedCurrency].creator,
+          //   created: this.state.currencies[this.state.selectedCurrency].created,
+          //   owner: this.state.currencies[this.state.selectedCurrency].owner
+          // },
+          // transporter: {
+          //   id: "string",
+          //   firstName: "",
+          //   lastName: "",
+          //   mobilePhoneNr: "",
+          //   licencePlate: "",
           //   latitude: 0,
           //   longitude: 0
-          // }
+          // },
+          // routePolyline: "",
+          // loadAcceptedByOwner: "",
+          // loadAcceptedByTransporter: "",
+          // status: 0,
+          // loadConfirmedByOwner: true,
+          // navigationRouteLink: "string",
+          // created: "2019-09-25T11:24:35.514Z"
+        };
+        body.items = [];
+        await this.state.parcels.forEach(item => {
+          if (item.parcel_address_name == null || item.parcel_address_name === '') {
+            error_cnt++;
+          }
+          if (item.parcel_city == null || item.parcel_city === '') {
+            error_cnt++;
+          }
+          if (item.parcel_city == null || item.parcel_city === '') {
+            error_cnt++;
+          }
+          if (item.parcel_street_nr == null || item.parcel_street_nr === '') {
+            error_cnt++;
+          }
+          if (item.parcel_postal_code == null || item.parcel_postal_code === '') {
+            error_cnt++;
+          }
+          if (item.parcel_phone == null || item.parcel_phone === '') {
+            error_cnt++;
+          }
+          if (item.parcel_email == null || item.parcel_email === '') {
+            error_cnt++;
+          }
+          if (item.parcel_price == null || item.parcel_price === '') {
+            error_cnt++;
+          }
+          if (item.avatarSource == null || item.avatarSource === '') {
+            error_cnt++;
+          }
+          body.items.push({
+            // id: null,
+            receiverAddressID: item.parcel_address_name,
+            receiverCity: item.parcel_city,
+            receiverStreet: item.parcel_street,
+            receiverHouseNr: item.parcel_street_nr,
+            receiverZip: item.parcel_postal_code,
+            receiverLatitude: item.coords.latitude,
+            receiverLongitude: item.coords.longitude,
+            requestedDeliveryTime: item.parcel_date,
+            receiverPhone: item.parcel_phone,
+            receiverEmail: item.parcel_email,
+            parcelType: this.props.parcels[item.selectedParcelType].label,
+            parcelValue: item.parcel_price,
+            parcelValueCurrency: this.props.currencies[item.selectedCurrency].label,
+            insuranceRequested: item.insurance,
+            receiverCountry: this.props.countries[item.selectedCountry].label,
+            parcelPicture: item.avatarSource.uri,
+            // deliveryStatus: "",
+            // deliveryOrder: "",
+            currentLatitude: this.props.coords.latitude,
+            currentLongitude: this.props.coords.longitude,
+            // carriedByTransporter: {
+            //   id: null,
+            //   firstName: null,
+            //   lastName: null,
+            //   mobilePhoneNr: null,
+            //   licencePlate: null,
+            //   latitude: 0,
+            //   longitude: 0
+            // }
+          });
         });
-      });
-      console.log('new transport request', body);
+        console.log('new transport request', body);
 
-      if (error_cnt > 0) {
-        this.refs.toast.show('Please, insert all fields.', 3500);
+        if (error_cnt > 0) {
+          this.refs.toast.show('Please, insert all fields.', 3500);
+          this.setState({ sendingNewRequest: false });
+          return;
+        }
+
+        const dispatch = this.props.dispatch;
+        try {
+          await dispatch(register_new_request(body));
+          this.refs.toast.show('Success', 3500);
+          this.props.navigation.navigate('WholeRoute');
+        } catch (error) {
+          console.log;
+          this.refs.toast.show('Failed', 3500);
+        }
+
         this.setState({ sendingNewRequest: false });
-        return;
-      }
-
-      const dispatch = this.props.dispatch;
-      try {
-        await dispatch(register_new_request(body));
-        this.refs.toast.show('Success', 3500);
-      } catch (error) {
-        this.refs.toast.show('Failed', 3500);
-      }
-
-      this.setState({ sendingNewRequest: false });
-    });
+      });
+    } catch (error) {
+      console.error('transport request error', error);
+    }
   };
 
   autocompleteSenderAddrrss = (data, details) => {
     this.setState(
       {
+        isSenderLoading: true,
         sender_coords: {
           latitude: details.geometry.location.lat,
           longitude: details.geometry.location.lng,
@@ -732,8 +762,9 @@ class RegisterParcel extends Component {
         isShowSenderMap: false,
       },
       () => {
-        this.getGeoCode_sender();
-        this.setState({ isShowSenderMap: true });
+        this.getGeoCode_sender(() => {
+          this.setState({ isSenderLoading: false, isShowSenderMap: true });
+        });
       }
     );
   };
@@ -749,16 +780,19 @@ class RegisterParcel extends Component {
           LONGITUDE: details.geometry.location.lng + SPACE,
         };
         parcels[index].isShowParcelMap = false;
+        parcels[index].isParcelLoading = true;
 
         return parcels;
       },
       () => {
-        this.getGeoCode_parcel(index, () => {});
-        this.setState(state => {
-          var parcels = state.parcels;
-          parcels[index].isShowParcelMap = true;
+        this.getGeoCode_parcel(index, () => {
+          this.setState(state => {
+            var parcels = state.parcels;
+            parcels[index].isShowParcelMap = true;
+            parcels[index].isParcelLoading = false;
 
-          return parcels;
+            return parcels;
+          });
         });
       }
     );
@@ -1456,6 +1490,7 @@ class RegisterParcel extends Component {
                       </View>
                     )}
                     <TouchableOpacity
+                      disabled={item.isLoadingImage}
                       onPress={() => {
                         this.selectPhotoTapped(index);
                       }}

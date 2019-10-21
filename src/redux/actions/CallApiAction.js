@@ -1,4 +1,11 @@
-import { GET_COUNTRIES, GET_PARCELS, GET_CURRENCIES, GET_ALL_ADDRESS, GET_ALL_TRANSPORT_REQUESTS } from '../actions/ActionTypes';
+import {
+  GET_COUNTRIES,
+  GET_PARCELS,
+  GET_CURRENCIES,
+  GET_ALL_ADDRESS,
+  GET_ALL_TRANSPORT_REQUESTS,
+  REGISTER_NEW_REQUEST,
+} from '../actions/ActionTypes';
 import { get, auth_get, post, auth_post } from '../../utils/httpRequest';
 
 import api from '../../config/api';
@@ -76,7 +83,8 @@ export const get_all_transport_requests = () => async (dispatch, getState) => {
 export const register_new_request = params => async (dispatch, getState) => {
   const { person_info } = getState().login;
   try {
-    await auth_post(api.register_new_request, person_info.token, params);
+    const response = await auth_post(api.register_new_request, person_info.token, params);
+    dispatch({ type: REGISTER_NEW_REQUEST, payload: response });
   } catch (error) {
     throw error;
   }

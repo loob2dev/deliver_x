@@ -27,7 +27,7 @@
 		33F79BB266D448F39BA9A059 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 02A325D570B24F20B38ECA54 /* Ionicons.ttf */; };
 		4F4FF5D758B5C6BC806FDFE2 /* libPods-del_X.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA2179CA6CDDE1A418A3BDA0 /* libPods-del_X.a */; };
 		59819A9B6D444646B09C168D /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5F1CE210F4064EAB8766B9BA /* Feather.ttf */; };
-		613755F6235932580084F163 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 613755F5235932580084F163 /* GoogleService-Info.plist */; };
+		61B36FED235D795600D4B4B3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 61B36FEC235D795600D4B4B3 /* GoogleService-Info.plist */; };
 		7463F2FF6CCE5AC2EEF31A13 /* libPods-del_XTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AC1353F0A53BF4FB339342B /* libPods-del_XTests.a */; };
 		7ACBA018E4B94390BBCDBD1A /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8FB204B060CB4A078B208DC1 /* Zocial.ttf */; };
 		82D95D0670D14EC7B361BDE6 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F01F2A1DFFD747C7B1B36A66 /* FontAwesome.ttf */; };
@@ -92,7 +92,7 @@
 		5BC6DCE75F28002526B11E52 /* libPods-del_X-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-del_X-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F1CE210F4064EAB8766B9BA /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/native-base/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		613755F323592AEE0084F163 /* del_X.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = del_X.entitlements; path = del_X/del_X.entitlements; sourceTree = "<group>"; };
-		613755F5235932580084F163 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Desktop/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		61B36FEC235D795600D4B4B3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Desktop/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		62A112A202467A2AFD94CC71 /* Pods-del_X-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-del_X-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-del_X-tvOS/Pods-del_X-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		8657A09AAFB6423AA6CB4E6B /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/native-base/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		891BD9B6EE542B165EF73918 /* Pods-del_X-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-del_X-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-del_X-tvOSTests/Pods-del_X-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -166,7 +166,7 @@
 		13B07FAE1A68108700A75B9A /* del_X */ = {
 			isa = PBXGroup;
 			children = (
-				613755F5235932580084F163 /* GoogleService-Info.plist */,
+				61B36FEC235D795600D4B4B3 /* GoogleService-Info.plist */,
 				613755F323592AEE0084F163 /* del_X.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -422,7 +422,6 @@
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
-				613755F6235932580084F163 /* GoogleService-Info.plist in Resources */,
 				FD1E7DF9D45449CAA5607110 /* AntDesign.ttf in Resources */,
 				06F7A0385FF74CD9A5D914CF /* Entypo.ttf in Resources */,
 				E36E5112432B4D1BA08DA473 /* EvilIcons.ttf in Resources */,
@@ -440,6 +439,7 @@
 				0D3EE18236E3418CA163E96F /* Roboto_medium.ttf in Resources */,
 				301B4614179F4A98BA467875 /* Roboto.ttf in Resources */,
 				EB788A8154074D70815D49C4 /* rubicon-icon-font.ttf in Resources */,
+				61B36FED235D795600D4B4B3 /* GoogleService-Info.plist in Resources */,
 				D17EB66C8B0342BE91BC2279 /* SimpleLineIcons.ttf in Resources */,
 				7ACBA018E4B94390BBCDBD1A /* Zocial.ttf in Resources */,
 			);
