@@ -14,9 +14,8 @@ import firebase from 'react-native-firebase';
 import Geolocation from 'react-native-geolocation-service';
 import { connect } from 'react-redux';
 
-import api from './config/api';
 import AppNavigator from './Navigations/index';
-import { set_coords } from './redux/actions/GeolocationAction';
+import { update_last_location } from './redux/actions/CallApiAction';
 
 const AppContainer = createAppContainer(AppNavigator);
 
@@ -160,8 +159,7 @@ class App extends Component {
 
     this.watchId = Geolocation.watchPosition(
       position => {
-        dispatch(set_coords(position.coords));
-        return fetch(api.update_last_Location + position.coords.latitude + '/' + position.coords.longitude);
+        dispatch(update_last_location(position.coords));
       },
       error => {
         // this.setState({ location: error });

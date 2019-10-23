@@ -5,11 +5,11 @@ import { SET_GEOLOCATION, GET_GEO_CODE } from '../actions/ActionTypes';
 
 import key from '../../config/api_keys';
 
-export const set_coords = coords => {
-  return {
+export const set_coords = coords => async (dispatch, getState) => {
+  dispatch({
     type: SET_GEOLOCATION,
     payload: coords,
-  };
+  });
 };
 
 export const get_geo_code = () => async (dispatch, getState) => {

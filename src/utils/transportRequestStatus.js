@@ -15,5 +15,5 @@ export default {
   TransporterAssigned,
   HandoverToTransporterDone,
   PartiallyDelivered,
-  Delivered
+  Delivered,
 };

@@ -159,10 +159,10 @@ class RequestDetail extends Component {
                 <Text style={styles.subTitle}>GPS</Text>
                 <View style={styles.row}>
                   <View style={styles.col}>
-                    <Input label="Longitude" disabled={true} keyboardType="numeric" disabled={true} value={item.receiverLatitude.toString()} />
+                    <Input label="Longitude" disabled={true} keyboardType="numeric" value={item.receiverLatitude.toString()} />
                   </View>
                   <View style={styles.col}>
-                    <Input disabled={true} label="Latitude" keyboardType="numeric" disabled={true} value={item.receiverLongitude.toString()} />
+                    <Input disabled={true} label="Latitude" keyboardType="numeric" value={item.receiverLongitude.toString()} />
                   </View>
                 </View>
                 <Text style={styles.label_data}>Loading Time</Text>
@@ -375,10 +375,6 @@ const styles = StyleSheet.create({
   },
   lable_button: {
     color: 'white',
-  },
-  textfield: {
-    height: 48,
-    marginTop: 10,
   },
   avatarContainer: {
     borderColor: '#9B9B9B',

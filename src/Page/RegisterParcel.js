@@ -27,7 +27,6 @@ import { connect } from 'react-redux';
 
 import colors from '../config/colors';
 import key from '../config/api_keys';
-import api from '../config/api';
 import { getDeviceType } from '../utils/deviceType';
 import { add_address, register_new_request } from '../redux/actions/CallApiAction';
 
@@ -691,6 +690,11 @@ class RegisterParcel extends Component {
           if (item.avatarSource == null || item.avatarSource === '') {
             error_cnt++;
           }
+          if (error_cnt > 0) {
+            this.refs.toast.show('Please, insert all fields.', 3500);
+            this.setState({ sendingNewRequest: false });
+            return;
+          }
           body.items.push({
             // id: null,
             receiverAddressID: item.parcel_address_name,
@@ -724,24 +728,19 @@ class RegisterParcel extends Component {
             // }
           });
         });
-        console.log('new transport request', body);
+        if (error_cnt === 0) {
+          console.log('new transport request', body);
 
-        if (error_cnt > 0) {
-          this.refs.toast.show('Please, insert all fields.', 3500);
-          this.setState({ sendingNewRequest: false });
-          return;
+          const dispatch = this.props.dispatch;
+          try {
+            await dispatch(register_new_request(body));
+            this.refs.toast.show('Success', 3500);
+            this.props.navigation.navigate('WholeRoute');
+          } catch (error) {
+            console.log;
+            this.refs.toast.show('Failed', 3500);
+          }
         }
-
-        const dispatch = this.props.dispatch;
-        try {
-          await dispatch(register_new_request(body));
-          this.refs.toast.show('Success', 3500);
-          this.props.navigation.navigate('WholeRoute');
-        } catch (error) {
-          console.log;
-          this.refs.toast.show('Failed', 3500);
-        }
-
         this.setState({ sendingNewRequest: false });
       });
     } catch (error) {
@@ -803,13 +802,17 @@ class RegisterParcel extends Component {
       <View style={styles.container}>
         <Header
           backgroundColor={colors.headerColor}
-          containerStyle={{ marginTop: Platform.OS === 'ios' ? 0 : -24 }}
+          containerStyle={styles.header_container}
           centerComponent={{ text: 'Register transport request', style: { color: '#fff' } }}
-          leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
+          leftComponent={
+            <View style={styles.icon_container}>
+              <Icon name="menu" style={styles.icon} onPress={() => this.props.navigation.openDrawer()} />
+            </View>
+          }
         />
         <Toast
           ref="toast"
-          style={{ backgroundColor: '#000' }}
+          style={styles.white}
           position="top"
           positionValue={100}
           fadeInDuration={750}
@@ -926,7 +929,7 @@ class RegisterParcel extends Component {
                     <Input
                       label="Address Name/ID"
                       value={this.state.sender_address_name}
-                      errorStyle={{ color: 'red' }}
+                      errorStyle={styles.error}
                       errorMessage={this.state.sender_address_name == null || this.state.sender_address_name == '' ? error_msg : ''}
                       onChangeText={sender_address_name => this.setState({ sender_address_name })}
                     />
@@ -938,7 +941,7 @@ class RegisterParcel extends Component {
                       label="E-mail"
                       keyboardType="email-address"
                       value={this.state.sender_email}
-                      errorStyle={{ color: 'red' }}
+                      errorStyle={styles.error}
                       errorMessage={this.state.sender_email == null || this.state.sender_email == '' ? error_msg : ''}
                       onChangeText={sender_email => this.setState({ sender_email })}
                     />
@@ -948,7 +951,7 @@ class RegisterParcel extends Component {
                       label="Phone"
                       keyboardType="numeric"
                       value={this.state.sender_phone}
-                      errorStyle={{ color: 'red' }}
+                      errorStyle={styles.error}
                       errorMessage={this.state.sender_phone == null || this.state.sender_phone == '' ? error_msg : ''}
                       onChangeText={sender_phone => this.setState({ sender_phone })}
                     />
@@ -968,7 +971,7 @@ class RegisterParcel extends Component {
                       label="Nr."
                       keyboardType="numeric"
                       value={this.state.sender_street_nr}
-                      errorStyle={{ color: 'red' }}
+                      errorStyle={styles.error}
                       errorMessage={this.state.sender_street_nr == null || this.state.sender_street_nr == '' ? error_msg : ''}
                       onChangeText={sender_street_nr => this.setState({ sender_street_nr })}
                     />
@@ -979,7 +982,7 @@ class RegisterParcel extends Component {
                     <Input
                       label="City"
                       value={this.state.sender_city}
-                      errorStyle={{ color: 'red' }}
+                      errorStyle={styles.error}
                       errorMessage={this.state.sender_city == null || this.state.sender_city == '' ? error_msg : ''}
                       onChangeText={sender_city => this.setState({ sender_city })}
                     />
@@ -991,7 +994,7 @@ class RegisterParcel extends Component {
                       label="Postal Code"
                       keyboardType="numeric"
                       value={this.state.sender_postal_code}
-                      errorStyle={{ color: 'red' }}
+                      errorStyle={styles.error}
                       errorMessage={this.state.sender_postal_code == null || this.state.sender_postal_code == '' ? error_msg : ''}
                       onChangeText={sender_postal_code => this.setState({ sender_postal_code })}
                     />
@@ -1000,7 +1003,7 @@ class RegisterParcel extends Component {
                     <Input
                       label="Country"
                       value={this.state.sender_country}
-                      errorStyle={{ color: 'red' }}
+                      errorStyle={styles.error}
                       errorMessage={this.state.sender_country == null || this.state.sender_country == '' ? error_msg : ''}
                       onChangeText={sender_country => this.setState({ sender_country })}
                     />
@@ -1085,7 +1088,7 @@ class RegisterParcel extends Component {
                     />
                   </View>
                 </View>
-                <View style={{ alignItems: 'flex-end' }}>
+                <View style={styles.savebutton_row}>
                   <TouchableOpacity
                     disabled={this.state.savingSenderAddress}
                     style={[styles.save_addressContainer, styles.addressButton]}
@@ -1099,7 +1102,7 @@ class RegisterParcel extends Component {
               </View>
             )}
           </View>
-          <Divider style={{ backgroundColor: '#000' }} />
+          <Divider style={styles.white} />
           {this.state.parcels.map((item, index) => {
             return (
               <View key={index}>
@@ -1230,7 +1233,7 @@ class RegisterParcel extends Component {
                         <Input
                           label="Address Name/ID"
                           value={item.parcel_address_name}
-                          errorStyle={{ color: 'red' }}
+                          errorStyle={styles.error}
                           errorMessage={item.parcel_address_name == null || item.parcel_address_name == '' ? error_msg : ''}
                           onChangeText={parcel_address_name =>
                             this.setState(state => {
@@ -1249,7 +1252,7 @@ class RegisterParcel extends Component {
                           label="E-mail"
                           keyboardType="email-address"
                           value={item.parcel_email}
-                          errorStyle={{ color: 'red' }}
+                          errorStyle={styles.error}
                           errorMessage={item.parcel_email == null || item.parcel_email == '' ? error_msg : ''}
                           onChangeText={parcel_email =>
                             this.setState(state => {
@@ -1266,7 +1269,7 @@ class RegisterParcel extends Component {
                           label="Phone"
                           keyboardType="numeric"
                           value={item.parcel_phone}
-                          errorStyle={{ color: 'red' }}
+                          errorStyle={styles.error}
                           errorMessage={item.parcel_phone == null || item.parcel_phone == '' ? error_msg : ''}
                           onChangeText={parcel_phone =>
                             this.setState(state => {
@@ -1284,7 +1287,7 @@ class RegisterParcel extends Component {
                         <Input
                           label="Street"
                           value={item.parcel_street}
-                          errorStyle={{ color: 'red' }}
+                          errorStyle={styles.error}
                           errorMessage={item.parcel_street == null || item.parcel_street == '' ? error_msg : ''}
                           onChangeText={parcel_street =>
                             this.setState(state => {
@@ -1318,7 +1321,7 @@ class RegisterParcel extends Component {
                         <Input
                           label="City"
                           value={item.parcel_city}
-                          errorStyle={{ color: 'red' }}
+                          errorStyle={styles.error}
                           errorMessage={item.parcel_city == null || item.parcel_city == '' ? error_msg : ''}
                           onChangeText={parcel_city =>
                             this.setState(state => {
@@ -1337,7 +1340,7 @@ class RegisterParcel extends Component {
                           label="Postal Code"
                           keyboardType="numeric"
                           value={item.parcel_postal_code}
-                          errorStyle={{ color: 'red' }}
+                          errorStyle={styles.error}
                           errorMessage={item.parcel_postal_code == null || item.parcel_postal_code == '' ? error_msg : ''}
                           onChangeText={parcel_postal_code =>
                             this.setState(state => {
@@ -1353,7 +1356,7 @@ class RegisterParcel extends Component {
                         <Input
                           label="Country"
                           value={item.parcel_country}
-                          errorStyle={{ color: 'red' }}
+                          errorStyle={styles.error}
                           errorMessage={item.parcel_country == null || item.parcel_country == '' ? error_msg : ''}
                           onChangeText={parcel_country =>
                             this.setState(state => {
@@ -1414,7 +1417,7 @@ class RegisterParcel extends Component {
                         />
                       </View>
                     </View>
-                    <View style={{ alignItems: 'flex-end' }}>
+                    <View style={styles.savebutton_row}>
                       <TouchableOpacity
                         disabled={this.state.savingParcelAddress}
                         style={[styles.save_addressContainer, styles.addressButton]}
@@ -1426,7 +1429,7 @@ class RegisterParcel extends Component {
                     <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'center', marginBottom: 20 }}>
                       <Picker
                         selectedValue={item.selectedCountry}
-                        style={{ height: 50, width: 100, margin: 10 }}
+                        style={styles.picker}
                         onValueChange={(itemValue, itemIndex) =>
                           this.setState(state => {
                             var parcels = this.state.parcels;
@@ -1441,7 +1444,7 @@ class RegisterParcel extends Component {
                       </Picker>
                       <Picker
                         selectedValue={item.selectedParcelType}
-                        style={{ height: 50, width: 100, margin: 10 }}
+                        style={styles.picker}
                         onValueChange={(itemValue, itemIndex) =>
                           this.setState(state => {
                             var parcels = this.state.parcels;
@@ -1456,7 +1459,7 @@ class RegisterParcel extends Component {
                       </Picker>
                       <Picker
                         selectedValue={item.selectedCurrency}
-                        style={{ height: 50, width: 100, margin: 10 }}
+                        style={styles.picker}
                         onValueChange={(itemValue, itemIndex) =>
                           this.setState(state => {
                             var parcels = this.state.parcels;
@@ -1470,7 +1473,7 @@ class RegisterParcel extends Component {
                         })}
                       </Picker>
                     </View>
-                    <View style={{ marginLeft: 20, marginRight: 20, marginTop: 120 }}>
+                    <View style={styles.instrunce}>
                       <CheckBox
                         title="Insurance"
                         checked={item.insurance}
@@ -1504,7 +1507,7 @@ class RegisterParcel extends Component {
                         label="ParcelPrice"
                         keyboardType="numeric"
                         value={item.parcel_price}
-                        errorStyle={{ color: 'red' }}
+                        errorStyle={styles.error}
                         errorMessage={item.parcel_price == null || item.parcel_price == '' ? error_msg : ''}
                         onChangeText={parcel_price =>
                           this.setState(state => {
@@ -1554,6 +1557,15 @@ RegisterParcel.propTypes = {
 };
 
 const styles = StyleSheet.create({
+  header_container: {
+    marginTop: Platform.OS === 'ios' ? 0 : -24,
+  },
+  icon_container: {
+    width: 50,
+  },
+  icon: {
+    color: '#fff',
+  },
   container: {
     flex: 1,
   },
@@ -1622,11 +1634,14 @@ const styles = StyleSheet.create({
   addressButton: {
     backgroundColor: '#007bff',
   },
+  savebutton_row: {
+    alignItems: 'flex-end',
+  },
   save_addressContainer: {
+    alignItems: 'center',
     height: 38,
     width: 150,
     justifyContent: 'center',
-    alignItems: 'center',
     borderRadius: 5,
     margin: 20,
   },
@@ -1679,6 +1694,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.subScreen,
     height: 300,
+  },
+  error: {
+    color: 'red',
+  },
+  picker: {
+    height: 50,
+    width: 100,
+    margin: 10,
+  },
+  instrunce: {
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 120,
+  },
+  white: {
+    color: 'white',
   },
 });
 

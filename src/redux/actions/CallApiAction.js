@@ -6,9 +6,20 @@ import {
   GET_ALL_TRANSPORT_REQUESTS,
   REGISTER_NEW_REQUEST,
 } from '../actions/ActionTypes';
+import { set_coords } from './GeolocationAction';
 import { get, auth_get, post, auth_post } from '../../utils/httpRequest';
 
 import api from '../../config/api';
+
+export const update_last_location = coords => async (dispatch, getState) => {
+  try {
+    await get(api.update_last_Location + coords.latitude + '/' + coords.longitude);
+    dispatch(set_coords(coords));
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 export const get_all_countries = () => async (dispatch, getState) => {
   const { person_info } = getState().login;
@@ -84,6 +95,18 @@ export const register_new_request = params => async (dispatch, getState) => {
   const { person_info } = getState().login;
   try {
     const response = await auth_post(api.register_new_request, person_info.token, params);
+    dispatch({ type: REGISTER_NEW_REQUEST, payload: response });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const accept_transport_request_by_client = RequestID => async (dispatch, getState) => {
+  const { person_info } = getState().login;
+  const { transport_request_dto } = getState().register_parcel;
+  console.log('accept_transport', api.accept_transport_request_by_client + RequestID);
+  try {
+    const response = await auth_get(api.accept_transport_request_by_client + RequestID, person_info.token);
     dispatch({ type: REGISTER_NEW_REQUEST, payload: response });
   } catch (error) {
     throw error;
