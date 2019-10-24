@@ -26,10 +26,6 @@ class ActualPosition extends Component {
     };
   }
 
-  static navigationOptions = {
-    drawerIcon: ({ tintColor }) => <Icon name="pin" style={{ fontSize: 24, color: tintColor }} />,
-  };
-
   render() {
     const { coords } = this.props;
 

@@ -1,4 +1,4 @@
-export const get = async (url, token) => {
+export const get_no_response = async (url, token) => {
   try {
     let response = await fetch(url, {
       method: 'GET',
@@ -14,6 +14,25 @@ export const get = async (url, token) => {
     // } else {
     //   return responseJson;
     // }
+  } catch (error) {
+    throw { status: error };
+  }
+};
+
+export const get = async url => {
+  try {
+    let response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json-patch+json',
+      },
+    });
+    let responseJson = await response.json();
+    if (responseJson.message) {
+      throw responseJson.message;
+    } else {
+      return responseJson;
+    }
   } catch (error) {
     throw { status: error };
   }

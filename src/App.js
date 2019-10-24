@@ -7,7 +7,7 @@
  */
 
 import React, { Component } from 'react';
-import { Alert, Platform, PermissionsAndroid, ToastAndroid } from 'react-native';
+import { Alert, Platform, PermissionsAndroid, ToastAndroid, YellowBox } from 'react-native';
 import { createAppContainer } from 'react-navigation';
 import AsyncStorage from '@react-native-community/async-storage';
 import firebase from 'react-native-firebase';
@@ -16,6 +16,8 @@ import { connect } from 'react-redux';
 
 import AppNavigator from './Navigations/index';
 import { update_last_location } from './redux/actions/CallApiAction';
+
+YellowBox.ignoreWarnings(['RCTRootView cancelTouches']);
 
 const AppContainer = createAppContainer(AppNavigator);
 

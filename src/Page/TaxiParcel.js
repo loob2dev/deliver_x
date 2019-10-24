@@ -1,24 +1,24 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Header } from 'react-native-elements';
-import { Left, Right, Icon } from 'native-base';
+import { Icon } from 'native-base';
 import colors from '../config/colors';
 
 class TaxiParcel extends Component {
-  static navigationOptions = {
-    drawerIcon: ({ tintColor }) => <Icon name="home" style={{ fontSize: 24, color: tintColor }} />,
-  };
-
   render() {
     return (
       <View style={styles.container}>
         <Header
           backgroundColor={colors.headerColor}
-          containerStyle={{ marginTop: Platform.OS === 'ios' ? 0 : -24 }}
+          containerStyle={styles.header_container}
           centerComponent={{ text: 'Home', style: { color: '#fff' } }}
-          leftComponent={<Icon name="menu" style={{ color: '#fff' }} onPress={() => this.props.navigation.openDrawer()} />}
+          leftComponent={
+            <View style={styles.icon_container}>
+              <Icon name="menu" style={styles.icon} onPress={() => this.props.navigation.openDrawer()} />
+            </View>
+          }
         />
-        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={styles.homepage}>
           <Text>Homepage</Text>
         </View>
       </View>
@@ -27,8 +27,19 @@ class TaxiParcel extends Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  header_container: {
+    marginTop: Platform.OS === 'ios' ? 0 : -24,
+  },
+  icon_container: {
+    width: 50,
+  },
+  icon: {
+    color: '#fff',
+  },
+  homepage: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

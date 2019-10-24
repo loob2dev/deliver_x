@@ -7,8 +7,7 @@ import { connect } from 'react-redux';
 import Toast from 'react-native-easy-toast';
 
 import colors from '../config/colors';
-import ProgressScreen from './ProgressScreen';
-import { get_all_address, delete_address } from '../redux/actions/CallApiAction';
+import { delete_address } from '../redux/actions/CallApiAction';
 
 class Address extends Component {
   deleteItem = async item => {
@@ -86,13 +85,13 @@ class Address extends Component {
         />
         <Toast
           ref="toast"
-          style={{ backgroundColor: '#000' }}
+          style={styles.toast}
           position="top"
           positionValue={100}
           fadeInDuration={750}
           fadeOutDuration={1000}
           opacity={0.8}
-          textStyle={{ color: 'white', fontSize: 15 }}
+          textStyle={styles.toastText}
         />
         <TouchableOpacity
           style={[styles.save_addressContainer, styles.addressButton]}
@@ -253,6 +252,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 12,
     width: '100%',
+  },
+  toast: {
+    backgroundColor: '#000',
+  },
+  toastText: {
+    color: 'white',
+    fontSize: 15,
   },
 });
 

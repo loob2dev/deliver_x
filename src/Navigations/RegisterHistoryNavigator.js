@@ -7,12 +7,12 @@
  */
 import { createStackNavigator } from 'react-navigation-stack';
 import RegisterHistoryScreen from '../Page/RegisterHistory';
-import RequestDetailScreen from '../Page/RequestDetail';
+import RegisterDetailScreen from '../Page/RegisterDetail/Main';
 
 const RegisterHistoryNavigator = createStackNavigator(
   {
     RegistoryHistory: RegisterHistoryScreen,
-    RequestDetail: RequestDetailScreen,
+    RegisterDetail: RegisterDetailScreen,
   },
   {
     initialRouteName: 'RegistoryHistory',

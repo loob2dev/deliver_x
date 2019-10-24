@@ -7,13 +7,13 @@ import {
   REGISTER_NEW_REQUEST,
 } from '../actions/ActionTypes';
 import { set_coords } from './GeolocationAction';
-import { get, auth_get, post, auth_post } from '../../utils/httpRequest';
+import { get_no_response, auth_get, auth_post } from '../../utils/httpRequest';
 
 import api from '../../config/api';
 
 export const update_last_location = coords => async (dispatch, getState) => {
   try {
-    await get(api.update_last_Location + coords.latitude + '/' + coords.longitude);
+    await get_no_response(api.update_last_Location + coords.latitude + '/' + coords.longitude);
     dispatch(set_coords(coords));
   } catch (error) {
     console.log(error);
@@ -44,7 +44,7 @@ export const get_all_parcels = () => async (dispatch, getState) => {
 export const get_all_currencies = () => async (dispatch, getState) => {
   const { person_info } = getState().login;
   try {
-    const response = await auth_get(api.get_all_parcels, person_info.token);
+    const response = await auth_get(api.get_all_currencies, person_info.token);
     dispatch({ type: GET_CURRENCIES, payload: response });
   } catch (error) {
     throw error;
@@ -95,7 +95,7 @@ export const register_new_request = params => async (dispatch, getState) => {
   const { person_info } = getState().login;
   try {
     const response = await auth_post(api.register_new_request, person_info.token, params);
-    dispatch({ type: REGISTER_NEW_REQUEST, payload: response });
+    await set_current_request(response, person_info.token, dispatch);
   } catch (error) {
     throw error;
   }
@@ -103,12 +103,36 @@ export const register_new_request = params => async (dispatch, getState) => {
 
 export const accept_transport_request_by_client = RequestID => async (dispatch, getState) => {
   const { person_info } = getState().login;
-  const { transport_request_dto } = getState().register_parcel;
-  console.log('accept_transport', api.accept_transport_request_by_client + RequestID);
   try {
-    const response = await auth_get(api.accept_transport_request_by_client + RequestID, person_info.token);
-    dispatch({ type: REGISTER_NEW_REQUEST, payload: response });
+    let response = await auth_get(api.accept_transport_request_by_client + RequestID, person_info.token);
+    await set_current_request(response, person_info.token, dispatch);
+
+    await dispatch(get_all_transport_requests());
   } catch (error) {
     throw error;
   }
+};
+
+export const get_request = RequestID => async (dispatch, getState) => {
+  const { person_info } = getState().login;
+  try {
+    let response = await auth_get(api.get_request + RequestID, person_info.token);
+    await set_current_request(response, person_info.token, dispatch);
+  } catch (error) {
+    throw error;
+  }
+};
+
+const set_current_request = async (response, token, dispatch) => {
+  console.log('response', response);
+  let items = [];
+  response.items.forEach(element => {
+    if (element.parcelPicture == null) {
+      element.parcelPicture = api.get_parcel_image + element.id;
+    }
+    items.push(element);
+  });
+  response.items = items;
+
+  await dispatch({ type: REGISTER_NEW_REQUEST, payload: response });
 };

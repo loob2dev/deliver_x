@@ -23,6 +23,9 @@ const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 const SPACE = 0.01;
 
+const error_message = 'It is required.';
+const error_mail = 'Email is Not Correct.';
+
 class AddAddress extends Component {
   constructor(props) {
     super(props);
@@ -47,7 +50,26 @@ class AddAddress extends Component {
     };
   }
 
-  getGeoCode = async => {
+  map_log(eventName, e) {
+    if (eventName === 'onDragEnd') {
+      this.setState(
+        {
+          coords: {
+            longitude: e.nativeEvent.coordinate.longitude,
+            latitude: e.nativeEvent.coordinate.latitude,
+          },
+          isLoading: true,
+        },
+        () => {
+          this.getGeoCode(() => {
+            this.setState({ isLoading: false });
+          });
+        }
+      );
+    }
+  }
+
+  getGeoCode = async callback => {
     Platform.OS === 'ios' ? RNGeocoder.fallbackToGoogle(key.google_map_ios) : RNGeocoder.fallbackToGoogle(key.google_map_android);
     RNGeocoder.geocodePosition({ lat: this.state.coords.latitude, lng: this.state.coords.longitude }).then(res => {
       res.forEach((item, index) => {
@@ -66,16 +88,16 @@ class AddAddress extends Component {
           Geocoder.from(this.state.coords.latitude, this.state.coords.longitude)
             .then(json => {
               json.results.forEach(array_component => {
-                array_component.types.forEach((type, index) => {
-                  if (type == 'country') {
+                array_component.types.forEach(type => {
+                  if (type === 'country') {
                     this.setState({
                       country: array_component.formatted_address,
                     });
                   }
-                  if (type == 'street_address') {
+                  if (type === 'street_address') {
                     array_component.address_components.forEach(item_address => {
-                      item_address.types.forEach(type => {
-                        if (type == 'postal_code') {
+                      item_address.types.forEach(type_address => {
+                        if (type_address === 'postal_code') {
                           this.setState({
                             postal_code: item_address.long_name,
                           });
@@ -89,6 +111,7 @@ class AddAddress extends Component {
             .catch(error => console.warn(error));
         }
       });
+      callback();
     });
   };
 
@@ -104,8 +127,9 @@ class AddAddress extends Component {
         isShowMap: false,
       },
       () => {
-        this.getGeoCode();
-        this.setState({ isShowMap: true });
+        this.getGeoCode(() => {
+          this.setState({ isShowMap: true });
+        });
       }
     );
   };
@@ -114,25 +138,25 @@ class AddAddress extends Component {
     console.log('saveAddress', this.state);
     this.setState({ savingAddress: true }, async () => {
       let error_cnt = 0;
-      if (this.state.address_name == null || this.state.address_name == '') {
+      if (this.state.address_name == null || this.state.address_name === '') {
         error_cnt++;
       }
-      if (this.state.city == null || this.state.city == '') {
+      if (this.state.city == null || this.state.city === '') {
         error_cnt++;
       }
-      if (this.state.street == null || this.state.street == '') {
+      if (this.state.street == null || this.state.street === '') {
         error_cnt++;
       }
-      if (this.state.street_nr == null || this.state.street_nr == '') {
+      if (this.state.street_nr == null || this.state.street_nr === '') {
         error_cnt++;
       }
-      if (this.state.postal_code == null || this.state.postal_code == '') {
+      if (this.state.postal_code == null || this.state.postal_code === '') {
         error_cnt++;
       }
-      if (this.state.phone == null || this.state.phone == '') {
+      if (this.state.phone == null || this.state.phone === '') {
         error_cnt++;
       }
-      if (this.state.email == null || this.state.email == '') {
+      if (this.state.email == null || this.state.error_mail === true) {
         error_cnt++;
       }
       if (error_cnt > 0) {
@@ -168,52 +192,13 @@ class AddAddress extends Component {
     });
   };
 
-  Item = ({ item }) => {
-    return (
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            this.props.navigation.pop();
-            this.props.navigation.state.params.updateData(item, this.props.navigation.state.params.info);
-          }}>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>Address ID: </Text>
-            <Text style={styles.value}>{item.addressID}</Text>
-          </View>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>Street: </Text>
-            <Text style={styles.value}>{item.street}</Text>
-          </View>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>Nr.: </Text>
-            <Text style={styles.value}>{item.houseNr}</Text>
-          </View>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>City: </Text>
-            <Text style={styles.value}>{item.city}</Text>
-          </View>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>Postal code: </Text>
-            <Text style={styles.value}>{item.zip}</Text>
-          </View>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>Phone: </Text>
-            <Text style={styles.value}>{item.phone}</Text>
-          </View>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>Latitude: </Text>
-            <Text style={styles.value}>{item.latitude}</Text>
-          </View>
-          <View style={styles.item_container}>
-            <Text style={styles.label}>Longitude: </Text>
-            <Text style={styles.value}>{item.longitude}</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.deleteButtonContainer, styles.deleteButton]} onPress={() => this.deleteItem(item)}>
-          <Text style={styles.lable_button}>Delete</Text>
-        </TouchableOpacity>
-      </View>
-    );
+  validateEmail = text => {
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    this.setState(state => {
+      state.error_mail = reg.test(text) ? false : true;
+
+      return state;
+    });
   };
 
   render() {
@@ -248,17 +233,17 @@ class AddAddress extends Component {
         />
         <Toast
           ref="toast"
-          style={{ backgroundColor: '#000' }}
+          style={styles.toast}
           position="top"
           positionValue={100}
           fadeInDuration={750}
           fadeOutDuration={1000}
           opacity={0.8}
-          textStyle={{ color: 'white', fontSize: 15 }}
+          textStyle={styles.toastText}
         />
-        <KeyboardAwareScrollView enabledOnAndroid>
+        <KeyboardAwareScrollView enabledOnAndroid enableResetScrollToCoords={false}>
           <View style={styles.borderContainer}>
-            <View containerStyle={{ padding: 0 }}>
+            <View>
               <GooglePlacesAutocomplete
                 placeholder="Search"
                 minLength={2} // minimum length of text to search
@@ -334,8 +319,8 @@ class AddAddress extends Component {
                 <Input
                   label="Address Name/ID"
                   value={this.state.address_name}
-                  errorStyle={{ color: 'red' }}
-                  errorMessage={this.state.address_name == null || this.state.address_name == '' ? 'It is necessary.' : ''}
+                  errorStyle={styles.error}
+                  errorMessage={this.state.address_name == null || this.state.address_name === '' ? error_message : ''}
                   onChangeText={address_name => this.setState({ address_name })}
                 />
               </View>
@@ -346,9 +331,12 @@ class AddAddress extends Component {
                   label="E-mail"
                   keyboardType="email-address"
                   value={this.state.email}
-                  errorStyle={{ color: 'red' }}
-                  errorMessage={this.state.email == null || this.state.email == '' ? 'It is necessary.' : ''}
-                  onChangeText={email => this.setState({ email })}
+                  errorStyle={styles.error}
+                  errorMessage={this.state.email == null || this.state.email === '' || this.state.error_mail ? error_mail : ''}
+                  onChangeText={email => {
+                    this.setState({ email });
+                    this.validateEmail(email);
+                  }}
                 />
               </View>
               <View style={styles.col}>
@@ -356,8 +344,8 @@ class AddAddress extends Component {
                   label="Phone"
                   keyboardType="numeric"
                   value={this.state.phone}
-                  errorStyle={{ color: 'red' }}
-                  errorMessage={this.state.phone == null || this.state.phone == '' ? 'It is necessary.' : ''}
+                  errorStyle={styles.error}
+                  errorMessage={this.state.phone == null || this.state.phone === '' ? error_message : ''}
                   onChangeText={phone => this.setState({ phone })}
                 />
               </View>
@@ -367,8 +355,8 @@ class AddAddress extends Component {
                 <Input
                   label="Street"
                   value={this.state.street}
-                  errorStyle={{ color: 'red' }}
-                  errorMessage={this.state.street == null || this.state.street == '' ? 'It is necessary.' : ''}
+                  errorStyle={styles.error}
+                  errorMessage={this.state.street == null || this.state.street === '' ? error_message : ''}
                   onChangeText={street => this.setState({ street })}
                 />
               </View>
@@ -377,8 +365,8 @@ class AddAddress extends Component {
                   label="Nr."
                   keyboardType="numeric"
                   value={this.state.street_nr}
-                  errorStyle={{ color: 'red' }}
-                  errorMessage={this.state.street_nr == null || this.state.street_nr == '' ? 'It is necessary.' : ''}
+                  errorStyle={styles.error}
+                  errorMessage={this.state.street_nr == null || this.state.street_nr === '' ? error_message : ''}
                   onChangeText={street_nr => this.setState({ street_nr })}
                 />
               </View>
@@ -388,8 +376,8 @@ class AddAddress extends Component {
                 <Input
                   label="City"
                   value={this.state.city}
-                  errorStyle={{ color: 'red' }}
-                  errorMessage={this.state.city == null || this.state.city == '' ? 'It is necessary.' : ''}
+                  errorStyle={styles.error}
+                  errorMessage={this.state.city == null || this.state.city === '' ? error_message : ''}
                   onChangeText={city => this.setState({ city })}
                 />
               </View>
@@ -400,8 +388,8 @@ class AddAddress extends Component {
                   label="Postal Code"
                   keyboardType="numeric"
                   value={this.state.postal_code}
-                  errorStyle={{ color: 'red' }}
-                  errorMessage={this.state.postal_code == null || this.state.postal_code == '' ? 'It is necessary.' : ''}
+                  errorStyle={styles.error}
+                  errorMessage={this.state.postal_code == null || this.state.postal_code === '' ? error_message : ''}
                   onChangeText={postal_code => this.setState({ postal_code })}
                 />
               </View>
@@ -409,8 +397,8 @@ class AddAddress extends Component {
                 <Input
                   label="Country"
                   value={this.state.country}
-                  errorStyle={{ color: 'red' }}
-                  errorMessage={this.state.country == null || this.state.country == '' ? 'It is necessary.' : ''}
+                  errorStyle={styles.error}
+                  errorMessage={this.state.country == null || this.state.country === '' ? error_message : ''}
                   onChangeText={country => this.setState({ country })}
                 />
               </View>
@@ -462,13 +450,7 @@ class AddAddress extends Component {
                 />
               </View>
             </View>
-            <Text style={styles.label_data}>Loading Time</Text>
             <View style={styles.row}>
-              <View style={styles.col}>
-                <TouchableOpacity style={[styles.buttonContainer, styles.addressButton]} onPress={() => this.setState({ addAddress: false })}>
-                  <Text style={styles.lable_button}>Back to list</Text>
-                </TouchableOpacity>
-              </View>
               <View style={styles.col}>
                 <TouchableOpacity
                   disabled={this.state.savingAddress}
@@ -629,6 +611,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 12,
     width: '100%',
+  },
+  error: {
+    color: 'red',
+  },
+  toast: {
+    backgroundColor: '#000',
+  },
+  toastText: {
+    color: 'white',
+    fontSize: 15,
   },
 });
 

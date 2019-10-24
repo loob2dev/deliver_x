@@ -6,17 +6,15 @@
  * @flow
  */
 import { createStackNavigator } from 'react-navigation-stack';
-import RegisterParcelScreen from '../Page/RegisterParcel';
+import RegisterParcelScreen from '../Page/RegisterParcel/Main';
 import AddressScreen from '../Page/Address';
 import AddAddressScreen from '../Page/AddAddress';
-import WholeRouteScreen from '../Page/WholeRoute';
 
 const RegisterParcelNavigator = createStackNavigator(
   {
     RegisterParcel: RegisterParcelScreen,
     Address: AddressScreen,
     AddAddress: AddAddressScreen,
-    WholeRoute: WholeRouteScreen,
   },
   {
     initialRouteName: 'RegisterParcel',

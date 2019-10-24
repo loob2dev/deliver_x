@@ -16,7 +16,9 @@ const api = {
   create_address_book_items: root_api + 'api/Request/CreateAddressBookItems',
   register_new_request: root_api + 'api/Request/RegisterNewRequest',
   delete_address_book_item: root_api + 'api/Request/DeleteAddressBookItems',
-  accept_transport_request_by_client: root_api + 'api/Transporter/AcceptTransportRequest/',
+  accept_transport_request_by_client: root_api + 'api/Request/AcceptTransportRequestByClient?RequestID=',
+  get_parcel_image: root_api + 'api/Request/GetParcelImage/',
+  get_request: root_api + 'api/Request/GetRequest/',
 };
 
 export default api;

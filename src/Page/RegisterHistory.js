@@ -6,18 +6,32 @@ import { connect } from 'react-redux';
 import colors from '../config/colors';
 import { getDeliveryStatus } from '../utils/requestStatus';
 
-class RegisterHistory extends Component {
-  static navigationOptions = {
-    drawerIcon: ({ tintColor }) => <Icon name="list" style={{ fontSize: 24, color: tintColor }} />,
-  };
+import { get_request } from '../redux/actions/CallApiAction';
+import ProgressScreen from './ProgressScreen';
 
+class RegisterHistory extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: false,
+    };
+  }
+  openDetail = async item => {
+    this.setState({ isLoading: true });
+    const dispatch = this.props.dispatch;
+    await dispatch(get_request(item.id));
+    this.props.navigation.navigate('RegisterDetail', { scrollToDown: false, id: item.id });
+    setTimeout(() => {
+      this.setState({ isLoading: false });
+    }, 1000);
+  };
   Item = ({ item }) => {
     return (
       <Card>
         <View style={styles.item_container}>
           <Text style={styles.label}>Created: </Text>
-          <TouchableOpacity onPress={() => this.props.navigation.navigate('RequestDetail', { data: item })}>
-            <Text style={[styles.value, { color: 'blue' }]}>{new Date(item.created).toLocaleString()}</Text>
+          <TouchableOpacity onPress={() => this.openDetail(item)}>
+            <Text style={[styles.value, styles.detail_button]}>{new Date(item.created).toLocaleString()}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.item_container}>
@@ -37,6 +51,23 @@ class RegisterHistory extends Component {
   };
 
   render() {
+    if (this.state.isLoading) {
+      return (
+        <View style={styles.container}>
+          <Header
+            backgroundColor={colors.headerColor}
+            containerStyle={styles.header_container}
+            centerComponent={{ text: 'Request History', style: { color: '#fff' } }}
+            leftComponent={
+              <View style={styles.icon_container}>
+                <Icon name="menu" style={styles.icon} onPress={() => this.props.navigation.openDrawer()} />
+              </View>
+            }
+          />
+          <ProgressScreen />
+        </View>
+      );
+    }
     return (
       <View style={styles.container}>
         <Header
@@ -85,6 +116,9 @@ const styles = StyleSheet.create({
     marginTop: 5,
     marginLeft: 35,
     fontSize: 15,
+  },
+  detail_button: {
+    color: 'blue',
   },
 });
 
