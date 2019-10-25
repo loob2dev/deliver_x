@@ -20,8 +20,10 @@ class Login extends Component {
     this.state = {
       isLoading: true,
       isConnecting: false,
-      email: 'test@email.cz',
-      password: 'heslo123',
+      // email: 'test@email.cz',
+      // password: 'heslo123',
+      email: 'ludvik.kupilik@ferratt.com',
+      password: '123',
       deviceID: null,
       email_error: false,
       password_error: false,
@@ -35,7 +37,6 @@ class Login extends Component {
   bootstrapAsync = async () => {
     try {
       const person_info = await this.ger_persion_info_from_storage();
-      console.log(person_info);
       const { dispatch } = this.props;
       await dispatch(set_person_info(person_info));
       this.props.navigation.navigate('Loading');
@@ -60,7 +61,7 @@ class Login extends Component {
 
       const deviceID = await AsyncStorage.getItem('@deviceID');
 
-      const transporter = await AsyncStorage.getItem('@transporter');
+      const transporter = (await AsyncStorage.getItem('@transporter')) === 'transporter' ? true : false;
 
       return {
         email: email,
@@ -143,7 +144,7 @@ class Login extends Component {
       await AsyncStorage.setItem('@deviceID', persion_info.deviceID);
     }
     if (persion_info.transporter) {
-      await AsyncStorage.setItem('@transporter', persion_info.transporter);
+      await AsyncStorage.setItem('@transporter', persion_info.transporter ? 'transporter' : 'order');
     }
   };
 

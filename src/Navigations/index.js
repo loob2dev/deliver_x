@@ -7,13 +7,15 @@
  */
 
 import { createSwitchNavigator } from 'react-navigation';
-import DrawerNavigator from './DrawerNavigator';
+import OrderDrawerNavigator from './OrderDrawerNavigator';
+import TransporterDrawerNavigator from './TransporterDrawNavigator';
 import AuthoNavigator from './AuthNavigator';
 
 const AppNavigator = createSwitchNavigator(
   {
     Auth: AuthoNavigator,
-    Drawer: DrawerNavigator,
+    OrderDrawer: OrderDrawerNavigator,
+    TransporterDrawer: TransporterDrawerNavigator,
   },
   {
     initialRouteName: 'Auth',

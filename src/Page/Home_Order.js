@@ -4,7 +4,7 @@ import { Header } from 'react-native-elements';
 import { Icon } from 'native-base';
 import colors from '../config/colors';
 
-class TaxiParcel extends Component {
+class Home_Order extends Component {
   render() {
     return (
       <View style={styles.container}>
@@ -19,7 +19,7 @@ class TaxiParcel extends Component {
           }
         />
         <View style={styles.homepage}>
-          <Text>Homepage</Text>
+          <Text style={styles.temp}>Homepage</Text>
         </View>
       </View>
     );
@@ -36,11 +36,17 @@ const styles = StyleSheet.create({
   icon: {
     color: '#fff',
   },
+  container: {
+    flex: 1,
+  },
   homepage: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  temp: {
+    color: 'black',
+  },
 });
 
-export default TaxiParcel;
+export default Home_Order;

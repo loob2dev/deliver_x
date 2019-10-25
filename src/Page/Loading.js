@@ -44,7 +44,11 @@ class Loading extends Component {
       this.setState({ progress: this.state.progress + load_step });
       await dispatch(get_all_address());
       this.setState({ progress: this.state.progress + load_step }, () => {
-        this.props.navigation.navigate('Drawer');
+        if (this.props.person_info.transporter) {
+          this.props.navigation.navigate('TransporterDrawer');
+        } else {
+          this.props.navigation.navigate('OrderDrawer');
+        }
       });
     } catch (error) {}
   };
@@ -75,4 +79,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default connect()(Loading);
+const mapStatetoProps = ({ login: { person_info } }) => ({ person_info });
+export default connect(mapStatetoProps)(Loading);

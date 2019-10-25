@@ -14,7 +14,9 @@ import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import colors from '../config/colors';
-import TaxiParcelNavigator from './TaxiParcelNavigator';
+import HomeOrderNavigator from './HomeOrderNavigator';
+import HomeTransporterNavigator from './HomeTransporterNavigator';
+import MyWorkNavigator from './MyWorkNavigator';
 import RegisterParcelNavigator from './RegisterParcelNavigator';
 import RegisterHistoryNavigator from './RegisterHistoryNavigator';
 import ActualPositionNavigator from './ActualPositionNavigator';
@@ -63,10 +65,10 @@ const ContentComponent = connect(mapStatetoProps)(CustomDrawerNavigation);
 
 const Drawer = createDrawerNavigator(
   {
-    TaxiParcel: {
-      screen: TaxiParcelNavigator,
+    HomeOrder: {
+      screen: HomeOrderNavigator,
       navigationOptions: {
-        title: 'Taxi Parcel',
+        title: 'Home',
         drawerIcon: ({ tintColor }) => <Icon name="home" style={getColorSheet(tintColor).icon} />,
       },
     },
@@ -93,7 +95,7 @@ const Drawer = createDrawerNavigator(
     },
   },
   {
-    initialRoutName: TaxiParcelNavigator,
+    initialRoutName: HomeOrderNavigator,
     navigationOptions: {
       gesturesEnabled: false,
     },
