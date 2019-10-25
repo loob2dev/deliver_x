@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, PixelRatio, Dimensions, Platform, ActivityIndicator } from 'react-native';
 import { Input } from 'react-native-elements';
-import DatePicker from 'react-native-datepicker';
 import MapView, { Marker } from 'react-native-maps';
 import RNGeocoder from 'react-native-geocoder';
 import Geocoder from 'react-native-geocoding';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import Toast from 'react-native-easy-toast';
 import { connect } from 'react-redux';
 
@@ -612,39 +612,15 @@ class Sender extends Component {
               </View>
             </View>
             <Text style={styles.label_data}>Loading Time</Text>
-            <View style={styles.row}>
-              <View style={styles.col}>
-                <DatePicker
-                  style={styles.dataPicker}
-                  date={this.state.sender_date}
-                  mode="datetime"
-                  placeholder="select date"
-                  format="YYYY/MM/DD hh:mm"
-                  minDate="2016-01-01"
-                  maxDate="2050-01-01"
-                  confirmBtnText="Confirm"
-                  cancelBtnText="Cancel"
-                  customStyles={{
-                    dateIcon: {
-                      position: 'absolute',
-                      left: 0,
-                      top: 4,
-                      marginLeft: 0,
-                    },
-                    dateInput: {
-                      marginLeft: 36,
-                      borderLeftWidth: 0,
-                      borderRightWidth: 0,
-                      borderTopWidth: 0,
-                      borderHight: 2,
-                    },
-                  }}
-                  onDateChange={date => {
-                    this.setState({ sender_date: date });
-                  }}
-                />
-              </View>
-            </View>
+            <DateTimePicker
+              value={this.state.sender_date}
+              mode="datetime"
+              is24Hour={true}
+              display="default"
+              onChange={(event, date) => {
+                this.setState({ sender_date: date });
+              }}
+            />
             <View style={styles.savebutton_row}>
               <TouchableOpacity
                 disabled={this.state.savingSenderAddress}

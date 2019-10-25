@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Input } from 'react-native-elements';
-import DatePicker from 'react-native-datepicker';
 import { connect } from 'react-redux';
+import Moment from 'moment';
 
 class Sender extends Component {
   constructor(props) {
@@ -67,39 +67,9 @@ class Sender extends Component {
             <Input label="Latitude" keyboardType="numeric" disabled={true} value={this.state.data.senderLongitude.toString()} />
           </View>
         </View>
-        <Text style={styles.label_data}>Loading Time</Text>
         <View style={styles.row}>
           <View style={styles.col}>
-            <DatePicker
-              style={styles.dataPicker}
-              disabled={true}
-              date={new Date(this.state.data.created)}
-              mode="datetime"
-              placeholder="select date"
-              format="YYYY/MM/DD hh:mm"
-              minDate="2016-01-01"
-              maxDate="2050-01-01"
-              confirmBtnText="Confirm"
-              cancelBtnText="Cancel"
-              customStyles={{
-                dateIcon: {
-                  position: 'absolute',
-                  left: 0,
-                  top: 4,
-                  marginLeft: 0,
-                },
-                dateInput: {
-                  marginLeft: 36,
-                  borderLeftWidth: 0,
-                  borderRightWidth: 0,
-                  borderTopWidth: 0,
-                  borderHight: 2,
-                },
-              }}
-              onDateChange={date => {
-                this.setState({ sender_date: date });
-              }}
-            />
+            <Input label="Loading Time" disabled={true} value={Moment(this.state.data.created).format('YYYY/MM/DD hh:mm')} />
           </View>
         </View>
       </View>
@@ -148,6 +118,10 @@ const styles = StyleSheet.create({
   },
   dataPicker: {
     width: 200,
+  },
+  loadingtime: {
+    marginLeft: 10,
+    color: '#7d8690',
   },
 });
 

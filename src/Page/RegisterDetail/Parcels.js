@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Picker, Image, PixelRatio } from 'react-native';
 import { CheckBox, Input } from 'react-native-elements';
-import DatePicker from 'react-native-datepicker';
+import Moment from 'moment';
 import { connect } from 'react-redux';
 
 class Parcels extends Component {
@@ -70,44 +70,9 @@ class Parcels extends Component {
                   <Input disabled={true} label="Latitude" keyboardType="numeric" value={item.receiverLongitude.toString()} />
                 </View>
               </View>
-              <Text style={styles.label_data}>Loading Time</Text>
               <View style={styles.row}>
                 <View style={styles.col}>
-                  <DatePicker
-                    disabled={true}
-                    style={styles.dataPicker}
-                    date={new Date(item.requestedDeliveryTime)}
-                    mode="datetime"
-                    placeholder="select date"
-                    format="YYYY/MM/DD hh:mm"
-                    minDate="2016-01-01"
-                    maxDate="2050-01-01"
-                    confirmBtnText="Confirm"
-                    cancelBtnText="Cancel"
-                    customStyles={{
-                      dateIcon: {
-                        position: 'absolute',
-                        left: 0,
-                        top: 4,
-                        marginLeft: 0,
-                      },
-                      dateInput: {
-                        marginLeft: 36,
-                        borderLeftWidth: 0,
-                        borderRightWidth: 0,
-                        borderTopWidth: 0,
-                        borderHight: 2,
-                      },
-                    }}
-                    onDateChange={date => {
-                      this.setState(state => {
-                        var parcels = this.state.parcels;
-                        parcels[index].parcel_date = date;
-
-                        return parcels;
-                      });
-                    }}
-                  />
+                  <Input label="Loading Time" disabled={true} value={Moment(item.requestedDeliveryTime).format('YYYY/MM/DD hh:mm')} />
                 </View>
               </View>
               <View style={styles.picker_container}>

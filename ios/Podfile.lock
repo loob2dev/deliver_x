@@ -334,6 +334,8 @@ PODS:
     - ReactCommon/jscallinvoker (= 0.61.2)
   - RNCAsyncStorage (1.6.2):
     - React
+  - RNDateTimePicker (2.1.0):
+    - React
   - RNDeviceInfo (4.0.1):
     - React
   - RNFirebase (5.5.6):
@@ -395,6 +397,7 @@ DEPENDENCIES:
   - ReactCommon/jscallinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
+  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNFirebase (from `../node_modules/react-native-firebase/ios`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -487,6 +490,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-community/async-storage"
+  RNDateTimePicker:
+    :path: "../node_modules/@react-native-community/datetimepicker"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNFirebase:
@@ -551,6 +556,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: fb54c732fd20405a76598e431aa2f8c2bf527de9
   ReactCommon: 5848032ed2f274fcb40f6b9ec24067787c42d479
   RNCAsyncStorage: 60a80e72d95bf02a01cace55d3697d9724f0d77f
+  RNDateTimePicker: 9db00606d689f5653f08aa601c81b9d3266a0a19
   RNDeviceInfo: 687c1b2ab6d86ff1ca1208783320cd144138c7f2
   RNFirebase: ac0de8b24c6f91ae9459575491ed6a77327619c6
   RNGestureHandler: 4cb47a93019c1a201df2644413a0a1569a51c8aa
