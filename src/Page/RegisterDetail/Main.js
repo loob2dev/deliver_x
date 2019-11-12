@@ -3,11 +3,14 @@ import { View, StyleSheet, PixelRatio, Platform } from 'react-native';
 import { Header, Divider } from 'react-native-elements';
 import { Icon } from 'native-base';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { connect } from 'react-redux';
 
 import colors from '../../config/colors';
 import Sender from './Sender';
 import Parcels from './Parcels';
 import WholeRoute from './WholeRoute';
+import TransporterInfo from './TransporterInfo';
+import DeliveryStatus from './DeliveryStatus';
 
 class Main extends Component {
   componentDidMount() {
@@ -38,10 +41,14 @@ class Main extends Component {
             this.scroll = ref;
           }}>
           <Sender {...this.props} onRef={ref => (this.sender = ref)} />
-          <Divider />
+          <Divider style={styles.divider} />
           <Parcels {...this.props} onRef={ref => (this.parcels = ref)} />
-          <Divider />
-          <WholeRoute {...this.props} onRef={ref => (this.parcels = ref)} />
+          <Divider style={styles.divider} />
+          {this.props.transport_request_dto.status >= 10 && <WholeRoute {...this.props} onRef={ref => (this.wholeRoute = ref)} />}
+          <Divider style={styles.divider} />
+          {this.props.transport_request_dto.status >= 40 && <TransporterInfo {...this.props} onRef={ref => (this.transporterInfo = ref)} />}
+          <Divider style={styles.divider} />
+          {this.props.transport_request_dto.status >= 50 && <DeliveryStatus {...this.props} onRef={ref => (this.deliverStatus = ref)} />}
         </KeyboardAwareScrollView>
       </View>
     );
@@ -177,6 +184,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 5,
   },
+  divider: {
+    marginBottom: 10,
+    marginTop: 20,
+  },
 });
 
-export default Main;
+const mapStatetoProps = ({ register_parcel: { transport_request_dto } }) => ({
+  transport_request_dto,
+});
+export default connect(mapStatetoProps)(Main);

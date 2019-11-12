@@ -8,7 +8,7 @@ import MapView, { Marker } from 'react-native-maps';
 import RNGeocoder from 'react-native-geocoder';
 import Geocoder from 'react-native-geocoding';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import Toast from 'react-native-easy-toast';
+import { Toast } from 'native-base';
 import { connect } from 'react-redux';
 
 import colors from '../config/colors';
@@ -161,7 +161,7 @@ class AddAddress extends Component {
       }
       if (error_cnt > 0) {
         this.setState({ savingAddress: false });
-        this.refs.toast.show('Please, insert all fiedls.', 3500);
+        Toast.show({ text: 'Please insert all fields of this parcel.', duration: 3000 });
 
         return;
       }
@@ -183,11 +183,11 @@ class AddAddress extends Component {
             },
           ])
         );
-        this.refs.toast.show('Success', 3500);
+        Toast.show({ text: 'Success' });
         this.setState({ savingAddress: false });
       } catch (error) {
         this.setState({ savingAddress: false });
-        this.refs.toast.show('Failed', 3500);
+        Toast.show({ text: 'Failure' });
       }
     });
   };
@@ -230,16 +230,6 @@ class AddAddress extends Component {
               <Icon name="arrow-back" style={styles.icon} onPress={() => this.props.navigation.goBack()} />
             </View>
           }
-        />
-        <Toast
-          ref="toast"
-          style={styles.toast}
-          position="top"
-          positionValue={100}
-          fadeInDuration={750}
-          fadeOutDuration={1000}
-          opacity={0.8}
-          textStyle={styles.toastText}
         />
         <KeyboardAwareScrollView enabledOnAndroid enableResetScrollToCoords={false}>
           <View style={styles.borderContainer}>

@@ -109,7 +109,7 @@ class Parcels extends Component {
                 </View>
               </View>
               <View style={styles.price}>
-                <Input disabled={true} label="ParcelPrice" keyboardType="numeric" value={item.parcelValue.toString()} />
+                <Input disabled={true} label="Parcel Price" keyboardType="numeric" value={item.parcelValue.toString()} />
               </View>
             </View>
           );

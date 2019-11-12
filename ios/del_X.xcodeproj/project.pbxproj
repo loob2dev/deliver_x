@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -27,7 +27,19 @@
 		33F79BB266D448F39BA9A059 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 02A325D570B24F20B38ECA54 /* Ionicons.ttf */; };
 		4F4FF5D758B5C6BC806FDFE2 /* libPods-del_X.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA2179CA6CDDE1A418A3BDA0 /* libPods-del_X.a */; };
 		59819A9B6D444646B09C168D /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5F1CE210F4064EAB8766B9BA /* Feather.ttf */; };
-		61B36FED235D795600D4B4B3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 61B36FEC235D795600D4B4B3 /* GoogleService-Info.plist */; };
+		612B52072379AB610068B91A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 612B52062379AB610068B91A /* GoogleService-Info.plist */; };
+		614EAA5C2379F12F003A1DD7 /* MapboxNavigation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 614EAA522379F12E003A1DD7 /* MapboxNavigation.framework */; };
+		614EAA5D2379F12F003A1DD7 /* MapboxMobileEvents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 614EAA532379F12E003A1DD7 /* MapboxMobileEvents.framework */; };
+		614EAA5E2379F12F003A1DD7 /* Polyline.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 614EAA542379F12F003A1DD7 /* Polyline.framework */; };
+		614EAA5F2379F12F003A1DD7 /* MapboxNavigationNative.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 614EAA552379F12F003A1DD7 /* MapboxNavigationNative.framework */; };
+		614EAA602379F12F003A1DD7 /* Solar.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 614EAA562379F12F003A1DD7 /* Solar.framework */; };
+		614EAA612379F12F003A1DD7 /* Turf.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 614EAA572379F12F003A1DD7 /* Turf.framework */; };
+		614EAA622379F12F003A1DD7 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 614EAA582379F12F003A1DD7 /* Mapbox.framework */; };
+		614EAA632379F12F003A1DD7 /* MapboxCoreNavigation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 614EAA592379F12F003A1DD7 /* MapboxCoreNavigation.framework */; };
+		614EAA642379F12F003A1DD7 /* MapboxSpeech.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 614EAA5A2379F12F003A1DD7 /* MapboxSpeech.framework */; };
+		614EAA652379F12F003A1DD7 /* MapboxDirections.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 614EAA5B2379F12F003A1DD7 /* MapboxDirections.framework */; };
+		6179559B237A05C700572665 /* NavDelX.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6179559A237A05C700572665 /* NavDelX.swift */; };
+		6179559D237A05DA00572665 /* NavDelX.m in Sources */ = {isa = PBXBuildFile; fileRef = 6179559C237A05DA00572665 /* NavDelX.m */; };
 		7463F2FF6CCE5AC2EEF31A13 /* libPods-del_XTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AC1353F0A53BF4FB339342B /* libPods-del_XTests.a */; };
 		7ACBA018E4B94390BBCDBD1A /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8FB204B060CB4A078B208DC1 /* Zocial.ttf */; };
 		82D95D0670D14EC7B361BDE6 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F01F2A1DFFD747C7B1B36A66 /* FontAwesome.ttf */; };
@@ -91,8 +103,21 @@
 		59E85CB8A3B13F9DA7AEF2F2 /* Pods-del_X.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-del_X.release.xcconfig"; path = "Target Support Files/Pods-del_X/Pods-del_X.release.xcconfig"; sourceTree = "<group>"; };
 		5BC6DCE75F28002526B11E52 /* libPods-del_X-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-del_X-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F1CE210F4064EAB8766B9BA /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/native-base/Fonts/Feather.ttf"; sourceTree = "<group>"; };
+		612B52062379AB610068B91A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Desktop/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		613755F323592AEE0084F163 /* del_X.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = del_X.entitlements; path = del_X/del_X.entitlements; sourceTree = "<group>"; };
-		61B36FEC235D795600D4B4B3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Desktop/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		614EAA522379F12E003A1DD7 /* MapboxNavigation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapboxNavigation.framework; path = Carthage/Build/iOS/MapboxNavigation.framework; sourceTree = "<group>"; };
+		614EAA532379F12E003A1DD7 /* MapboxMobileEvents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapboxMobileEvents.framework; path = Carthage/Build/iOS/MapboxMobileEvents.framework; sourceTree = "<group>"; };
+		614EAA542379F12F003A1DD7 /* Polyline.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Polyline.framework; path = Carthage/Build/iOS/Polyline.framework; sourceTree = "<group>"; };
+		614EAA552379F12F003A1DD7 /* MapboxNavigationNative.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapboxNavigationNative.framework; path = Carthage/Build/iOS/MapboxNavigationNative.framework; sourceTree = "<group>"; };
+		614EAA562379F12F003A1DD7 /* Solar.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Solar.framework; path = Carthage/Build/iOS/Solar.framework; sourceTree = "<group>"; };
+		614EAA572379F12F003A1DD7 /* Turf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Turf.framework; path = Carthage/Build/iOS/Turf.framework; sourceTree = "<group>"; };
+		614EAA582379F12F003A1DD7 /* Mapbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Mapbox.framework; path = Carthage/Build/iOS/Mapbox.framework; sourceTree = "<group>"; };
+		614EAA592379F12F003A1DD7 /* MapboxCoreNavigation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapboxCoreNavigation.framework; path = Carthage/Build/iOS/MapboxCoreNavigation.framework; sourceTree = "<group>"; };
+		614EAA5A2379F12F003A1DD7 /* MapboxSpeech.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapboxSpeech.framework; path = Carthage/Build/iOS/MapboxSpeech.framework; sourceTree = "<group>"; };
+		614EAA5B2379F12F003A1DD7 /* MapboxDirections.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapboxDirections.framework; path = Carthage/Build/iOS/MapboxDirections.framework; sourceTree = "<group>"; };
+		61795599237A05C700572665 /* del_X-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "del_X-Bridging-Header.h"; sourceTree = "<group>"; };
+		6179559A237A05C700572665 /* NavDelX.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavDelX.swift; sourceTree = "<group>"; };
+		6179559C237A05DA00572665 /* NavDelX.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NavDelX.m; sourceTree = "<group>"; };
 		62A112A202467A2AFD94CC71 /* Pods-del_X-tvOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-del_X-tvOS.debug.xcconfig"; path = "Target Support Files/Pods-del_X-tvOS/Pods-del_X-tvOS.debug.xcconfig"; sourceTree = "<group>"; };
 		8657A09AAFB6423AA6CB4E6B /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/native-base/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		891BD9B6EE542B165EF73918 /* Pods-del_X-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-del_X-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-del_X-tvOSTests/Pods-del_X-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -123,6 +148,16 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				614EAA5C2379F12F003A1DD7 /* MapboxNavigation.framework in Frameworks */,
+				614EAA5D2379F12F003A1DD7 /* MapboxMobileEvents.framework in Frameworks */,
+				614EAA5E2379F12F003A1DD7 /* Polyline.framework in Frameworks */,
+				614EAA5F2379F12F003A1DD7 /* MapboxNavigationNative.framework in Frameworks */,
+				614EAA602379F12F003A1DD7 /* Solar.framework in Frameworks */,
+				614EAA612379F12F003A1DD7 /* Turf.framework in Frameworks */,
+				614EAA622379F12F003A1DD7 /* Mapbox.framework in Frameworks */,
+				614EAA632379F12F003A1DD7 /* MapboxCoreNavigation.framework in Frameworks */,
+				614EAA642379F12F003A1DD7 /* MapboxSpeech.framework in Frameworks */,
+				614EAA652379F12F003A1DD7 /* MapboxDirections.framework in Frameworks */,
 				4F4FF5D758B5C6BC806FDFE2 /* libPods-del_X.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -166,7 +201,8 @@
 		13B07FAE1A68108700A75B9A /* del_X */ = {
 			isa = PBXGroup;
 			children = (
-				61B36FEC235D795600D4B4B3 /* GoogleService-Info.plist */,
+				612B52062379AB610068B91A /* GoogleService-Info.plist */,
+				6179559A237A05C700572665 /* NavDelX.swift */,
 				613755F323592AEE0084F163 /* del_X.entitlements */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -175,6 +211,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				61795599237A05C700572665 /* del_X-Bridging-Header.h */,
+				6179559C237A05DA00572665 /* NavDelX.m */,
 			);
 			name = del_X;
 			sourceTree = "<group>";
@@ -182,6 +220,16 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				614EAA582379F12F003A1DD7 /* Mapbox.framework */,
+				614EAA592379F12F003A1DD7 /* MapboxCoreNavigation.framework */,
+				614EAA5B2379F12F003A1DD7 /* MapboxDirections.framework */,
+				614EAA532379F12E003A1DD7 /* MapboxMobileEvents.framework */,
+				614EAA522379F12E003A1DD7 /* MapboxNavigation.framework */,
+				614EAA552379F12F003A1DD7 /* MapboxNavigationNative.framework */,
+				614EAA5A2379F12F003A1DD7 /* MapboxSpeech.framework */,
+				614EAA542379F12F003A1DD7 /* Polyline.framework */,
+				614EAA562379F12F003A1DD7 /* Solar.framework */,
+				614EAA572379F12F003A1DD7 /* Turf.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				AA2179CA6CDDE1A418A3BDA0 /* libPods-del_X.a */,
@@ -365,6 +413,7 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = L5R3P8D5HK;
+						LastSwiftMigration = 1030;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
@@ -439,7 +488,7 @@
 				0D3EE18236E3418CA163E96F /* Roboto_medium.ttf in Resources */,
 				301B4614179F4A98BA467875 /* Roboto.ttf in Resources */,
 				EB788A8154074D70815D49C4 /* rubicon-icon-font.ttf in Resources */,
-				61B36FED235D795600D4B4B3 /* GoogleService-Info.plist in Resources */,
+				612B52072379AB610068B91A /* GoogleService-Info.plist in Resources */,
 				D17EB66C8B0342BE91BC2279 /* SimpleLineIcons.ttf in Resources */,
 				7ACBA018E4B94390BBCDBD1A /* Zocial.ttf in Resources */,
 			);
@@ -540,45 +589,12 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-del_X/Pods-del_X-resources.sh",
-				"${PODS_ROOT}/GoogleMaps/Maps/Frameworks/GoogleMaps.framework/Resources/GoogleMaps.bundle",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Feather.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Regular.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Fontisto.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Foundation.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Octicons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf",
-				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Zocial.ttf",
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-del_X/Pods-del_X-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleMaps.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Feather.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Brands.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Regular.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/FontAwesome5_Solid.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Fontisto.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Foundation.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Ionicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialCommunityIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MaterialIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Octicons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SimpleLineIcons.ttf",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Zocial.ttf",
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-del_X/Pods-del_X-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -591,16 +607,18 @@
 			files = (
 			);
 			inputFileListPaths = (
+				"$(SRCROOT)/input.xcfilelist",
 			);
 			inputPaths = (
 			);
 			outputFileListPaths = (
+				"$(SRCROOT)/output.xcfilelist",
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Fabric/run\"\n";
+			shellScript = "\"${PODS_ROOT}/Fabric/run\"\n/usr/local/bin/carthage copy-frameworks\n";
 		};
 		D25D3B47F8173459706BECC8 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -699,7 +717,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6179559B237A05C700572665 /* NavDelX.swift in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				6179559D237A05DA00572665 /* NavDelX.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -753,6 +773,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 18A3A8072B8CFBB5C4D2EDA1 /* Pods-del_XTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -760,7 +781,11 @@
 				);
 				INFOPLIST_FILE = del_XTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -776,11 +801,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5542BD20404D7798D92BB5FA /* Pods-del_XTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = del_XTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -797,14 +827,23 @@
 			baseConfigurationReference = B8EEB795603F4EE3FDBB2D28 /* Pods-del_X.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = del_X/del_X.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
 				DEVELOPMENT_TEAM = L5R3P8D5HK;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = del_X/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -813,6 +852,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ferratt.delx;
 				PRODUCT_NAME = del_X;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "del_X-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;
@@ -822,13 +864,22 @@
 			baseConfigurationReference = 59E85CB8A3B13F9DA7AEF2F2 /* Pods-del_X.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = del_X/del_X.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = L5R3P8D5HK;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = del_X/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -837,6 +888,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.ferratt.delx;
 				PRODUCT_NAME = del_X;
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "del_X-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
@@ -855,7 +908,10 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "del_X-tvOS/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -883,7 +939,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "del_X-tvOS/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -910,7 +969,11 @@
 				ENABLE_TESTABILITY = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "del_X-tvOSTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -937,7 +1000,11 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "del_X-tvOSTests/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

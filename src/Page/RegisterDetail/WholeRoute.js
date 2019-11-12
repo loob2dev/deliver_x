@@ -1,19 +1,24 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions, ActivityIndicator, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, Dimensions, ActivityIndicator } from 'react-native';
 import { Input } from 'react-native-elements';
-import Toast from 'react-native-easy-toast';
+import { Toast } from 'native-base';
 import MapView, { Marker } from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
 import { connect } from 'react-redux';
 
 import keys from '../../config/api_keys';
-import { accept_transport_request_by_client } from '../../redux/actions/CallApiAction';
+import api from '../../config/api';
+import { auth_get } from '../../utils/httpRequest';
+import { accept_transport_request_by_client, get_request } from '../../redux/actions/CallApiAction';
 
 const { width, height } = Dimensions.get('window');
 
 const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.015;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
+const TIME = 30 * 1000;
+let timer = null;
 
 class WholeRoute extends Component {
   constructor(props) {
@@ -25,28 +30,30 @@ class WholeRoute extends Component {
 
   componentDidMount() {
     this.props.onRef(this);
+    timer = setInterval(async () => {
+      await this.props.dispatch(get_request(this.props.transport_request_dto.id));
+    }, TIME);
+    console.log('wholeroute');
   }
 
   componentWillUnmount() {
     this.props.onRef(null);
+    clearImmediate(timer);
   }
 
-  confirmOrder = id => {
-    this.setState({ isConfirming: true }, async () => {
-      const dispatch = this.props.dispatch;
-      try {
-        await dispatch(accept_transport_request_by_client(id));
-        const url = this.props.transport_request_dto.paymentUrl;
-        this.refs.toast.show('Success.', 3500);
-        console.log('payment url', url);
-        Linking.openURL(url);
-      } catch (error) {
-        console.log('confirm order', error);
-        this.refs.toast.show('Failed.', 3500);
-      }
-      this.setState({ isConfirming: false });
-    });
+  confirmOrder = async id => {
+    this.setState({ isConfirming: true });
+    const token = this.props.person_info.token;
+    try {
+      const response = await auth_get(api.accept_transport_request_by_client + id, token);
+      const url = response.paymentUrl;
+      this.props.navigation.navigate('GoPay', { url: url, id: id });
+    } catch (error) {
+      Toast.show({ text: 'Failure' });
+    }
+    this.setState({ isConfirming: false });
   };
+
   render() {
     const origin = { latitude: this.props.transport_request_dto.senderLatitude, longitude: this.props.transport_request_dto.senderLongitude };
     const destinations = [];
@@ -58,17 +65,7 @@ class WholeRoute extends Component {
     });
     return (
       <View style={styles.container}>
-        <Toast
-          ref="toast"
-          style={styles.toast}
-          position="top"
-          positionValue={100}
-          fadeInDuration={750}
-          fadeOutDuration={1000}
-          opacity={0.8}
-          textStyle={styles.toast_text}
-        />
-        <Text style={styles.subTitle}>WholeRoute</Text>
+        <Text style={styles.subTitle}>Whole Route</Text>
         <MapView
           provider={this.props.provider}
           style={styles.map}
@@ -92,7 +89,7 @@ class WholeRoute extends Component {
                 origin={origin}
                 destination={item}
                 key={index}
-                strokeWidth={1}
+                strokeWidth={2}
                 strokeColor="blue"
                 optimizeWaypoints={true}
                 apikey={Platform.OS === 'ios' ? keys.google_map_ios : keys.google_map_android}
@@ -122,7 +119,7 @@ class WholeRoute extends Component {
             <Input label="Total price" disabled={true} value={this.props.transport_request_dto.totalPrice.toString()} />
           </View>
         </View>
-        {this.props.transport_request_dto.status === 10 && (
+        {this.props.transport_request_dto.status < 20 && (
           <View style={styles.confirmButtonContainer}>
             <TouchableOpacity
               disabled={this.state.isConfirming}
@@ -159,6 +156,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    marginTop: 10,
   },
   map: {
     height: 300,
@@ -196,7 +194,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStatetoProps = ({ register_parcel: { transport_request_dto } }) => ({
+const mapStatetoProps = ({ register_parcel: { transport_request_dto }, login: { person_info } }) => ({
   transport_request_dto,
+  person_info,
 });
 export default connect(mapStatetoProps)(WholeRoute);

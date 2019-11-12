@@ -7,6 +7,7 @@ import currencies from './CurrenciesReducer';
 import geolocation from './GeolocationReducer';
 
 import register_parcel from './RegisterParcelReducer';
+import transporter from './TransporterReducer';
 
 const reducer = combineReducers({
   geolocation,
@@ -15,6 +16,7 @@ const reducer = combineReducers({
   currencies,
   login,
   register_parcel,
+  transporter,
 });
 
 export default reducer;

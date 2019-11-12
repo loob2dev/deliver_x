@@ -6,7 +6,7 @@ import RNGeocoder from 'react-native-geocoder';
 import Geocoder from 'react-native-geocoding';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Toast from 'react-native-easy-toast';
+import { Content, Toast } from 'native-base';
 import { connect } from 'react-redux';
 
 import colors from '../../config/colors';
@@ -222,7 +222,7 @@ class Sender extends Component {
       }
       if (error_cnt > 0) {
         this.setState({ savingSenderAddress: false });
-        this.refs.toast.show('Please insert all fields of a sender.', 3500);
+        Toast.show({ text: 'Please insert all fields of a sender.', duration: 3000 });
         console.log(this.state);
 
         return;
@@ -244,11 +244,12 @@ class Sender extends Component {
             },
           ])
         );
-        this.refs.toast.show('Success', 3500);
+        Toast.show({ text: 'Success' });
         this.setState({ savingAddress: false });
       } catch (error) {
         this.setState({ savingAddress: false });
-        this.refs.toast.show('Failed', 3500);
+        Toast.show({ text: 'Failure' });
+        console.log(error);
       }
       this.setState({ savingSenderAddress: false });
     });
@@ -363,17 +364,7 @@ class Sender extends Component {
 
   render() {
     return (
-      <View style={styles.borderContainer}>
-        <Toast
-          ref="toast"
-          style={styles.white}
-          position="bottom"
-          positionValue={100}
-          fadeInDuration={750}
-          fadeOutDuration={1000}
-          opacity={0.8}
-          textStyle={styles.toast}
-        />
+      <Content padder style={styles.borderContainer}>
         <Text style={styles.subTitle}>Sender</Text>
         {this.state.isSenderLoading && (
           <View style={styles.container_progress}>
@@ -634,7 +625,7 @@ class Sender extends Component {
             </View>
           </View>
         )}
-      </View>
+      </Content>
     );
   }
 }

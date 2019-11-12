@@ -19,6 +19,13 @@ const api = {
   accept_transport_request_by_client: root_api + 'api/Request/AcceptTransportRequestByClient?RequestID=',
   get_parcel_image: root_api + 'api/Request/GetParcelImage/',
   get_request: root_api + 'api/Request/GetRequest/',
+
+  get_all_unaccepted_by_transporter: root_api + 'api/Transporter/GetAllUnacceptedByTransporter',
+  reject_request: root_api + 'api/Transporter/RequestRejected/',
+  accept_request: root_api + 'api/Transporter/AcceptTransportRequest/',
+
+  load_pachages: root_api + 'api/Transporter/PackagesLoaded/',
+  deliveried_pachage: root_api + 'api/Transporter/PackageDelivered/',
 };
 
 export default api;

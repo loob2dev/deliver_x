@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, TouchableOpacity, Alert, ActivityIndicator } fr
 import AsyncStorage from '@react-native-community/async-storage';
 import { Input } from 'react-native-elements';
 import { Icon } from 'native-base';
-import { getUniqueId } from 'react-native-device-info';
 import { connect } from 'react-redux';
 
 import api from '../config/api';
@@ -59,7 +58,7 @@ class Login extends Component {
         throw { status: NO_TOKEN };
       }
 
-      const deviceID = await AsyncStorage.getItem('@deviceID');
+      const deviceID = await AsyncStorage.getItem('fcmToken');
 
       const transporter = (await AsyncStorage.getItem('@transporter')) === 'transporter' ? true : false;
 
@@ -80,14 +79,8 @@ class Login extends Component {
   };
 
   login = async () => {
-    let deviceId = null;
-    try {
-      deviceId = await getUniqueId();
-    } catch (e) {
-      console.log('Trouble getting device info ', e);
-    }
-
-    console.log('deviceId', deviceId);
+    let fcmToken = this.props.screenProps;
+    console.log(fcmToken);
 
     const { dispatch } = this.props;
     if (this.state.email === '') {
@@ -100,15 +93,17 @@ class Login extends Component {
       return;
     }
 
-    this.setState({ isConnecting: true });
     const param = {
       email: this.state.email,
       password: this.state.password,
       mobilePhoneNr: null,
       token: null,
-      deviceID: deviceId,
+      deviceID: fcmToken,
     };
 
+    console.log('param', param);
+
+    this.setState({ isConnecting: true });
     try {
       const response = await post(api.authenticate, param);
       this.setState({ isConnecting: false });
@@ -141,7 +136,7 @@ class Login extends Component {
       await AsyncStorage.setItem('@token', persion_info.token);
     }
     if (persion_info.deviceID) {
-      await AsyncStorage.setItem('@deviceID', persion_info.deviceID);
+      await AsyncStorage.setItem('fcmToken', persion_info.deviceID);
     }
     if (persion_info.transporter) {
       await AsyncStorage.setItem('@transporter', persion_info.transporter ? 'transporter' : 'order');

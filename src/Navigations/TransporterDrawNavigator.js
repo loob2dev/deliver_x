@@ -14,11 +14,8 @@ import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import colors from '../config/colors';
-import HomeOrderNavigator from './HomeOrderNavigator';
 import HomeTransporterNavigator from './HomeTransporterNavigator';
 import MyWorkNavigator from './MyWorkNavigator';
-import RegisterParcelNavigator from './RegisterParcelNavigator';
-import RegisterHistoryNavigator from './RegisterHistoryNavigator';
 import ActualPositionNavigator from './ActualPositionNavigator';
 import { set_person_info } from '../redux/actions/MainActions';
 
@@ -76,21 +73,7 @@ const Drawer = createDrawerNavigator(
       screen: MyWorkNavigator,
       navigationOptions: {
         title: 'My Work',
-        drawerIcon: ({ tintColor }) => <Icon name="home" style={getColorSheet(tintColor).icon} />,
-      },
-    },
-    RegisterParcel: {
-      screen: RegisterParcelNavigator,
-      navigationOptions: {
-        title: 'Register Parcel',
-        drawerIcon: ({ tintColor }) => <Icon name="settings" style={getColorSheet(tintColor).icon} />,
-      },
-    },
-    RegisterHistory: {
-      screen: RegisterHistoryNavigator,
-      navigationOptions: {
-        title: 'Request history',
-        drawerIcon: ({ tintColor }) => <Icon name="list" style={getColorSheet(tintColor).icon} />,
+        drawerIcon: ({ tintColor }) => <Icon name="git-network" style={getColorSheet(tintColor).icon} />,
       },
     },
     ActualPosition: {

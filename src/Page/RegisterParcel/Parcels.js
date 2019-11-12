@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Picker, Image, PixelRatio, Dimensions, Platform, ActivityIndicator } from 'react-native';
 import { CheckBox, Input } from 'react-native-elements';
+import { Toast } from 'native-base';
 import ImagePicker from 'react-native-image-picker';
 import MapView, { Marker, ProviderPropType } from 'react-native-maps';
 import RNGeocoder from 'react-native-geocoder';
 import Geocoder from 'react-native-geocoding';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import Toast from 'react-native-easy-toast';
 import { connect } from 'react-redux';
 
 import colors from '../../config/colors';
@@ -382,7 +382,7 @@ class Main extends Component {
       }
       if (error_cnt > 0) {
         this.setState({ savingParcelAddress: false });
-        this.refs.toast.show('Please insert all fields of this parcel.', 3500);
+        Toast.show({ text: 'Please insert all fields of this parcel.', duration: 3000 });
 
         return;
       }
@@ -403,11 +403,11 @@ class Main extends Component {
             },
           ])
         );
-        this.refs.toast.show('Success', 3500);
+        Toast.show({ text: 'Success' });
         this.setState({ savingParcelAddress: false });
       } catch (error) {
         this.setState({ savingParcelAddress: false });
-        this.refs.toast.show('Failed', 3500);
+        Toast.show({ text: 'Failure' });
       }
       this.setState({ savingSenderAddress: false });
     });
@@ -525,16 +525,6 @@ class Main extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Toast
-          ref="toast"
-          style={styles.white}
-          position="bottom"
-          positionValue={100}
-          fadeInDuration={750}
-          fadeOutDuration={1000}
-          opacity={0.8}
-          textStyle={styles.toast}
-        />
         {this.state.parcels.map((item, index) => {
           return (
             <View key={index}>

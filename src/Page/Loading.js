@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
-import * as Progress from 'react-native-progress';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
 
 import {
@@ -9,11 +8,12 @@ import {
   get_all_currencies,
   get_all_transport_requests,
   get_all_address,
+  get_all_unaccepted_by_transporter,
+  all_own_undelivered_transport_requests,
 } from '../redux/actions/CallApiAction';
 import colors from '../config/colors';
 import { get_geo_code } from '../redux/actions/GeolocationAction';
 
-const load_step = 0.2;
 class Loading extends Component {
   constructor(props) {
     super(props);
@@ -31,33 +31,38 @@ class Loading extends Component {
   bootstrapAsync = async () => {
     try {
       const { dispatch } = this.props;
-      this.setState({ progress: this.state.progress + load_step });
-      await dispatch(get_all_countries());
-      this.setState({ progress: this.state.progress + load_step });
-      await dispatch(get_all_parcels());
-      this.setState({ progress: this.state.progress + load_step });
-      await dispatch(get_all_currencies());
-      this.setState({ progress: this.state.progress + load_step });
-      await dispatch(get_geo_code());
-      this.setState({ progress: this.state.progress + load_step });
-      await dispatch(get_all_transport_requests());
-      this.setState({ progress: this.state.progress + load_step });
-      await dispatch(get_all_address());
-      this.setState({ progress: this.state.progress + load_step }, () => {
-        if (this.props.person_info.transporter) {
-          this.props.navigation.navigate('TransporterDrawer');
-        } else {
-          this.props.navigation.navigate('OrderDrawer');
-        }
-      });
-    } catch (error) {}
+      if (this.props.person_info.transporter) {
+        await Promise.all([
+          dispatch(get_all_countries()),
+          dispatch(get_all_parcels()),
+          dispatch(get_all_currencies()),
+          dispatch(get_geo_code()),
+          dispatch(get_all_address()),
+          dispatch(all_own_undelivered_transport_requests()),
+          dispatch(get_all_unaccepted_by_transporter()),
+        ]);
+        this.props.navigation.navigate('TransporterDrawer');
+      } else {
+        await Promise.all([
+          dispatch(get_all_countries()),
+          dispatch(get_all_parcels()),
+          dispatch(get_all_currencies()),
+          dispatch(get_geo_code()),
+          dispatch(get_all_address()),
+          dispatch(get_all_transport_requests()),
+        ]);
+        this.props.navigation.navigate('OrderDrawer');
+      }
+    } catch (error) {
+      console.log('Loding_Error', error);
+    }
   };
 
   render() {
     const { progress, indeterminate } = this.state;
     return (
       <View style={styles.container}>
-        <Progress.Bar style={styles.progress} progress={progress} indeterminate={indeterminate} />
+        <ActivityIndicator size="large" color={colors.progress} />
       </View>
     );
   }

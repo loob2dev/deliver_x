@@ -15,8 +15,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import colors from '../config/colors';
 import HomeOrderNavigator from './HomeOrderNavigator';
-import HomeTransporterNavigator from './HomeTransporterNavigator';
-import MyWorkNavigator from './MyWorkNavigator';
 import RegisterParcelNavigator from './RegisterParcelNavigator';
 import RegisterHistoryNavigator from './RegisterHistoryNavigator';
 import ActualPositionNavigator from './ActualPositionNavigator';

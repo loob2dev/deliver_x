@@ -7,17 +7,16 @@
  */
 
 import React, { Component } from 'react';
-import { Alert, Platform, PermissionsAndroid, ToastAndroid, YellowBox } from 'react-native';
+import { Platform, PermissionsAndroid, ToastAndroid } from 'react-native';
 import { createAppContainer } from 'react-navigation';
-import AsyncStorage from '@react-native-community/async-storage';
-import firebase from 'react-native-firebase';
+import { Root } from 'native-base';
 import Geolocation from 'react-native-geolocation-service';
+import firebase from 'react-native-firebase';
+import AsyncStorage from '@react-native-community/async-storage';
 import { connect } from 'react-redux';
 
 import AppNavigator from './Navigations/index';
 import { update_last_location } from './redux/actions/CallApiAction';
-
-YellowBox.ignoreWarnings(['RCTRootView cancelTouches']);
 
 const AppContainer = createAppContainer(AppNavigator);
 
@@ -36,13 +35,10 @@ class App extends Component {
 
   async componentDidMount() {
     this.checkPermission();
-    this.createNotificationListeners();
     this.getLocationUpdates();
   }
 
   componentWillUnmount() {
-    this.notificationListener();
-    this.notificationOpenedListener();
     this.removeLocationUpdates();
   }
 
@@ -68,6 +64,7 @@ class App extends Component {
         await AsyncStorage.setItem('fcmToken', fcmToken);
       }
     }
+    this.setState({ fcmToken });
   }
 
   //2
@@ -81,74 +78,6 @@ class App extends Component {
       console.log('permission rejected');
     }
   }
-
-  async createNotificationListeners() {
-    /*
-     * Triggered when a particular notification has been received in foreground
-     * */
-    this.notificationListener = firebase.notifications().onNotification(notification => {
-      const { title, body } = notification;
-      console.log(title, body);
-      this.showAlert(title, body);
-    });
-
-    /*
-     * If your app is in background, you can listen for when a notification is clicked / tapped / opened as follows:
-     * */
-    this.notificationOpenedListener = firebase.notifications().onNotificationOpened(notificationOpen => {
-      const { title, body } = notificationOpen.notification;
-      console.log(title, body);
-      this.showAlert(title, body);
-    });
-
-    /*
-     * If your app is closed, you can check if it was opened by a notification being clicked / tapped / opened as follows:
-     * */
-    const notificationOpen = await firebase.notifications().getInitialNotification();
-    if (notificationOpen) {
-      const { title, body } = notificationOpen.notification;
-      console.log(title, body);
-      this.showAlert(title, body);
-    }
-    /*
-     * Triggered for data only payload in foreground
-     * */
-    this.messageListener = firebase.messaging().onMessage(message => {
-      //process data message
-      console.log('fcm', message);
-      console.log(JSON.stringify(message));
-    });
-  }
-
-  showAlert(title, body) {
-    Alert.alert(title, body, [{ text: 'OK', onPress: () => console.log('OK Pressed') }], { cancelable: false });
-  }
-
-  hasLocationPermission = async () => {
-    if (Platform.OS === 'ios' || (Platform.OS === 'android' && Platform.Version < 23)) {
-      return true;
-    }
-
-    const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
-
-    if (hasPermission) {
-      return true;
-    }
-
-    const status = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
-
-    if (status === PermissionsAndroid.RESULTS.GRANTED) {
-      return true;
-    }
-
-    if (status === PermissionsAndroid.RESULTS.DENIED) {
-      ToastAndroid.show('Location permission denied by user.', ToastAndroid.LONG);
-    } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-      ToastAndroid.show('Location permission revoked by user.', ToastAndroid.LONG);
-    }
-
-    return false;
-  };
 
   getLocationUpdates = async () => {
     const { dispatch } = this.props;
@@ -178,8 +107,38 @@ class App extends Component {
     }
   };
 
+  hasLocationPermission = async () => {
+    if (Platform.OS === 'ios' || (Platform.OS === 'android' && Platform.Version < 23)) {
+      return true;
+    }
+
+    const hasPermission = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+
+    if (hasPermission) {
+      return true;
+    }
+
+    const status = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION);
+
+    if (status === PermissionsAndroid.RESULTS.GRANTED) {
+      return true;
+    }
+
+    if (status === PermissionsAndroid.RESULTS.DENIED) {
+      ToastAndroid.show('Location permission denied by user.', ToastAndroid.LONG);
+    } else if (status === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+      ToastAndroid.show('Location permission revoked by user.', ToastAndroid.LONG);
+    }
+
+    return false;
+  };
+
   render() {
-    return <AppContainer screenProps={this.state.coords} />;
+    return (
+      <Root>
+        <AppContainer screenProps={this.state.fcmToken} uriPrefix="delX://" enableURLHandling />
+      </Root>
+    );
   }
 }
 

@@ -4,7 +4,7 @@ import { Header } from 'react-native-elements';
 import { Icon } from 'native-base';
 import { Card } from 'react-native-elements';
 import { connect } from 'react-redux';
-import Toast from 'react-native-easy-toast';
+import { Toast } from 'native-base';
 
 import colors from '../config/colors';
 import { delete_address } from '../redux/actions/CallApiAction';
@@ -15,9 +15,9 @@ class Address extends Component {
     this.setState({ isLoading: true });
     try {
       await dispatch(delete_address([item.id]));
-      this.refs.toast.show('Success', 3500);
+      Toast.show({ text: 'Success' });
     } catch (error) {
-      this.refs.toast.show('Failed', 3500);
+      Toast.show({ text: 'Failure' });
     }
     this.setState({ isLoading: false });
   };
@@ -82,16 +82,6 @@ class Address extends Component {
               <Icon name="arrow-back" style={styles.icon} onPress={() => this.props.navigation.goBack()} />
             </View>
           }
-        />
-        <Toast
-          ref="toast"
-          style={styles.toast}
-          position="top"
-          positionValue={100}
-          fadeInDuration={750}
-          fadeOutDuration={1000}
-          opacity={0.8}
-          textStyle={styles.toastText}
         />
         <TouchableOpacity
           style={[styles.save_addressContainer, styles.addressButton]}

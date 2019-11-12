@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Platform, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, ActivityIndicator } from 'react-native';
 import { Header, Divider } from 'react-native-elements';
 import { Icon } from 'native-base';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { ProviderPropType } from 'react-native-maps';
-import Toast from 'react-native-easy-toast';
+import { Toast } from 'native-base';
 import { connect } from 'react-redux';
 
 import colors from '../../config/colors';
@@ -37,7 +37,6 @@ class Main extends Component {
   };
 
   sendTransportRequest = () => {
-    console.log('new transport request', this.state);
     try {
       this.setState({ sendingNewRequest: true }, async () => {
         let error_cnt = 0;
@@ -51,24 +50,23 @@ class Main extends Component {
         }
         if (error_cnt > 0) {
           console.log('toast', this.toast);
-          this.refs.toast.show('Please, insert all fields.', 3500);
+          Toast.show({ text: 'Please, insert all fields.', duration: 3000 });
           this.setState({ sendingNewRequest: false });
 
           return;
         } else {
           body.items = items;
-          console.log('new transport request', body);
 
           const dispatch = this.props.dispatch;
           try {
             await dispatch(register_new_request(body));
             await dispatch(get_request(this.props.transport_request_dto.id));
-            this.refs.toast.show('Success', 3500);
+            Toast.show({ text: 'Success' });
             this.format();
             this.props.navigation.navigate('RegisterDetail', { scrollToDown: true });
           } catch (error) {
-            console.log;
-            this.refs.toast.show('Failed', 3500);
+            console.log(error);
+            Toast.show({ text: 'Failure' });
           }
         }
         this.setState({ sendingNewRequest: false });
@@ -95,16 +93,6 @@ class Main extends Component {
               <Icon name="menu" style={styles.icon} onPress={() => this.props.navigation.openDrawer()} />
             </View>
           }
-        />
-        <Toast
-          ref="toast"
-          style={styles.white}
-          position="top"
-          positionValue={100}
-          fadeInDuration={750}
-          fadeOutDuration={1000}
-          opacity={0.8}
-          textStyle={styles.toast}
         />
         <KeyboardAwareScrollView enabledOnAndroid enableResetScrollToCoords={false}>
           <Sender {...this.props} onRef={ref => (this.sender = ref)} />
