@@ -1,4 +1,4 @@
-## React Native Live Stream
+## React Native GoogleMap, MapBox
 Front-end of the Delivery app with react native.
 
 ## Preview
