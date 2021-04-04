@@ -1,11 +1,21 @@
-## React Native GoogleMap, MapBox
+## Introduction
 Front-end of the Delivery app with react native.
 
 ## Preview
 
-<img width="250" height="450" style="float: left" src="https://drive.google.com/uc?export=view&id=1wuXVIT3sYEPcbQKOoC4bZdLZGWHkiuqj" />
-<img width="250" height="450" style="float: left" src="https://drive.google.com/uc?export=view&id=1XFLtQk17aZPkSVF_d-aO1j9-gjsG0nAp" />
-<img width="250" height="450" style="float: left" src="https://drive.google.com/uc?export=view&id=1qaQpIU-eINOJb-ZIGLIQkCtnuyWCMi_v" />
+![Open React template preview](https://github.com/lub2code/images/blob/main/delX.png)
+
+## Features
+
+- Google Map
+- Activity detail screen
+- Turn-by-turn mapbox
+- Profile update screen
+- Status update with hashtags, mentions, URL enrichment and image upload
+
+## Requirements
+
+- React Native CLI
 
 ## Run
 ```sh
